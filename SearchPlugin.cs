@@ -10,7 +10,7 @@ using System.Windows.Controls;
 
 namespace Search
 {
-    public class Search : Plugin
+    public class SearchPlugin : Plugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
@@ -18,7 +18,7 @@ namespace Search
 
         public override Guid Id { get; } = Guid.Parse("6a604592-7001-4b4e-a3be-91073b459e2b");
 
-        public Search(IPlayniteAPI api) : base(api)
+        public SearchPlugin(IPlayniteAPI api) : base(api)
         {
             settings = new SearchSettings(this);
         }

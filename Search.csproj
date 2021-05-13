@@ -51,7 +51,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Search.cs" />
+    <Compile Include="SearchPlugin.cs" />
     <Compile Include="SearchSettings.cs" />
     <Compile Include="SearchSettingsView.xaml.cs">
       <DependentUpon>SearchSettingsView.xaml</DependentUpon>

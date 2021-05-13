@@ -10,7 +10,7 @@ namespace Search
 {
     public class SearchSettings : ISettings
     {
-        private readonly Search plugin;
+        private readonly SearchPlugin plugin;
 
         public string Option1 { get; set; } = string.Empty;
 
@@ -26,7 +26,7 @@ namespace Search
         {
         }
 
-        public SearchSettings(Search plugin)
+        public SearchSettings(SearchPlugin plugin)
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
             this.plugin = plugin;
