@@ -6,7 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Search
 {
@@ -51,6 +55,31 @@ namespace Search
         public override void OnApplicationStarted()
         {
             // Add code to be executed when Playnite is initialized.
+            var window = Application.Current.MainWindow;
+            var cmd = new RoutedCommand();
+            cmd.InputGestures.Add(new KeyGesture(Key.Space, ModifierKeys.Alt));
+            var binding = new CommandBinding(cmd);
+            binding.Executed += ShortutPressed;
+            window.CommandBindings.Add(binding);
+        }
+        public Popup popup;
+        SearchWindow searchWindow;
+        private void ShortutPressed(object sender, ExecutedRoutedEventArgs e)
+        {
+            //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
+
+            if (popup is null)
+            {
+                popup = new Popup();
+                popup.PlacementTarget = Application.Current.MainWindow;
+                popup.Placement = PlacementMode.Center;
+                popup.StaysOpen = false;
+            }
+            searchWindow = new SearchWindow(this);
+            popup.Child = searchWindow;
+            popup.IsOpen = !popup.IsOpen;
+            searchWindow.SearchBox.Focus();
+            e.Handled = true;
         }
 
         public override void OnApplicationStopped()
