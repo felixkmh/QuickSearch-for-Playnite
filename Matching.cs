@@ -121,8 +121,6 @@ namespace Search
                 words2.RemoveAt(maxIdx);
             }
             return sum;
-            return words1.Sum(w => words2.Max(w2 => w.FuzzyMatch(w)));
-            return words1.Count(w => words2.Contains(w)) * 1.0 / (0.7 * words1.Count + 0.3 * words2.Count);
         }
 
         private static Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");

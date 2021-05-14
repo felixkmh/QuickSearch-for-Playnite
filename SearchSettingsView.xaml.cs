@@ -67,6 +67,16 @@ namespace Search
             {
                 settings.SearchShortcut = new SearchSettings.Hotkey(key, modifiers);
             }
+            ShortcutText.Focusable = false;
+            SetHotkeyButton.Focus();
+            SetHotkeyButton.Content = "Set Hotkey";
+        }
+
+        private void SetHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShortcutText.Focusable = true;
+            ShortcutText.Focus();
+            SetHotkeyButton.Content = "Press Hotkey (+ modfiers) now";
         }
     }
 }
