@@ -7,7 +7,9 @@
              xmlns:local="clr-namespace:QuickSearch"
              xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK"
              mc:Ignorable="d"
-             Style="{StaticResource {x:Type ListBoxItem}}">
+             Style="{StaticResource {x:Type ListBoxItem}}"
+             KeyboardNavigation.IsTabStop="False"
+             KeyboardNavigation.ControlTabNavigation="None">
 
     <Grid>
         <Grid x:Name="DefaultView">

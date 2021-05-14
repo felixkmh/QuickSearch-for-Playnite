@@ -8,7 +8,7 @@
     <StackPanel Margin="10">
         <TextBlock Text="Hotkey to open the search popup:" Margin="2"/>
         <StackPanel Orientation="Horizontal" Margin="2">
-            <TextBox Text="{Binding Option1}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False"/>
+            <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False"/>
             <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
         </StackPanel>
         <TextBlock Text="Fuzzy search threshold (higher value = more strict):" Margin="2"/>

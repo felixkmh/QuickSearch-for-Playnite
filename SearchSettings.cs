@@ -25,7 +25,7 @@ namespace QuickSearch
         }
 
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
-        public string Option1 { get; set; } = string.Empty;
+        public string HotkeyText { get; set; } = string.Empty;
 
         public double Threshold { get; set; } = 0.3;
 
@@ -55,7 +55,7 @@ namespace QuickSearch
             if (savedSettings != null)
             {
                 SearchShortcut = savedSettings.SearchShortcut;
-                Option1 = $"{savedSettings.SearchShortcut.Modifiers} + {savedSettings.SearchShortcut.Key}";
+                HotkeyText = $"{savedSettings.SearchShortcut.Modifiers} + {savedSettings.SearchShortcut.Key}";
                 Threshold = savedSettings.Threshold;
             }
         }
@@ -66,7 +66,7 @@ namespace QuickSearch
         {
             previousSettings = JsonConvert.DeserializeObject<SearchSettings>(JsonConvert.SerializeObject(this));
             // Code executed when settings view is opened and user starts editing values.
-            Option1 = $"{SearchShortcut.Modifiers} + {SearchShortcut.Key}";
+            HotkeyText = $"{SearchShortcut.Modifiers} + {SearchShortcut.Key}";
         }
 
         public void CancelEdit()

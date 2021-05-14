@@ -16,6 +16,6 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="SearchBox" Grid.Row="0" Padding="5" TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_KeyDown"
                  Background="{DynamicResource PopupBackgroundBrush}"/>
-        <ListBox x:Name="SearchResults" Grid.Row="1" Background="{DynamicResource PopupBackgroundBrush}"/>
+        <ListBox x:Name="SearchResults" Grid.Row="1" Background="{DynamicResource PopupBackgroundBrush}" Focusable="False" KeyboardNavigation.ControlTabNavigation="None" KeyboardNavigation.IsTabStop="False"/>
     </Grid>
 </UserControl>
