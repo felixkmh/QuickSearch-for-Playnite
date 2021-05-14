@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Windows;
 
-namespace Search
+namespace QuickSearch
 {
     /// <summary>
     /// Interaktionslogik für SearchWindow.xaml

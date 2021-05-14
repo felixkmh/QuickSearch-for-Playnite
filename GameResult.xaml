@@ -1,10 +1,10 @@
-﻿<ListBoxItem x:Class="Search.GameResult"
+﻿<ListBoxItem x:Class="QuickSearch.GameResult"
              d:DataContext="{d:DesignInstance Game, IsDesignTimeCreatable=True}"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Search"
+             xmlns:local="clr-namespace:QuickSearch"
              xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK"
              mc:Ignorable="d"
              Style="{StaticResource {x:Type ListBoxItem}}">

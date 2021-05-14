@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Search
+namespace QuickSearch
 {
     // http://www.catalysoft.com/articles/StrikeAMatch.html
     class Matching

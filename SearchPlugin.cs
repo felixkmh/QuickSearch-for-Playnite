@@ -12,7 +12,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Search
+namespace QuickSearch
 {
     public class SearchPlugin : Plugin
     {

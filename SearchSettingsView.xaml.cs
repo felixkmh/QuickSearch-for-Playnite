@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Search
+namespace QuickSearch
 {
     public partial class SearchSettingsView : UserControl
     {
