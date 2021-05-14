@@ -6,9 +6,12 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <StackPanel>
-        <TextBlock Text="Description for Option1:"/>
-        <TextBox Text="{Binding Option1}"/>
-        <TextBlock Text="Description for Option2:"/>
-        <CheckBox IsChecked="{Binding Option2}"/>
+        <TextBlock Text="Hotkey to open the search popup:"/>
+        <TextBox Text="{Binding Option1}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5"/>
+        <TextBlock Text="Fuzzy search threshold (higher value = more strict):"/>
+        <StackPanel Orientation="Horizontal">
+            <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="200" HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"/>
+            <TextBlock Text="{Binding Threshold}"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>

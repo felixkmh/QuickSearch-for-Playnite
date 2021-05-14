@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading;
 using System;
+using Playnite.SDK.Models;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace Search
 {
@@ -16,14 +19,20 @@ namespace Search
         SearchPlugin searchPlugin;
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
+        static UnboundedCache<GameResult> gameResults;
 
         public SearchWindow(SearchPlugin plugin)
         {
             InitializeComponent();
             searchPlugin = plugin;
+            gameResults = new UnboundedCache<GameResult>(() => 
+            { 
+                var result = new GameResult(); 
+                result.MouseLeftButtonDown += ItemClicked;
+                result.MouseDoubleClick += ItemDoubleClick;
+                return result; 
+            });
         }
-
-
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -36,13 +45,13 @@ namespace Search
                 var cancellationToken = tokenSource.Token;
                 backgroundTask = backgroundTask.ContinueWith(_ => { 
                     var fuzzy = searchPlugin.PlayniteApi.Database.Games
-                    .Where(g => Matching.GetScore(input, g.Name) > 0.5)
-                    .OrderByDescending(g => Matching.GetScore(input, g.Name))
+                    .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
+                    .OrderByDescending(g => Matching.GetScore(input, g.Name) + input.LongestCommonSubsequence(g.Name.ToLower()).Item1.Length)
                     .ThenBy(g => g.Name)
                     .Take(20);
                     var results = searchPlugin.PlayniteApi.Database.Games
-                    .Where(g => g.Name.ToLower().Contains(input) && input.Length > 0)
-                    .OrderByDescending(g => input.LongestCommonSubsequence(g.Name.ToLower()))
+                    .Where(g => Matching.MatchingWords(input, g.Name) > 0.2 && input.Length > 0)
+                    .OrderByDescending(g => Matching.MatchingWords(input, g.Name))
                     .ThenBy(g => g.Name)
                     .Take(20)
                     .Union(fuzzy)
@@ -60,9 +69,10 @@ namespace Search
                         Dispatcher.Invoke(() => { 
                             if (count == 0)
                             {
-                                SearchResults.Items.Clear();
+                                gameResults.Consume(SearchResults.Items);
                             }
-                            ListBoxItem newItem = new ListBoxItem() { Content = new TextBlock() { Text = (result.IsInstalled ? "Launch " : "Install ") + result.Name + " on " + result.Source?.Name ?? "" }, Tag = result };
+                            var newItem = gameResults.Get();
+                            newItem.SetGame(result);
                             SearchResults.Items.Add(newItem);
                         });
                         count++;
@@ -71,7 +81,7 @@ namespace Search
                     {
                         if (count == 0)
                         {
-                            SearchResults.Items.Clear();
+                            gameResults.Consume(SearchResults.Items);
                         }
                         if (SearchResults.Items.Count > 0)
                         {
@@ -80,6 +90,29 @@ namespace Search
                     });
                     oldSource.Dispose();
                 }, tokenSource.Token);
+            }
+        }
+
+        private void ItemClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListBoxItem item)
+            {
+                SearchResults.SelectedItem = item;
+            }
+        }
+
+        private void ItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (sender is ListBoxItem item)
+                {
+                    SearchResults.SelectedItem = item;
+                    if (item.DataContext is Game game)
+                    {
+                        searchPlugin.PlayniteApi.StartGame(game.Id);
+                    }
+                }
             }
         }
 
@@ -116,6 +149,70 @@ namespace Search
                     }
                     searchPlugin.popup.IsOpen = false;
                 }
+            }
+        }
+    }
+
+    class UnboundedCache<T> : Stack<T>
+    {
+        public bool HasItems { get => Count > 0; }
+
+        protected readonly Func<T> generate;
+
+        public virtual new void Push(T item)
+        {
+            base.Push(item);
+        }
+
+        public virtual void Consume<Collection>(Collection collection)
+            where Collection : IList, ICollection, IEnumerable
+        {
+            for (int i = 0; i < collection.Count; ++i)
+            {
+                if (collection[i] is T item)
+                {
+                    base.Push(item);
+                }
+            }
+            collection.Clear();
+        }
+
+        internal int Recycled = 0;
+        internal int Generated = 0;
+
+        public readonly Func<T> Get;
+
+        internal T GetOrGenerate()
+        {
+            T item = default(T);
+            if (Count > 0)
+            {
+                ++Recycled;
+                item = Pop();
+            }
+            else if (generate != null)
+            {
+                ++Generated;
+                item = generate.Invoke();
+            }
+            return item;
+        }
+
+        public UnboundedCache(Func<T> generator = null) : base()
+        {
+            this.generate = generator;
+            if (generate != null)
+            {
+                Get = GetOrGenerate;
+            }
+            else
+            {
+                Get = () =>
+                {
+                    if (Count > 0)
+                        return Pop();
+                    return default(T);
+                };
             }
         }
     }

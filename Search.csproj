@@ -54,6 +54,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameResult.xaml.cs">
+      <DependentUpon>GameResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Matching.cs" />
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="SearchSettings.cs" />
@@ -72,6 +75,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="GameResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SearchSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

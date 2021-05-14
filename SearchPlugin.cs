@@ -18,13 +18,24 @@ namespace Search
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private SearchSettings settings { get; set; }
+        public SearchSettings settings { get; set; }
+
+        private InputBinding HotkeyBinding { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("6a604592-7001-4b4e-a3be-91073b459e2b");
 
         public SearchPlugin(IPlayniteAPI api) : base(api)
         {
             settings = new SearchSettings(this);
+            settings.SettingsChanged += OnSettingsChanged;
+        }
+
+        private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
+        {
+            var window = Application.Current.MainWindow;
+            window.InputBindings.Remove(HotkeyBinding);
+            HotkeyBinding = new InputBinding(new ActionCommand(OpenSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
+            window.InputBindings.Add(HotkeyBinding);
         }
 
         public override void OnGameInstalled(Game game)
@@ -52,19 +63,39 @@ namespace Search
             // Add code to be executed when game is uninstalled.
         }
 
+        private class ActionCommand : ICommand
+        {
+            public ActionCommand(Action action)
+            {
+                this.action = action;
+            }
+
+            public event EventHandler CanExecuteChanged;
+
+            private Action action;
+
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
+
+            public void Execute(object parameter)
+            {
+                action?.Invoke();
+            }
+        }
+
         public override void OnApplicationStarted()
         {
             // Add code to be executed when Playnite is initialized.
             var window = Application.Current.MainWindow;
-            var cmd = new RoutedCommand();
-            cmd.InputGestures.Add(new KeyGesture(Key.Space, ModifierKeys.Alt));
-            var binding = new CommandBinding(cmd);
-            binding.Executed += ShortutPressed;
-            window.CommandBindings.Add(binding);
+            HotkeyBinding = new InputBinding(new ActionCommand(OpenSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
+            window.InputBindings.Add(HotkeyBinding);
         }
+
         public Popup popup;
         SearchWindow searchWindow;
-        private void ShortutPressed(object sender, ExecutedRoutedEventArgs e)
+        private void OpenSearch()
         {
             //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
 
@@ -79,7 +110,6 @@ namespace Search
             popup.Child = searchWindow;
             popup.IsOpen = !popup.IsOpen;
             searchWindow.SearchBox.Focus();
-            e.Handled = true;
         }
 
         public override void OnApplicationStopped()
@@ -101,5 +131,6 @@ namespace Search
         {
             return new SearchSettingsView();
         }
+
     }
 }
