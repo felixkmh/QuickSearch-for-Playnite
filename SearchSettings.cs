@@ -27,7 +27,7 @@ namespace QuickSearch
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
         public string Option1 { get; set; } = string.Empty;
 
-        public double Threshold { get; set; } = 0.4;
+        public double Threshold { get; set; } = 0.3;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
