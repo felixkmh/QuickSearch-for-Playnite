@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DuoVia.FuzzyStrings;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -80,7 +81,7 @@ namespace Search
             return (2.0 * matches) / (pairs1.Count + pairs2.Count);
         }
 
-        static string RemoveDiacritics(in string text)
+        public static string RemoveDiacritics(in string text)
         {
             var normalizedString = text.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();
@@ -99,9 +100,29 @@ namespace Search
 
         public static double MatchingWords(in string input, in string str)
         {
-            var words1 = RemoveDiacritics(input).ToLower().Split(' ');
-            var words2 = RemoveDiacritics(str).ToLower().Split(' ');
-            return words1.Count(w => words2.Contains(w)) * 1.0 / (0.7 * words1.Length + 0.3 * words2.Length);
+            var words1 = RemoveDiacritics(input).ToLower().Split(' ').ToList();
+            var words2 = RemoveDiacritics(str).ToLower().Split(' ').ToList();
+            double sum = 0;
+            for (int i = 0; i < words1.Count; ++i)
+            {
+                if (words2.Count == 0) break;
+                double maxValue = 0;
+                int maxIdx = 0;
+                for (int j = 0; j < words2.Count; ++j)
+                {
+                    var val = words1[i].FuzzyMatch(words2[j]);
+                    if (val > maxValue)
+                    {
+                        maxValue = val;
+                        maxIdx = j;
+                    }
+                }
+                sum += maxValue > 0.6 ? maxValue : 0;
+                words2.RemoveAt(maxIdx);
+            }
+            return sum;
+            return words1.Sum(w => words2.Max(w2 => w.FuzzyMatch(w)));
+            return words1.Count(w => words2.Contains(w)) * 1.0 / (0.7 * words1.Count + 0.3 * words2.Count);
         }
 
         private static Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");

@@ -12,7 +12,11 @@
     <Grid>
         <Grid x:Name="DefaultView">
             <TextBlock Text="{Binding Name}"/>
-            <TextBlock Text="{Binding Source}" HorizontalAlignment="Right"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
+                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}"/>
+                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
+            </StackPanel>
         </Grid>
         <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40">
             <Grid.ColumnDefinitions>
@@ -20,15 +24,20 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Image Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" MaxWidth="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
-                   Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                   Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
+                   RenderOptions.BitmapScalingMode="Fant"/>
             <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Source}" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Bottom"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top">
+                <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
+                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>
+                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
+            </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="1">
                 <TextBlock Text="{Binding Platform}" Margin="0,0,15,0"/>
                 <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
                 <TextBlock Text=": "/>
-                <TextBlock x:Name="Playtime" Margin="0,0,10,0"/>
+                <TextBlock x:Name="Playtime" Margin="0,0,15,0"/>
+                <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis"/>
             </StackPanel>
         </Grid>
     </Grid>

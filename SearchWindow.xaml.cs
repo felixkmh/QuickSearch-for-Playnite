@@ -8,6 +8,7 @@ using System;
 using Playnite.SDK.Models;
 using System.Collections.Generic;
 using System.Collections;
+using System.Windows;
 
 namespace Search
 {
@@ -25,37 +26,32 @@ namespace Search
         {
             InitializeComponent();
             searchPlugin = plugin;
-            gameResults = new UnboundedCache<GameResult>(() => 
-            { 
-                var result = new GameResult(); 
-                result.MouseLeftButtonDown += ItemClicked;
-                result.MouseDoubleClick += ItemDoubleClick;
-                return result; 
-            });
+            if (gameResults is null)
+            {
+                gameResults = new UnboundedCache<GameResult>(() => 
+                { 
+                    var result = new GameResult(); 
+                    result.MouseLeftButtonDown += ItemClicked;
+                    result.MouseDoubleClick += ItemDoubleClick;
+                    return result; 
+                });
+            }
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
-                string input = textBox.Text.ToLower().Trim();
+                string input = textBox.Text.ToLower();
                 tokenSource.Cancel();
                 var oldSource = tokenSource;
                 tokenSource = new CancellationTokenSource();
                 var cancellationToken = tokenSource.Token;
                 backgroundTask = backgroundTask.ContinueWith(_ => { 
-                    var fuzzy = searchPlugin.PlayniteApi.Database.Games
-                    .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
-                    .OrderByDescending(g => Matching.GetScore(input, g.Name) + input.LongestCommonSubsequence(g.Name.ToLower()).Item1.Length)
-                    .ThenBy(g => g.Name)
-                    .Take(20);
                     var results = searchPlugin.PlayniteApi.Database.Games
-                    .Where(g => Matching.MatchingWords(input, g.Name) > 0.2 && input.Length > 0)
-                    .OrderByDescending(g => Matching.MatchingWords(input, g.Name))
+                    .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
+                    .OrderByDescending(g => Matching.GetScoreNormalized(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
                     .ThenBy(g => g.Name)
-                    .Take(20)
-                    .Union(fuzzy)
-                    .Distinct()
                     .Take(20);
                     int count = 0;
                     foreach(var result in results)
@@ -67,21 +63,35 @@ namespace Search
                         }
 
                         Dispatcher.Invoke(() => { 
-                            if (count == 0)
+                            if (count < SearchResults.Items.Count)
                             {
-                                gameResults.Consume(SearchResults.Items);
+                                if (SearchResults.Items[count] is GameResult existing)
+                                {
+                                    existing.SetGame(result);
+                                } else
+                                {
+                                    var newItem = gameResults.Get();
+                                    newItem.SetGame(result);
+                                    SearchResults.Items[count] = newItem;
+                                }
+                            } else
+                            {
+                                var newItem = gameResults.Get();
+                                newItem.SetGame(result);
+                                SearchResults.Items.Add(newItem);
                             }
-                            var newItem = gameResults.Get();
-                            newItem.SetGame(result);
-                            SearchResults.Items.Add(newItem);
                         });
                         count++;
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        if (count == 0)
+                        for(int i = SearchResults.Items.Count - 1; i >= count; --i)
                         {
-                            gameResults.Consume(SearchResults.Items);
+                            if (SearchResults.Items[i] is GameResult result)
+                            {
+                                gameResults.Push(result);
+                            }
+                            SearchResults.Items.RemoveAt(i);
                         }
                         if (SearchResults.Items.Count > 0)
                         {
@@ -144,8 +154,10 @@ namespace Search
                 {
                     if (SearchResults.SelectedIndex != -1)
                     {
-                        var game = ((ListBoxItem)SearchResults.SelectedItem).Tag as Playnite.SDK.Models.Game;
-                        searchPlugin.PlayniteApi.StartGame(game.Id);
+                        if (((FrameworkElement)SearchResults.SelectedItem).DataContext is Game game)
+                        {
+                            searchPlugin.PlayniteApi.StartGame(game.Id);
+                        }
                     }
                     searchPlugin.popup.IsOpen = false;
                 }

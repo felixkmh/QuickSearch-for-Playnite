@@ -31,6 +31,13 @@ namespace Search
         {
             DataContext = game;
             Playtime.Text = TimeSpan.FromSeconds(game.Playtime).ToString("%h'h'%m'm'");
+            if (string.IsNullOrEmpty(game.GameImagePath))
+            {
+                ROM.Text = string.Empty;
+            } else
+            {
+                ROM.Text = System.IO.Path.GetFileNameWithoutExtension(game.GameImagePath);
+            }
         }
 
         private void GameResult_Unselected(object sender, RoutedEventArgs e)
