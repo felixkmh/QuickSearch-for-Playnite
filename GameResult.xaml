@@ -56,8 +56,8 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Platform}" Margin="0,0,15,0"/>
-                    <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis" Grid.Column="1"/>
+                    <TextBlock Text="{Binding Platform}" Margin="0,0,15,0" VerticalAlignment="Bottom"/>
+                    <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
                         <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
                         <TextBlock Text=": "/>
