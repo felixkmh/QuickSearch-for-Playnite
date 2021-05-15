@@ -34,8 +34,10 @@ namespace QuickSearch
         {
             var window = Application.Current.MainWindow;
             window.InputBindings.Remove(HotkeyBinding);
-            HotkeyBinding = new InputBinding(new ActionCommand(OpenSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
+            popup?.InputBindings.Remove(HotkeyBinding);
+            HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
             window.InputBindings.Add(HotkeyBinding);
+            popup?.InputBindings.Add(HotkeyBinding);
         }
 
         public override void OnGameInstalled(Game game)
@@ -89,13 +91,13 @@ namespace QuickSearch
         {
             // Add code to be executed when Playnite is initialized.
             var window = Application.Current.MainWindow;
-            HotkeyBinding = new InputBinding(new ActionCommand(OpenSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
+            HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
             window.InputBindings.Add(HotkeyBinding);
         }
 
         public Popup popup;
         SearchWindow searchWindow;
-        private void OpenSearch()
+        private void ToggleSearch()
         {
             //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
 
@@ -105,11 +107,16 @@ namespace QuickSearch
                 popup.PlacementTarget = Application.Current.MainWindow;
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
+                searchWindow = new SearchWindow(this);
+                popup.Child = searchWindow;
+                popup.InputBindings.Add(HotkeyBinding);
             }
-            searchWindow = new SearchWindow(this);
-            popup.Child = searchWindow;
             popup.IsOpen = !popup.IsOpen;
-            searchWindow.SearchBox.Focus();
+            if (popup.IsOpen)
+            {
+                searchWindow.SearchBox.SelectAll();
+                searchWindow.SearchBox.Focus();
+            }
         }
 
         public override void OnApplicationStopped()

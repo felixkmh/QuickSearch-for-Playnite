@@ -11,13 +11,21 @@
              KeyboardNavigation.IsTabStop="False"
              KeyboardNavigation.ControlTabNavigation="None">
 
-    <Grid>
-        <Grid x:Name="DefaultView">
-            <TextBlock Text="{Binding Name}"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
-                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}"/>
-                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
+    <Grid ClipToBounds="True">
+        <Grid x:Name="DefaultView" ClipToBounds="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
+                Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
+                RenderOptions.BitmapScalingMode="Fant"/>
+            <TextBlock Text="{Binding Name}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" x:Name="PlatformStack">
+                <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
+                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}" Margin="0,3,0,3"/>
+                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
             </StackPanel>
         </Grid>
         <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40">
@@ -25,22 +33,41 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top">
+                        <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
+                        <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>
+                        <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Platform}" Margin="0,0,15,0"/>
+                    <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis" Grid.Column="1"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
+                        <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
+                        <TextBlock Text=": "/>
+                        <TextBlock x:Name="Playtime" Margin="0,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
             <Image Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" MaxWidth="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
                    Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
                    RenderOptions.BitmapScalingMode="Fant"/>
-            <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Top"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top">
-                <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
-                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>
-                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="1">
-                <TextBlock Text="{Binding Platform}" Margin="0,0,15,0"/>
-                <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
-                <TextBlock Text=": "/>
-                <TextBlock x:Name="Playtime" Margin="0,0,15,0"/>
-                <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis"/>
-            </StackPanel>
         </Grid>
     </Grid>
 </ListBoxItem>

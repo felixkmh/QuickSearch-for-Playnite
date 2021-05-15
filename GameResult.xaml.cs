@@ -30,7 +30,10 @@ namespace QuickSearch
         public void SetGame(Playnite.SDK.Models.Game game)
         {
             DataContext = game;
-            Playtime.Text = TimeSpan.FromSeconds(game.Playtime).ToString("%h'h'%m'm'");
+            var time = TimeSpan.FromSeconds(game.Playtime);
+            int hours = (int)Math.Truncate(time.TotalHours);
+            int minutes = (int)((time.TotalHours - hours) * 60);
+            Playtime.Text = $"{hours}h{minutes}min";
             if (string.IsNullOrEmpty(game.GameImagePath))
             {
                 ROM.Text = string.Empty;

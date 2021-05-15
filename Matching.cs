@@ -62,6 +62,7 @@ namespace QuickSearch
 
         public static double GetScoreNormalized(in string str1, in string str2)
         {
+            if (str1.Length == 0) return 0;
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
 
@@ -100,6 +101,7 @@ namespace QuickSearch
 
         public static double MatchingWords(in string input, in string str)
         {
+            if (input.Length == 0) return 0;
             var words1 = RemoveDiacritics(input).ToLower().Split(' ').ToList();
             var words2 = RemoveDiacritics(str).ToLower().Split(' ').ToList();
             double sum = 0;
@@ -117,8 +119,9 @@ namespace QuickSearch
                         maxIdx = j;
                     }
                 }
-                sum += maxValue > 0.6 ? maxValue : 0;
-                words2.RemoveAt(maxIdx);
+                sum += maxValue >= 0.75 ? maxValue : 0;
+                if (maxValue >= 0.75)
+                    words2.RemoveAt(maxIdx);
             }
             return sum;
         }

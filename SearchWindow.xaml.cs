@@ -42,12 +42,12 @@ namespace QuickSearch
         {
             if (sender is TextBox textBox)
             {
-                string input = textBox.Text.ToLower();
+                string input = textBox.Text.ToLower().Trim();
                 tokenSource.Cancel();
                 var oldSource = tokenSource;
                 tokenSource = new CancellationTokenSource();
                 var cancellationToken = tokenSource.Token;
-                backgroundTask = backgroundTask.ContinueWith(_ => { 
+                backgroundTask = backgroundTask.ContinueWith(_ => {
                     var results = searchPlugin.PlayniteApi.Database.Games
                     .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
                     .OrderByDescending(g => Matching.GetScoreNormalized(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
@@ -146,9 +146,16 @@ namespace QuickSearch
                 {
                     if (SearchResults.SelectedIndex == -1)
                         SearchResults.SelectedIndex = 0;
-                    idx = idx + count - 1;
+                    idx = idx - 1;
                 }
-                idx = idx % count;
+                if(e.IsRepeat)
+                {
+                    idx = Math.Min(count - 1, Math.Max(0, idx));
+                } else
+                {
+                    idx = (idx + count) % count;
+                }
+                SearchResults.ScrollIntoView(SearchResults.Items[idx]);
                 SearchResults.SelectedIndex = idx;
                 if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
