@@ -39,7 +39,8 @@ namespace QuickSearch
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
                 window.InputBindings.Add(HotkeyBinding);
                 popup?.InputBindings.Add(HotkeyBinding);
-                searchWindow.SearchBox.Text = string.Empty;
+                if (searchWindow is SearchWindow)
+                    searchWindow.SearchBox.Text = string.Empty;
             });
         }
 
