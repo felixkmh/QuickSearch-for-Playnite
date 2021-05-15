@@ -33,11 +33,14 @@ namespace QuickSearch
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
         {
             var window = Application.Current.MainWindow;
-            window.InputBindings.Remove(HotkeyBinding);
-            popup?.InputBindings.Remove(HotkeyBinding);
-            HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
-            window.InputBindings.Add(HotkeyBinding);
-            popup?.InputBindings.Add(HotkeyBinding);
+            window.Dispatcher.Invoke(() => { 
+                window.InputBindings.Remove(HotkeyBinding);
+                popup?.InputBindings.Remove(HotkeyBinding);
+                HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
+                window.InputBindings.Add(HotkeyBinding);
+                popup?.InputBindings.Add(HotkeyBinding);
+                searchWindow.SearchBox.Text = string.Empty;
+            });
         }
 
         public override void OnGameInstalled(Game game)
@@ -114,8 +117,10 @@ namespace QuickSearch
             popup.IsOpen = !popup.IsOpen;
             if (popup.IsOpen)
             {
-                searchWindow.SearchBox.SelectAll();
-                searchWindow.SearchBox.Focus();
+                searchWindow.Dispatcher.Invoke(() => { 
+                    searchWindow.SearchBox.SelectAll();
+                    searchWindow.SearchBox.Focus();
+                });
             }
         }
 

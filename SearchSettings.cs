@@ -13,7 +13,7 @@ namespace QuickSearch
     {
         private readonly SearchPlugin plugin;
 
-        public struct Hotkey
+        public struct Hotkey : IEquatable<Hotkey>
         {
             public Hotkey(Key key, ModifierKeys modifier)
             {
@@ -22,12 +22,20 @@ namespace QuickSearch
             }
             public Key Key { get; set; }
             public ModifierKeys Modifiers { get; set; }
+
+            public bool Equals(Hotkey other)
+            {
+                return Key == other.Key && Modifiers == other.Modifiers;
+            }
         }
 
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
         public string HotkeyText { get; set; } = string.Empty;
 
         public double Threshold { get; set; } = 0.3;
+
+        public bool ExpandAllItems { get; set; } = false;
+        public bool ShowSeperator { get; set; } = false;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -57,6 +65,8 @@ namespace QuickSearch
                 SearchShortcut = savedSettings.SearchShortcut;
                 HotkeyText = $"{savedSettings.SearchShortcut.Modifiers} + {savedSettings.SearchShortcut.Key}";
                 Threshold = savedSettings.Threshold;
+                ExpandAllItems = savedSettings.ExpandAllItems;
+                ShowSeperator = savedSettings.ShowSeperator;
             }
         }
 
@@ -75,6 +85,8 @@ namespace QuickSearch
             // This method should revert any changes made to Option1 and Option2.
             this.SearchShortcut = previousSettings.SearchShortcut;
             this.Threshold = previousSettings.Threshold;
+            this.ExpandAllItems = previousSettings.ExpandAllItems;
+            this.ShowSeperator = previousSettings.ShowSeperator;
             previousSettings = null;
         }
 
@@ -82,7 +94,13 @@ namespace QuickSearch
         {
             // Code executed when user decides to confirm changes made since BeginEdit was called.
             // This method should save settings made to Option1 and Option2.
-            SettingsChanged?.Invoke(this, previousSettings);
+            bool changed = false;
+            changed |= !SearchShortcut.Equals(previousSettings.SearchShortcut);
+            changed |= Threshold != previousSettings.Threshold;
+            changed |= ExpandAllItems != previousSettings.ExpandAllItems;
+            changed |= ShowSeperator != previousSettings.ShowSeperator; 
+            if (changed)
+                SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;
             plugin.SavePluginSettings(this);
         }

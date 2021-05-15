@@ -20,6 +20,16 @@ namespace QuickSearch
     /// </summary>
     public partial class GameResult : ListBoxItem
     {
+        public bool AlwaysExpand { 
+            get => alwaysExpand; 
+            set {
+                alwaysExpand = value;
+                if (value) Expand();
+                else if (!IsSelected) Collapse();
+            } 
+        }
+        private bool alwaysExpand = false;
+
         public GameResult()
         {
             InitializeComponent();
@@ -45,11 +55,27 @@ namespace QuickSearch
 
         private void GameResult_Unselected(object sender, RoutedEventArgs e)
         {
+            if (AlwaysExpand)
+            {
+                Expand();
+            } else
+            {
+                Collapse();
+            }
+        }
+
+        private void GameResult_Selected(object sender, RoutedEventArgs e)
+        {
+            Expand();
+        }
+
+        private void Collapse()
+        {
             SelectedView.Visibility = Visibility.Collapsed;
             DefaultView.Visibility = Visibility.Visible;
         }
 
-        private void GameResult_Selected(object sender, RoutedEventArgs e)
+        private void Expand()
         {
             SelectedView.Visibility = Visibility.Visible;
             DefaultView.Visibility = Visibility.Collapsed;

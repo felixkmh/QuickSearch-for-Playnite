@@ -5,69 +5,90 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuickSearch"
-             xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK"
+             xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK" xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              Style="{StaticResource {x:Type ListBoxItem}}"
              KeyboardNavigation.IsTabStop="False"
-             KeyboardNavigation.ControlTabNavigation="None">
-
-    <Grid ClipToBounds="True">
-        <Grid x:Name="DefaultView" ClipToBounds="True">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
-                Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
-                RenderOptions.BitmapScalingMode="Fant"/>
-            <TextBlock Text="{Binding Name}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" x:Name="PlatformStack">
-                <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
-                <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}" Margin="0,3,0,3"/>
-                <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
-            </StackPanel>
-        </Grid>
-        <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top">
-                        <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
-                        <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>
-                        <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Platform}" Margin="0,0,15,0" VerticalAlignment="Bottom"/>
-                    <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
-                        <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
-                        <TextBlock Text=": "/>
-                        <TextBlock x:Name="Playtime" Margin="0,0,0,0"/>
-                    </StackPanel>
-                </Grid>
+             KeyboardNavigation.ControlTabNavigation="None"
+             >
+    <ListBoxItem.Resources>
+        <ResourceDictionary>
+            <system:Double x:Key="DetailsOpacity">0.8</system:Double>
+        </ResourceDictionary>
+    </ListBoxItem.Resources>
+    <StackPanel>
+        <Grid>
+           <Grid x:Name="DefaultView">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" 
+                       MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
+                       Width="{Binding ActualHeight, ElementName=PlatformStack}"
+                       Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
+                       RenderOptions.BitmapScalingMode="Fant"
+                       x:Name="DefaultIcon"/>
+                <Image Grid.Column="0" Source="{DynamicResource TrayIcon}" 
+                       MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
+                       Width="{Binding ActualHeight, ElementName=PlatformStack}"
+                       Visibility="{Binding IsVisible, ElementName=DefaultIcon, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                       RenderOptions.BitmapScalingMode="Fant"/>
+                <TextBlock Text="{Binding Name}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="SemiBold"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
+                    <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right" Margin="0,3,0,3" />
+                    <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}" Margin="0,3,0,3" />
+                    <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
+                </StackPanel>
             </Grid>
-            <Image Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" MaxWidth="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
-                   Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
-                   RenderOptions.BitmapScalingMode="Fant"/>
+            <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
+                            <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
+                            <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>
+                            <TextBlock Text="{Binding InstallationStatus}" HorizontalAlignment="Right"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1" Opacity="{StaticResource DetailsOpacity}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Platform}" Margin="0,0,15,0" VerticalAlignment="Bottom"/>
+                        <TextBlock x:Name="ROM" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
+                            <TextBlock Text="{DynamicResource LOCTimePlayed}"/>
+                            <TextBlock Text=": "/>
+                            <TextBlock x:Name="Playtime" Margin="0,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Image Source="{Binding Icon, Converter={StaticResource ImageStringToImageConverter}}" Width="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
+                       Visibility="{Binding Icon, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
+                       RenderOptions.BitmapScalingMode="Fant"
+                       x:Name="SelectedImage"/>
+                <Image Source="{DynamicResource TrayIcon}" Width="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
+                       Visibility="{Binding IsVisible, ElementName=SelectedImage, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                       RenderOptions.BitmapScalingMode="Fant"/>
+            </Grid>
         </Grid>
-    </Grid>
+        <Separator x:Name="Seperator" Margin="0,0,0,-5" Padding="0"
+                   Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
+    </StackPanel>
 </ListBoxItem>

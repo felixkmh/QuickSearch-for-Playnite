@@ -9,6 +9,7 @@ using Playnite.SDK.Models;
 using System.Collections.Generic;
 using System.Collections;
 using System.Windows;
+using System.Windows.Media;
 
 namespace QuickSearch
 {
@@ -33,6 +34,8 @@ namespace QuickSearch
                     var result = new GameResult(); 
                     result.MouseLeftButtonDown += ItemClicked;
                     result.MouseDoubleClick += ItemDoubleClick;
+                    result.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
+                    result.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                     return result; 
                 });
             }
@@ -51,7 +54,9 @@ namespace QuickSearch
                     var results = searchPlugin.PlayniteApi.Database.Games
                     .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
                     .OrderByDescending(g => Matching.GetScoreNormalized(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
-                    .ThenBy(g => g.Name)
+                    .ThenBy(g => Matching.RemoveDiacritics(g.Name))
+                    .ThenByDescending(g => g.LastActivity??DateTime.MinValue)
+                    .ThenByDescending(g => g.IsInstalled)
                     .Take(20);
                     int count = 0;
                     foreach(var result in results)
@@ -65,19 +70,24 @@ namespace QuickSearch
                         Dispatcher.Invoke(() => { 
                             if (count < SearchResults.Items.Count)
                             {
+                                GameResult item;
                                 if (SearchResults.Items[count] is GameResult existing)
                                 {
-                                    existing.SetGame(result);
+                                    item = existing;
                                 } else
                                 {
-                                    var newItem = gameResults.Get();
-                                    newItem.SetGame(result);
-                                    SearchResults.Items[count] = newItem;
+                                    item = gameResults.Get();
+                                    SearchResults.Items[count] = item;
                                 }
+                                item.SetGame(result);
+                                item.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
+                                item.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                             } else
                             {
                                 var newItem = gameResults.Get();
                                 newItem.SetGame(result);
+                                newItem.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
+                                newItem.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                                 SearchResults.Items.Add(newItem);
                             }
                         });
@@ -96,6 +106,29 @@ namespace QuickSearch
                         if (SearchResults.Items.Count > 0)
                         {
                             SearchResults.SelectedIndex = 0;
+                        }
+                        if (SearchResults.Items.Count > 1)
+                        {
+                            var first = (UIElement)SearchResults.Items[0];
+                            var second = (UIElement)SearchResults.Items[1];
+                            var heightSelected = first.RenderSize.Height;
+                            var heightNotSelected = second.RenderSize.Height;
+                            var availableHeight = WindowGrid.Height;
+                            availableHeight -= SearchBox.RenderSize.Height;
+                            availableHeight -= heightSelected;
+                            availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
+                            var maxItems = Math.Floor(availableHeight / heightNotSelected);
+                            var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
+                            Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+                            if (maxItems + 1 >= SearchResults.Items.Count)
+                            {
+                                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                            } else
+                            {
+                                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                            }
+                            SearchResults.MaxHeight = maxHeight;
                         }
                     });
                     oldSource.Dispose();
