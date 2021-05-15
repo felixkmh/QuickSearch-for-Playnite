@@ -35,7 +35,7 @@
                        Width="{Binding ActualHeight, ElementName=PlatformStack}"
                        Visibility="{Binding IsVisible, ElementName=DefaultIcon, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                        RenderOptions.BitmapScalingMode="Fant"/>
-                <TextBlock Text="{Binding Name}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Name}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="Bold"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
                     <TextBlock x:Name="SourceText" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right" Margin="0,3,0,3" />
                     <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceText}" Margin="0,3,0,3" />
@@ -57,7 +57,7 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="Bold"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
                             <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
                             <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>

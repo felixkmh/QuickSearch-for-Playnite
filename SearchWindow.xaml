@@ -10,7 +10,7 @@
     <UserControl.Effect>
         <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1"/>
     </UserControl.Effect>
-    <Grid Width="600" Height="450" x:Name="WindowGrid">
+    <Grid Width="620" Height="450" x:Name="WindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
