@@ -27,7 +27,6 @@ namespace QuickSearch
         public SearchPlugin(IPlayniteAPI api) : base(api)
         {
             settings = new SearchSettings(this);
-            settings.SettingsChanged += OnSettingsChanged;
         }
 
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
@@ -94,9 +93,13 @@ namespace QuickSearch
         public override void OnApplicationStarted()
         {
             // Add code to be executed when Playnite is initialized.
-            var window = Application.Current.MainWindow;
-            HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
-            window.InputBindings.Add(HotkeyBinding);
+            if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            {
+                settings.SettingsChanged += OnSettingsChanged;
+                var window = Application.Current.MainWindow;
+                HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
+                window.InputBindings.Add(HotkeyBinding);
+            }
         }
 
         public Popup popup;
