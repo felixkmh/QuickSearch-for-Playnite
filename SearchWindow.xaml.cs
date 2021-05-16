@@ -90,7 +90,7 @@ namespace QuickSearch
                                 newItem.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                                 SearchResults.Items.Add(newItem);
                             }
-                        });
+                        }, System.Windows.Threading.DispatcherPriority.Background, cancellationToken);
                         count++;
                     }
                     Dispatcher.Invoke(() =>
@@ -130,7 +130,7 @@ namespace QuickSearch
                             }
                             SearchResults.MaxHeight = maxHeight;
                         }
-                    });
+                    }, System.Windows.Threading.DispatcherPriority.Background, cancellationToken);
                     oldSource.Dispose();
                 }, tokenSource.Token);
             }
