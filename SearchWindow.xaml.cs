@@ -90,6 +90,10 @@ namespace QuickSearch
                                 newItem.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                                 SearchResults.Items.Add(newItem);
                             }
+                            if (SearchResults.Items.Count > 0 && count == 0)
+                            {
+                                SearchResults.SelectedIndex = 0;
+                            }
                         }, System.Windows.Threading.DispatcherPriority.Background, cancellationToken);
                         count++;
                     }
