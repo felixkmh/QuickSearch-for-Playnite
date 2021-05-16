@@ -51,6 +51,13 @@ namespace QuickSearch
                 tokenSource = new CancellationTokenSource();
                 var cancellationToken = tokenSource.Token;
                 backgroundTask = backgroundTask.ContinueWith(_ => {
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        oldSource.Dispose();
+                        return;
+                    }
+
                     var results = searchPlugin.PlayniteApi.Database.Games
                     .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
                     .OrderByDescending(g => Matching.GetScoreNormalized(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
