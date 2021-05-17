@@ -140,8 +140,13 @@ namespace QuickSearch
                                 scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
                             }
                             SearchResults.MaxHeight = maxHeight;
+                        } else
+                        {
+                            Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+                            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                         }
-                    }, System.Windows.Threading.DispatcherPriority.Background, cancellationToken);
+                    }, System.Windows.Threading.DispatcherPriority.Normal, cancellationToken);
                     oldSource.Dispose();
                 }, tokenSource.Token);
             }
