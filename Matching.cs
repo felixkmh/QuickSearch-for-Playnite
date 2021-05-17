@@ -39,7 +39,7 @@ namespace QuickSearch
             return result;
         }
 
-        public static double GetScore(in string str1, in string str2)
+        public static float GetScore(in string str1, in string str2)
         {
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
@@ -60,7 +60,7 @@ namespace QuickSearch
             return matches;
         }
 
-        public static double GetScoreNormalized(in string str1, in string str2)
+        public static float GetScoreNormalized(in string str1, in string str2)
         {
             if (str1.Length == 0) return 0;
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
@@ -79,7 +79,7 @@ namespace QuickSearch
                     }
                 }
             }
-            return (2.0 * matches) / (pairs1.Count + pairs2.Count);
+            return (2.0f * matches) / (pairs1.Count + pairs2.Count);
         }
 
         public static string RemoveDiacritics(in string text)
@@ -99,20 +99,20 @@ namespace QuickSearch
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        public static double MatchingWords(in string input, in string str)
+        public static float MatchingWords(in string input, in string str)
         {
             if (input.Length == 0) return 0;
             var words1 = RemoveDiacritics(input).ToLower().Split(' ').ToList();
             var words2 = RemoveDiacritics(str).ToLower().Split(' ').ToList();
-            double sum = 0;
+            float sum = 0;
             for (int i = 0; i < words1.Count; ++i)
             {
                 if (words2.Count == 0) break;
-                double maxValue = 0;
+                float maxValue = 0;
                 int maxIdx = 0;
                 for (int j = 0; j < words2.Count; ++j)
                 {
-                    var val = words1[i].FuzzyMatch(words2[j]);
+                    var val = (float)words1[i].FuzzyMatch(words2[j]);
                     if (val > maxValue)
                     {
                         maxValue = val;
