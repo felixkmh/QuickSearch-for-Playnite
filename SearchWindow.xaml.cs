@@ -102,7 +102,7 @@ namespace QuickSearch
                             {
                                 SearchResults.SelectedIndex = 0;
                             }
-                        }, searchPlugin.settings.IncrementalUpdate?DispatcherPriority.Background:DispatcherPriority.Normal, cancellationToken);
+                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                         count++;
                     }
                     Dispatcher.Invoke(() =>
@@ -147,7 +147,7 @@ namespace QuickSearch
                             ScrollViewer scrollViewer = border.Child as ScrollViewer;
                             scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                         }
-                    }, System.Windows.Threading.DispatcherPriority.Normal, cancellationToken);
+                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     oldSource.Dispose();
                 }, tokenSource.Token);
             }
