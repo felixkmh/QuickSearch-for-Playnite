@@ -36,6 +36,7 @@ namespace QuickSearch
 
         public bool ExpandAllItems { get; set; } = false;
         public bool ShowSeperator { get; set; } = false;
+        public bool IncrementalUpdate { get; set; } = false;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -67,6 +68,7 @@ namespace QuickSearch
                 Threshold = savedSettings.Threshold;
                 ExpandAllItems = savedSettings.ExpandAllItems;
                 ShowSeperator = savedSettings.ShowSeperator;
+                IncrementalUpdate = savedSettings.IncrementalUpdate;
             }
         }
 
@@ -87,6 +89,7 @@ namespace QuickSearch
             this.Threshold = previousSettings.Threshold;
             this.ExpandAllItems = previousSettings.ExpandAllItems;
             this.ShowSeperator = previousSettings.ShowSeperator;
+            this.IncrementalUpdate = previousSettings.IncrementalUpdate;
             previousSettings = null;
         }
 
@@ -96,9 +99,10 @@ namespace QuickSearch
             // This method should save settings made to Option1 and Option2.
             bool changed = false;
             changed |= !SearchShortcut.Equals(previousSettings.SearchShortcut);
-            changed |= Threshold != previousSettings.Threshold;
-            changed |= ExpandAllItems != previousSettings.ExpandAllItems;
-            changed |= ShowSeperator != previousSettings.ShowSeperator; 
+            changed |= Threshold         != previousSettings.Threshold;
+            changed |= ExpandAllItems    != previousSettings.ExpandAllItems;
+            changed |= ShowSeperator     != previousSettings.ShowSeperator;
+            changed |= IncrementalUpdate != previousSettings.IncrementalUpdate;
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;

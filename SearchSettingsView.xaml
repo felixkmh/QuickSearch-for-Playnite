@@ -18,5 +18,6 @@
         </StackPanel>
         <CheckBox Content="Expand all items" IsChecked="{Binding ExpandAllItems}" Margin="5"/>
         <CheckBox Content="Show seperator" IsChecked="{Binding ShowSeperator}" Margin="5"/>
+        <CheckBox Content="Incrementally add results (Enable if search performance is slow)" IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
     </StackPanel>
 </UserControl>

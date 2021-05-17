@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace QuickSearch
 {
@@ -101,7 +102,7 @@ namespace QuickSearch
                             {
                                 SearchResults.SelectedIndex = 0;
                             }
-                        }, System.Windows.Threading.DispatcherPriority.Background, cancellationToken);
+                        }, searchPlugin.settings.IncrementalUpdate?DispatcherPriority.Background:DispatcherPriority.Normal, cancellationToken);
                         count++;
                     }
                     Dispatcher.Invoke(() =>
