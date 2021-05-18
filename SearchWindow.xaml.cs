@@ -65,7 +65,7 @@ namespace QuickSearch
                     {
                         results = searchPlugin.PlayniteApi.Database.Games
                         .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
-                        .OrderByDescending(g => (float)(Matching.GetScoreNormalized(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name)))
+                        .OrderByDescending(g => Matching.GetScore(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
                         .ThenBy(g => Matching.RemoveDiacritics(g.Name))
                         .ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
                         .ThenByDescending(g => g.IsInstalled)
