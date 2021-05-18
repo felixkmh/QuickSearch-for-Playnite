@@ -48,7 +48,7 @@ namespace QuickSearch
         public static float GetCombinedScore(in string str1, in string str2)
         {
             return MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
-                 + LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
+                 + 0.5f * LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
                  + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1);
         }
 
@@ -174,19 +174,21 @@ namespace QuickSearch
             }
             var a = RemoveDiacritics(str1.ToLower());
             var b = RemoveDiacritics(str2.ToLower());
-            var common = Substrings(a).Intersect(Substrings(b)).OrderByDescending(s => s.Length);
+            var stringsA = Substrings(a).ToList();
+            var stringsB = Substrings(b).ToList();
+            var common = stringsA.Intersect(stringsB).OrderByDescending(s => s.Length);
             var lcs = common.FirstOrDefault()??string.Empty;
             var result = new LcsResult { String = lcs, Score = lcs.Length };
             switch (normalization)
             {
                 case ScoreNormalization.Str1:
-                    result.Score /= str1.Length;
+                    result.Score /= str1.Length + b.IndexOf(lcs);
                     break;
                 case ScoreNormalization.Str2:
-                    result.Score /= str2.Length;
+                    result.Score /= str2.Length + a.IndexOf(lcs);
                     break;
                 case ScoreNormalization.Both:
-                    result.Score /= 0.5f * (str1.Length + str2.Length);
+                    result.Score /= 0.5f * (str1.Length + str2.Length + a.IndexOf(lcs) + b.IndexOf(lcs));
                     break;
             }
             return result;
