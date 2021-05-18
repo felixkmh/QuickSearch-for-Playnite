@@ -11,7 +11,7 @@ using System.Collections;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Diagnostics;
+using static QuickSearch.Matching;
 
 namespace QuickSearch
 {
@@ -64,9 +64,9 @@ namespace QuickSearch
                     if (!string.IsNullOrEmpty(input))
                     {
                         results = searchPlugin.PlayniteApi.Database.Games
-                        .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
-                        .OrderByDescending(g => Matching.GetScore(input, g.Name) + 0.5 * Matching.LongestCommonSubstring(input, g.Name).Item2 + Matching.MatchingWords(input, g.Name))
-                        .ThenBy(g => Matching.RemoveDiacritics(g.Name))
+                        .Where(g => MatchingLetterPairs(input, g.Name, ScoreNormalization.Str1) >= searchPlugin.settings.Threshold)
+                        .OrderByDescending(g => GetCombinedScore(input, g.Name))
+                        .ThenBy(g => RemoveDiacritics(g.Name))
                         .ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
                         .ThenByDescending(g => g.IsInstalled)
                         .Take(20);

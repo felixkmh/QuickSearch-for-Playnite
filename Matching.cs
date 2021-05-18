@@ -12,18 +12,24 @@ namespace QuickSearch
     // http://www.catalysoft.com/articles/StrikeAMatch.html
     class Matching
     {
-        static List<string> GetLetterPairs(in string str)
+        public enum ScoreNormalization
         {
-            var result = new List<string>();
+            None,
+            Str1,
+            Str2,
+            Both
+        }
+
+        static IEnumerable<string> GetLetterPairs(string str)
+        {
             for(int i = 0; i < str.Length - 1; ++i)
             {
-                result.Add(str.Substring(i, 2));
+                yield return str.Substring(i, 2);
             }
             if (str.Length == 1)
             {
-                result.Add(str);
+                yield return str;
             }
-            return result;
         }
 
         static List<string> GetWordLetterPairs(in string str)
@@ -39,7 +45,12 @@ namespace QuickSearch
             return result;
         }
 
-        public static float GetScore(in string str1, in string str2)
+        public static float GetCombinedScore(in string str1, in string str2)
+        {
+            return MatchingLetterPairs(str1, str2) + 0.25f * LongestCommonSubstring(str1, str2).Score + MatchingWords(str1, str2);
+        }
+
+        public static float MatchingLetterPairs(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
@@ -57,29 +68,19 @@ namespace QuickSearch
                     }
                 }
             }
-            return matches;
-        }
-
-        public static float GetScoreNormalized(in string str1, in string str2)
-        {
-            if (str1.Length == 0) return 0;
-            var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
-            var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
-
-            int matches = 0;
-            for (int i = 0; i < pairs1.Count; ++i)
+            switch (normalization)
             {
-                for (int j = pairs2.Count - 1; j >= 0; --j)
-                {
-                    if (pairs1[i].Equals(pairs2[j], StringComparison.OrdinalIgnoreCase))
-                    {
-                        ++matches;
-                        pairs2.RemoveAt(j);
-                        break;
-                    }
-                }
+                case ScoreNormalization.None:
+                    return matches;
+                case ScoreNormalization.Str1:
+                    return matches / pairs1.Count;
+                case ScoreNormalization.Str2:
+                    return matches / pairs2.Count;
+                case ScoreNormalization.Both:
+                    return 2 * matches / (pairs1.Count + pairs2.Count);
+                default:
+                    return matches;
             }
-            return (2.0f * matches) / (pairs1.Count + pairs2.Count);
         }
 
         public static string RemoveDiacritics(in string text)
@@ -99,11 +100,11 @@ namespace QuickSearch
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        public static float MatchingWords(in string input, in string str)
+        public static float MatchingWords(in string str1, in string str2, float wordThreshold = 0.6667f, ScoreNormalization normalization = ScoreNormalization.None)
         {
-            if (input.Length == 0) return 0;
-            var words1 = RemoveDiacritics(input).ToLower().Split(' ').ToList();
-            var words2 = RemoveDiacritics(str).ToLower().Split(' ').ToList();
+            if (str1.Length == 0) return 0;
+            var words1 = RemoveDiacritics(str1).ToLower().Split(' ').ToList();
+            var words2 = RemoveDiacritics(str2).ToLower().Split(' ').ToList();
             float sum = 0;
             for (int i = 0; i < words1.Count; ++i)
             {
@@ -119,11 +120,26 @@ namespace QuickSearch
                         maxIdx = j;
                     }
                 }
-                sum += maxValue >= 0.75 ? maxValue : 0;
-                if (maxValue >= 0.75)
+                if (maxValue >= wordThreshold)
+                {
+                    sum += maxValue;
                     words2.RemoveAt(maxIdx);
+                }
             }
-            return sum;
+
+            switch (normalization)
+            {
+                case ScoreNormalization.None:
+                    return sum;
+                case ScoreNormalization.Str1:
+                    return sum / words1.Count;
+                case ScoreNormalization.Str2:
+                    return sum / words2.Count;
+                case ScoreNormalization.Both:
+                    return 2 * sum / (words1.Count + words2.Count);
+                default:
+                    return sum;
+            }
         }
 
         private static Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");
@@ -142,16 +158,36 @@ namespace QuickSearch
             return regex.Replace(stringBuilder.ToString(), "");
         }
 
-        public static Tuple<string, int> LongestCommonSubstring(in string str1, in string str2)
+        public struct LcsResult
+        {
+            public string String;
+            public float Score;
+        } 
+
+        public static LcsResult LongestCommonSubstring(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
             if (string.IsNullOrEmpty(str1) || string.IsNullOrEmpty(str2))
             {
-                return new Tuple<string, int>(string.Empty, 0);
+                return new LcsResult { String = string.Empty, Score = 0f};
             }
             var a = RemoveDiacritics(str1.ToLower());
             var b = RemoveDiacritics(str2.ToLower());
-            var lcs = Substrings(a).Intersect(Substrings(b)).OrderByDescending(s => s.Length);
-            return new Tuple<string, int>( lcs.First(), lcs.First().Length);
+            var common = Substrings(a).Intersect(Substrings(b)).OrderByDescending(s => s.Length);
+            var lcs = common.FirstOrDefault()??string.Empty;
+            var result = new LcsResult { String = lcs, Score = lcs.Length };
+            switch (normalization)
+            {
+                case ScoreNormalization.Str1:
+                    result.Score /= str1.Length;
+                    break;
+                case ScoreNormalization.Str2:
+                    result.Score /= str2.Length;
+                    break;
+                case ScoreNormalization.Both:
+                    result.Score /= 0.5f * (str1.Length + str2.Length);
+                    break;
+            }
+            return result;
         }
 
         public static IEnumerable<string> Substrings(string str)
