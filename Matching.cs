@@ -54,6 +54,11 @@ namespace QuickSearch
 
         public static float MatchingLetterPairs(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
+            if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
+            {
+                return 0f;
+            }
+
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
 
@@ -104,7 +109,11 @@ namespace QuickSearch
 
         public static float MatchingWords(in string str1, in string str2, float wordThreshold = 0.6667f, ScoreNormalization normalization = ScoreNormalization.None)
         {
-            if (str1.Length == 0) return 0;
+            if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
+            {
+                return 0f;
+            }
+
             var words1 = RemoveDiacritics(str1).ToLower().Split(' ').ToList();
             var words2 = RemoveDiacritics(str2).ToLower().Split(' ').ToList();
             float sum = 0;
@@ -168,7 +177,7 @@ namespace QuickSearch
 
         public static LcsResult LongestCommonSubstring(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
-            if (string.IsNullOrEmpty(str1) || string.IsNullOrEmpty(str2))
+            if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
             {
                 return new LcsResult { String = string.Empty, Score = 0f};
             }
