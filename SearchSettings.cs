@@ -37,6 +37,7 @@ namespace QuickSearch
         public bool ExpandAllItems { get; set; } = false;
         public bool ShowSeperator { get; set; } = false;
         public bool IncrementalUpdate { get; set; } = false;
+        public int MaxNumberResults { get; set; } = 20;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -69,6 +70,7 @@ namespace QuickSearch
                 ExpandAllItems = savedSettings.ExpandAllItems;
                 ShowSeperator = savedSettings.ShowSeperator;
                 IncrementalUpdate = savedSettings.IncrementalUpdate;
+                MaxNumberResults = savedSettings.MaxNumberResults;
             }
         }
 
@@ -90,6 +92,7 @@ namespace QuickSearch
             this.ExpandAllItems = previousSettings.ExpandAllItems;
             this.ShowSeperator = previousSettings.ShowSeperator;
             this.IncrementalUpdate = previousSettings.IncrementalUpdate;
+            this.MaxNumberResults = previousSettings.MaxNumberResults;
             previousSettings = null;
         }
 
@@ -103,6 +106,7 @@ namespace QuickSearch
             changed |= ExpandAllItems    != previousSettings.ExpandAllItems;
             changed |= ShowSeperator     != previousSettings.ShowSeperator;
             changed |= IncrementalUpdate != previousSettings.IncrementalUpdate;
+            changed |= MaxNumberResults  != previousSettings.MaxNumberResults;
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;

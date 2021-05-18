@@ -16,6 +16,10 @@
             <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="200" HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"/>
             <TextBlock Text="{Binding Threshold}"/>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="5">
+            <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center"/>
+            <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" TextChanged="MaxNumberResultsTextBox_TextChanged"/>
+        </StackPanel>
         <CheckBox Content="Expand all items" IsChecked="{Binding ExpandAllItems}" Margin="5"/>
         <CheckBox Content="Show seperator" IsChecked="{Binding ShowSeperator}" Margin="5"/>
         <CheckBox Content="Lower priority of adding results (Enable if search performance is slow)" IsChecked="{Binding IncrementalUpdate}" Margin="5"/>

@@ -78,5 +78,30 @@ namespace QuickSearch
             ShortcutText.Focus();
             SetHotkeyButton.Content = "Press Hotkey (+ modfiers) now";
         }
+
+        private void MaxNumberResultsTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (int.TryParse(e.Text, out var val))
+            {
+                if (val >= 0)
+                {
+                    return;
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void MaxNumberResultsTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(MaxNumberResultsTextBox.Text, out var val))
+            {
+                if (val >= 0)
+                {
+                    return;
+                }
+            }
+            MaxNumberResultsTextBox.Text = "0";
+            MaxNumberResultsTextBox.SelectAll();
+        }
     }
 }

@@ -68,8 +68,11 @@ namespace QuickSearch
                         .OrderByDescending(g => GetCombinedScore(input, g.Name))
                         .ThenBy(g => RemoveDiacritics(g.Name))
                         .ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
-                        .ThenByDescending(g => g.IsInstalled)
-                        .Take(20);
+                        .ThenByDescending(g => g.IsInstalled);
+                        if (searchPlugin.settings.MaxNumberResults > 0)
+                        {
+                            results = results.Take(searchPlugin.settings.MaxNumberResults);
+                        }
                     }
                     int count = 0;
                     foreach(var result in results)
