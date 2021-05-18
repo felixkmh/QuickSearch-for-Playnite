@@ -47,7 +47,9 @@ namespace QuickSearch
 
         public static float GetCombinedScore(in string str1, in string str2)
         {
-            return MatchingLetterPairs(str1, str2) + 0.25f * LongestCommonSubstring(str1, str2).Score + MatchingWords(str1, str2);
+            return MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
+                 + LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
+                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1);
         }
 
         public static float MatchingLetterPairs(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
