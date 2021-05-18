@@ -55,7 +55,7 @@ namespace QuickSearch
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
 
-            int matches = 0;
+            float matches = 0;
             for(int i = 0; i < pairs1.Count; ++i)
             {
                 for (int j = pairs2.Count - 1; j >= 0; --j)
