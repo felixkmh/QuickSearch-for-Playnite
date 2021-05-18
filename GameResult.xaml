@@ -57,7 +57,10 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="Bold"/>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="Bold"/>
+                            <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
                             <TextBlock x:Name="SourceTextSelected" Text="{Binding Source, TargetNullValue=''}" HorizontalAlignment="Right"/>
                             <TextBlock Text=" - " HorizontalAlignment="Right" MaxWidth="{Binding ActualWidth, ElementName=SourceTextSelected}"/>

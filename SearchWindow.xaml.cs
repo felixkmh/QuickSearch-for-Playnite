@@ -65,7 +65,7 @@ namespace QuickSearch
                     {
                         results = searchPlugin.PlayniteApi.Database.Games
                         .Where(g => Matching.GetScore(input, g.Name) / input.Replace(" ", "").Length >= searchPlugin.settings.Threshold)
-                        .OrderByDescending(g => Matching.GetScore(input, g.Name) + input.LongestCommonSubsequence(Matching.RemoveDiacritics(g.Name.ToLower())).Item1.Length + Matching.MatchingWords(input, g.Name))
+                        .OrderByDescending(g => Matching.GetScore(input, g.Name) + 0.5 * Matching.LongestCommonSubstring(input, g.Name).Item2 + Matching.MatchingWords(input, g.Name))
                         .ThenBy(g => Matching.RemoveDiacritics(g.Name))
                         .ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
                         .ThenByDescending(g => g.IsInstalled)
@@ -93,12 +93,14 @@ namespace QuickSearch
                                     SearchResults.Items[count] = item;
                                 }
                                 item.SetGame(result);
+                                // item.Score.Text = $"LCS = {Matching.LongestCommonSubstring(input, result.Name.ToLower()).Item1}";
                                 item.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
                                 item.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                             } else
                             {
                                 var newItem = gameResults.Get();
                                 newItem.SetGame(result);
+                                // newItem.Score.Text = $"LCS = {Matching.LongestCommonSubstring(input, result.Name.ToLower()).Item1}"; 
                                 newItem.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
                                 newItem.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
                                 SearchResults.Items.Add(newItem);

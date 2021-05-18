@@ -141,5 +141,28 @@ namespace QuickSearch
             }
             return regex.Replace(stringBuilder.ToString(), "");
         }
+
+        public static Tuple<string, int> LongestCommonSubstring(in string str1, in string str2)
+        {
+            if (string.IsNullOrEmpty(str1) || string.IsNullOrEmpty(str2))
+            {
+                return new Tuple<string, int>(string.Empty, 0);
+            }
+            var a = RemoveDiacritics(str1.ToLower());
+            var b = RemoveDiacritics(str2.ToLower());
+            var lcs = Substrings(a).Intersect(Substrings(b)).OrderByDescending(s => s.Length);
+            return new Tuple<string, int>( lcs.First(), lcs.First().Length);
+        }
+
+        public static IEnumerable<string> Substrings(string str)
+        {
+            for (int i = 0; i < str.Length; ++i)
+            {
+                for (int j = i; j < str.Length; ++j)
+                {
+                    yield return str.Substring(i, j - i + 1);
+                }
+            }
+        }
     }
 }
