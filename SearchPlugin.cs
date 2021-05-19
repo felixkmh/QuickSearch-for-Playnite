@@ -74,9 +74,9 @@ namespace QuickSearch
             {
                 this.action = action;
             }
-
+#pragma warning disable CS0067
             public event EventHandler CanExecuteChanged;
-
+#pragma warning restore CS0067
             private Action action;
 
             public bool CanExecute(object parameter)
