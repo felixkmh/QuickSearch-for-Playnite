@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace QuickSearch
 {
-    // http://www.catalysoft.com/articles/StrikeAMatch.html
     class Matching
     {
         public enum ScoreNormalization
@@ -32,6 +31,14 @@ namespace QuickSearch
             }
         }
 
+        public static float GetCombinedScore(in string str1, in string str2)
+        {
+            return 10 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
+                 + LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
+                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1);
+        }
+
+        // http://www.catalysoft.com/articles/StrikeAMatch.html
         static List<string> GetWordLetterPairs(in string str)
         {
             var result = new List<string>();
@@ -44,14 +51,7 @@ namespace QuickSearch
             }
             return result;
         }
-
-        public static float GetCombinedScore(in string str1, in string str2)
-        {
-            return 10 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
-                 + LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
-                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1);
-        }
-
+        // http://www.catalysoft.com/articles/StrikeAMatch.html
         public static float MatchingLetterPairs(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
             if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
