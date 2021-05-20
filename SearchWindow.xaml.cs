@@ -12,7 +12,13 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using static QuickSearch.Matching;
+using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
+using System.Windows.Controls.Primitives;
+using QuickSearch.Controls;
 
+[assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
 {
     /// <summary>
@@ -23,24 +29,46 @@ namespace QuickSearch
         SearchPlugin searchPlugin;
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
-        static UnboundedCache<GameResult> gameResults;
+        ISearchItem<string>[] searchItems = Array.Empty<ISearchItem<string>>();
+
+        private double heightSelected = double.NaN;
+        private double heightNotSelected = double.NaN;
+
+        public void Reset()
+        {
+            heightSelected = double.NaN;
+            heightNotSelected = double.NaN;
+            SearchBox.Text = string.Empty;
+        }
+
+        public ObservableCollection<ISearchItem<string>> ListDataContext { get; private set; } = new ObservableCollection<ISearchItem<string>>();
 
         public SearchWindow(SearchPlugin plugin)
         {
             InitializeComponent();
             searchPlugin = plugin;
-            if (gameResults is null)
+            SearchResults.SelectionChanged += SearchResults_SelectionChanged;
+
+        }
+
+        private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (e.AddedItems.Count > 0)
             {
-                gameResults = new UnboundedCache<GameResult>(() => 
-                { 
-                    var result = new GameResult(); 
-                    result.MouseLeftButtonDown += ItemClicked;
-                    result.MouseDoubleClick += ItemDoubleClick;
-                    result.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
-                    result.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
-                    return result; 
-                });
+                if (ActionsListBox.Items.Count > 0)
+                {
+                    ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
+                }
             }
+        }
+
+        public void QueueIndexUpdate()
+        {
+            backgroundTask = backgroundTask.ContinueWith((t) =>
+            {
+                searchItems = SearchPlugin.Instance.searchItemSources.Values.AsParallel().SelectMany(source => source.GetItems()).ToArray();
+            });
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -61,21 +89,48 @@ namespace QuickSearch
                     }
 
                     var results = new List<Game>().AsEnumerable();
+                    var searchResults = new List<ISearchItem<string>>().AsEnumerable();
                     if (!string.IsNullOrEmpty(input))
                     {
-                        results = searchPlugin.PlayniteApi.Database.Games
-                        .Where(g => MatchingLetterPairs(input, g.Name, ScoreNormalization.Str1) >= searchPlugin.settings.Threshold)
-                        .OrderByDescending(g => GetCombinedScore(input, g.Name))
-                        .ThenBy(g => RemoveDiacritics(g.Name))
-                        .ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
-                        .ThenByDescending(g => g.IsInstalled);
+                        //results = searchPlugin.PlayniteApi.Database.Games
+                        //.Where(g => MatchingLetterPairs(input, g.Name, ScoreNormalization.Str1) >= searchPlugin.settings.Threshold)
+                        //.OrderByDescending(g => GetCombinedScore(input, g.Name))
+                        //.ThenBy(g => RemoveDiacritics(g.Name))
+                        //.ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
+                        //.ThenByDescending(g => g.IsInstalled);
+
+                        searchResults = searchItems.AsParallel()
+                        .Where(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1)) / item.TotalKeyWeight >= searchPlugin.settings.Threshold)
+                        .OrderByDescending(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * GetCombinedScore(input, k.Key) / item.TotalKeyWeight))
+                        .ThenBy(g =>
+                        {
+                            if (g is SearchItems.GameSearchItem game) 
+                                return RemoveDiacritics(game.game.Name); 
+                            else 
+                                return string.Empty;
+                        })
+                        .ThenByDescending(g =>
+                        {
+                            if (g is SearchItems.GameSearchItem game) 
+                                return game.game.LastActivity ?? DateTime.MinValue; 
+                            else 
+                                return DateTime.MinValue;
+                        })
+                        .ThenByDescending(g =>
+                        {
+                            if (g is SearchItems.GameSearchItem game) 
+                                return game.game.IsInstalled; 
+                            else 
+                                return false;
+                        });
+
                         if (searchPlugin.settings.MaxNumberResults > 0)
                         {
-                            results = results.Take(searchPlugin.settings.MaxNumberResults);
+                            searchResults = searchResults.Take(searchPlugin.settings.MaxNumberResults);
                         }
                     }
                     int count = 0;
-                    foreach(var result in results)
+                    foreach (var result in searchResults)
                     {
                         if (cancellationToken.IsCancellationRequested)
                         {
@@ -84,103 +139,110 @@ namespace QuickSearch
                         }
 
                         Dispatcher.Invoke(() => { 
-                            if (count < SearchResults.Items.Count)
+                            if (count < ListDataContext.Count)
                             {
-                                GameResult item;
-                                if (SearchResults.Items[count] is GameResult existing)
-                                {
-                                    item = existing;
-                                } else
-                                {
-                                    item = gameResults.Get();
-                                    SearchResults.Items[count] = item;
-                                }
-                                item.SetGame(result);
-                                // item.Score.Text = $"LCS = {Matching.LongestCommonSubstring(input, result.Name.ToLower()).Item1}";
-                                item.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
-                                item.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
+                                ListDataContext[count] = result;
                             } else
                             {
-                                var newItem = gameResults.Get();
-                                newItem.SetGame(result);
-                                // newItem.Score.Text = $"LCS = {Matching.LongestCommonSubstring(input, result.Name.ToLower()).Item1}"; 
-                                newItem.AlwaysExpand = searchPlugin.settings.ExpandAllItems;
-                                newItem.Seperator.Height = searchPlugin.settings.ShowSeperator ? 5 : 0;
-                                SearchResults.Items.Add(newItem);
+                                ListDataContext.Add(result);
                             }
+
                             if (SearchResults.Items.Count > 0 && count == 0)
                             {
                                 SearchResults.SelectedIndex = 0;
+                            }
+
+                            if (count == 2)
+                            {
+                                UpdateListBox(searchResults.Count());
                             }
                         }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                         count++;
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        for(int i = SearchResults.Items.Count - 1; i >= count; --i)
+                        for (int i = SearchResults.Items.Count - 1; i >= count; --i)
                         {
-                            if (SearchResults.Items[i] is GameResult result)
-                            {
-                                gameResults.Push(result);
-                            }
-                            SearchResults.Items.RemoveAt(i);
+                            ListDataContext.RemoveAt(i);
                         }
                         if (SearchResults.Items.Count > 0)
                         {
                             SearchResults.SelectedIndex = 0;
                         }
-                        if (SearchResults.Items.Count > 1)
-                        {
-                            var first = (UIElement)SearchResults.Items[0];
-                            var second = (UIElement)SearchResults.Items[1];
-                            var heightSelected = first.RenderSize.Height;
-                            var heightNotSelected = second.RenderSize.Height;
-                            var availableHeight = WindowGrid.Height;
-                            availableHeight -= SearchBox.RenderSize.Height;
-                            availableHeight -= heightSelected;
-                            availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
-                            var maxItems = Math.Floor(availableHeight / heightNotSelected);
-                            var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
-                            Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
-                            ScrollViewer scrollViewer = border.Child as ScrollViewer;
-                            if (maxItems + 1 >= SearchResults.Items.Count)
-                            {
-                                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                            } else
-                            {
-                                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                            }
-                            SearchResults.MaxHeight = maxHeight;
-                        } else
-                        {
-                            Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
-                            ScrollViewer scrollViewer = border.Child as ScrollViewer;
-                            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                        }
+                        UpdateListBox(searchResults.Count());
                     }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     oldSource.Dispose();
                 }, tokenSource.Token);
             }
         }
 
-        private void ItemClicked(object sender, MouseButtonEventArgs e)
+        private void UpdateListBox(int items)
         {
-            if (sender is ListBoxItem item)
+            if (SearchResults.Items.Count > 1)
             {
-                SearchResults.SelectedItem = item;
+                if (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))
+                {
+                    var first = SearchResults.ItemContainerGenerator.ContainerFromIndex(0) as ListBoxItem;
+                    var second = SearchResults.ItemContainerGenerator.ContainerFromIndex(1) as ListBoxItem;
+                    if(first != null && second != null)
+                    {
+                        heightSelected = first.RenderSize.Height;
+                        heightNotSelected = second.RenderSize.Height;
+                    }
+                }
+                if (!double.IsNaN(heightSelected) && !double.IsNaN(heightNotSelected))
+                {
+                    var availableHeight = WindowGrid.Height;
+                    availableHeight -= SearchBox.RenderSize.Height;
+                    availableHeight -= heightSelected;
+                    availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
+                    var maxItems = Math.Floor(availableHeight / heightNotSelected);
+                    var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
+                    Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                    ScrollViewer scrollViewer = border.Child as ScrollViewer;
+                    if (maxItems + 1 >= items)
+                    {
+                        scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    }
+                    else
+                    {
+                        scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                    }
+                    SearchResults.MaxHeight = maxHeight;
+                }
+            }
+            else
+            {
+                Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                ScrollViewer scrollViewer = border.Child as ScrollViewer;
+                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             }
         }
 
-        private void ItemDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ItemClicked(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                if (sender is ListBoxItem item)
+                if (e.ClickCount == 1)
                 {
-                    SearchResults.SelectedItem = item;
-                    if (item.DataContext is Game game)
+                    if (sender is SearchResult searchResult)
                     {
-                        searchPlugin.PlayniteApi.StartGame(game.Id);
+                        SearchResults.SelectedItem = searchResult;
+                    }
+                }
+                if (e.ClickCount == 2)
+                {
+                    if (sender is SearchResult searchResult)
+                    {
+                        SearchResults.SelectedItem = searchResult;
+                        searchPlugin.popup.IsOpen = false;
+                        if (SearchResults.SelectedIndex != -1)
+                        {
+                            if (ActionsListBox.SelectedItem is ISearchAction<string> action)
+                            {
+                                action.Execute(searchResult.DataContext);
+                            }
+                        }
                     }
                 }
             }
@@ -188,6 +250,24 @@ namespace QuickSearch
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Tab)
+            {
+                int currentIdx = ActionsListBox.SelectedIndex;
+                if (Keyboard.Modifiers == ModifierKeys.Shift)
+                {
+                    if (currentIdx >= 0)
+                    {
+                        SelectActionButton((currentIdx + ActionsListBox.Items.Count - 1) % ActionsListBox.Items.Count);
+                    }
+                } else
+                {
+                    if (currentIdx >= 0)
+                    {
+                        SelectActionButton((currentIdx + 1) % ActionsListBox.Items.Count);
+                    }
+                }
+                e.Handled = true;
+            }
             if (e.Key == Key.Escape)
             {
                 searchPlugin.popup.IsOpen = false;
@@ -219,80 +299,90 @@ namespace QuickSearch
                 SearchResults.SelectedIndex = idx;
                 if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
+                    searchPlugin.popup.IsOpen = false;
                     if (SearchResults.SelectedIndex != -1)
                     {
-                        if (((FrameworkElement)SearchResults.SelectedItem).DataContext is Game game)
+                        if (ActionsListBox.SelectedItem is ISearchAction<string> action)
                         {
-                            searchPlugin.PlayniteApi.StartGame(game.Id);
+                            if (SearchResults.SelectedItem is ISearchItem<string> item)
+                            {
+                                action.Execute(item);
+                            }
                         }
                     }
-                    searchPlugin.popup.IsOpen = false;
                 }
             }
         }
-    }
 
-    class UnboundedCache<T> : Stack<T>
-    {
-        public bool HasItems { get => Count > 0; }
-
-        protected readonly Func<T> generate;
-
-        public virtual new void Push(T item)
+        private void SelectActionButton(int idx)
         {
-            base.Push(item);
+            ActionsListBox.SelectedIndex = idx;
+            var containter = ActionsListBox.ItemContainerGenerator.ContainerFromIndex(idx);
+            ActionsListBox.ScrollIntoView(ActionsListBox.SelectedItem);
         }
 
-        public virtual void Consume<Collection>(Collection collection)
-            where Collection : IList, ICollection, IEnumerable
+        private void ActionButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            for (int i = 0; i < collection.Count; ++i)
+            if (sender is ActionButton bt)
             {
-                if (collection[i] is T item)
+                if (bt.Command is ISearchAction<string> action)
                 {
-                    base.Push(item);
+                    var lbi = ActionsListBox.ContainerFromElement(bt);
+                    if (lbi is ListBoxItem)
+                    {
+                        SelectActionButton(ActionsListBox.ItemContainerGenerator.IndexFromContainer(lbi));
+                    }
                 }
             }
-            collection.Clear();
         }
 
-        internal int Recycled = 0;
-        internal int Generated = 0;
-
-        public readonly Func<T> Get;
-
-        internal T GetOrGenerate()
+        private void ActionsListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            T item = default(T);
-            if (Count > 0)
+            Decorator border = VisualTreeHelper.GetChild(ActionsListBox, 0) as Decorator;
+            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+            if (e.Delta > 0)
             {
-                ++Recycled;
-                item = Pop();
-            }
-            else if (generate != null)
-            {
-                ++Generated;
-                item = generate.Invoke();
-            }
-            return item;
-        }
-
-        public UnboundedCache(Func<T> generator = null) : base()
-        {
-            this.generate = generator;
-            if (generate != null)
-            {
-                Get = GetOrGenerate;
+                scrollViewer.LineLeft();
             }
             else
             {
-                Get = () =>
-                {
-                    if (Count > 0)
-                        return Pop();
-                    return default(T);
-                };
+                scrollViewer.LineRight();
             }
+            e.Handled = true;
+        }
+    }
+
+    // Fix for CanExecute being called with null value
+    // https://stackoverflow.com/a/24669638
+    public static class ButtonHelper
+    {
+        public static DependencyProperty CommandParameterProperty = DependencyProperty.RegisterAttached(
+            "CommandParameter",
+            typeof(object),
+            typeof(ButtonHelper),
+            new PropertyMetadata(CommandParameter_Changed));
+
+        private static void CommandParameter_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var target = d as ButtonBase;
+            if (target == null)
+                return;
+
+            target.CommandParameter = e.NewValue;
+            var temp = target.Command;
+            // Have to set it to null first or CanExecute won't be called.
+            target.Command = null;
+            target.Command = temp;
+        }
+
+        public static object GetCommandParameter(ButtonBase target)
+        {
+            return target.GetValue(CommandParameterProperty);
+        }
+
+        public static void SetCommandParameter(ButtonBase target, object value)
+        {
+            target.SetValue(CommandParameterProperty, value);
         }
     }
 }

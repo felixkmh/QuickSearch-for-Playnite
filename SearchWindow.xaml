@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:QuickSearch"
+             xmlns:local="clr-namespace:QuickSearch" xmlns:search="clr-namespace:QuickSearch" xmlns:controls="clr-namespace:QuickSearch.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="40"
              >
@@ -17,11 +17,70 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="SearchBox" Grid.Row="0" Padding="7" TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_KeyDown"
                  Background="{DynamicResource PopupBackgroundBrush}"/>
+        <ListBox x:Name="ActionsListBox" Height="{Binding ActualHeight, ElementName=SearchBox}" Grid.Row="0" HorizontalAlignment="Right"
+                 ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Actions}" 
+                 ScrollViewer.CanContentScroll="False"
+                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                 PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
+                 Padding="2" Background="{x:Null}" MaxWidth="230">
+            <ListBox.OpacityMask>
+                <VisualBrush Visual="{Binding ElementName=SearchBox}" AutoLayoutContent="True" Stretch="None" AlignmentX="Right" AlignmentY="Center">
+                    <VisualBrush.Transform>
+                        <ScaleTransform ScaleX="0.99" ScaleY="0.99"/>
+                    </VisualBrush.Transform>
+                </VisualBrush>
+            </ListBox.OpacityMask>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                            IsVirtualizing="True"
+                                            VirtualizationMode="Recycling"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <controls:ActionButton Command="{Binding .}" ClipToBounds="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Content="{Binding Name}"
+                            local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem}"
+                            MouseEnter="ActionButton_MouseEnter"
+                            IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="1"
+                                           Padding="5,0"
+                            Opacity="{Binding Converter={StaticResource OpacityBoolConverter}, RelativeSource={RelativeSource Mode=Self}, Path=IsSelected, Mode=OneWay}">
+                    </controls:ActionButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="{x:Null}"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
         <ListBox x:Name="SearchResults" Grid.Row="1" MaxHeight="400"
                  Background="{DynamicResource PopupBackgroundBrush}" 
                  Focusable="False" KeyboardNavigation.ControlTabNavigation="None" 
                  KeyboardNavigation.IsTabStop="False" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 />
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 ItemsSource="{Binding ListDataContext}"
+                 ScrollViewer.CanContentScroll="True"
+                 >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:SearchResult IsSelected="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" 
+                                        KeyboardNavigation.IsTabStop="False"
+                                        MouseDown="ItemClicked"
+                                        />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>

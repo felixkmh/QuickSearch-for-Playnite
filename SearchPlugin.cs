@@ -16,7 +16,13 @@ namespace QuickSearch
 {
     public class SearchPlugin : Plugin
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
+        internal static readonly ILogger logger = LogManager.GetLogger();
+
+        public static SearchPlugin Instance { get => instance; }
+        private static SearchPlugin instance;
+
+        internal IDictionary<string, ISearchItemSource<string>> searchItemSources = new Dictionary<string, ISearchItemSource<string>>();
+        internal static SearchItems.SimpleCommandItemSource simpleCommands = new SearchItems.SimpleCommandItemSource();
 
         public SearchSettings settings { get; set; }
 
@@ -29,6 +35,18 @@ namespace QuickSearch
             settings = new SearchSettings(this);
         }
 
+        public static SearchItems.SimpleCommandItem AddCommand(string name, Action action, string descripton = null, string absoluteIconPath = null)
+        {
+            var item = new SearchItems.SimpleCommandItem(name, action, descripton, absoluteIconPath);
+            simpleCommands.Items.Add(item);
+            return item;
+        }
+
+        public static bool RemoveCommand(SearchItems.SimpleCommandItem item)
+        {
+            return simpleCommands.Items.Remove(item);
+        }
+
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
         {
             var window = Application.Current.MainWindow;
@@ -38,8 +56,7 @@ namespace QuickSearch
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
                 window.InputBindings.Add(HotkeyBinding);
                 popup?.InputBindings.Add(HotkeyBinding);
-                if (searchWindow is SearchWindow)
-                    searchWindow.SearchBox.Text = string.Empty;
+                searchWindow?.Reset();
             });
         }
 
@@ -92,6 +109,9 @@ namespace QuickSearch
 
         public override void OnApplicationStarted()
         {
+            instance = this;
+            searchItemSources.Add("QuickSearch_Games", new SearchItems.GameSearchSource());
+            searchItemSources.Add("QuickSearch_Commands", simpleCommands);
             // Add code to be executed when Playnite is initialized.
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -100,6 +120,8 @@ namespace QuickSearch
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
                 window.InputBindings.Add(HotkeyBinding);
             }
+
+            AddCommand("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.");
         }
 
         public Popup popup;
@@ -115,13 +137,15 @@ namespace QuickSearch
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
                 searchWindow = new SearchWindow(this);
+                searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
                 popup.InputBindings.Add(HotkeyBinding);
             }
             popup.IsOpen = !popup.IsOpen;
             if (popup.IsOpen)
             {
-                searchWindow.Dispatcher.Invoke(() => { 
+                searchWindow.Dispatcher.Invoke(() => {
+                    searchWindow.QueueIndexUpdate();
                     searchWindow.SearchBox.SelectAll();
                     searchWindow.SearchBox.Focus();
                 });
