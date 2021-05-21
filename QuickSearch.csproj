@@ -60,18 +60,15 @@
     <Compile Include="SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GameResult.xaml.cs">
-      <DependentUpon>GameResult.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Matching.cs" />
     <Compile Include="SearchItems\GameSearchItem.cs" />
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="SearchSettings.cs" />
-    <Compile Include="SearchSettingsView.xaml.cs">
+    <Compile Include="Views\SearchSettingsView.xaml.cs">
       <DependentUpon>SearchSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SearchWindow.xaml.cs">
+    <Compile Include="Views\SearchWindow.xaml.cs">
       <DependentUpon>SearchWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -90,15 +87,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="GameResult.xaml">
+    <Page Include="Views\SearchSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SearchSettingsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SearchWindow.xaml">
+    <Page Include="Views\SearchWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
