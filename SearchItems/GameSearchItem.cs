@@ -32,7 +32,7 @@ namespace QuickSearch.SearchItems
         public Game game;
         public string Key => game.Source?.Name;
 
-        public float Weight => string.IsNullOrEmpty(game.Source?.Name) ? 0f : 0.1f;
+        public float Weight => string.IsNullOrEmpty(game.Source?.Name) ? 0f : 0.05f;
     }
 
     class GameActions : ISearchAction<string>
@@ -101,8 +101,8 @@ namespace QuickSearch.SearchItems
                 keys.Add(new NameKey { game = game });
             if (!string.IsNullOrEmpty(game.GameImagePath))
                 keys.Add(new RomKey { game = game });
-            //if (!string.IsNullOrEmpty(game.Source?.Name))
-            //    keys.Add(new SourceKey { game = game });
+            if (!string.IsNullOrEmpty(game.Source?.Name))
+                keys.Add(new SourceKey { game = game });
         }
 
         public Game game;
@@ -162,15 +162,6 @@ namespace QuickSearch.SearchItems
             }
         }
 
-        public float TotalKeyWeight
-        {
-            get
-            {
-                var sum = Keys.Sum(k => k.Weight);
-                return sum > 0 ? sum : 1;
-            }
-        }
-
-        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
+        public ScoreMode ScoreMode => ScoreMode.WeightedAverage;
     }
 }

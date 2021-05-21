@@ -85,13 +85,30 @@ namespace QuickSearch
             switch (item.ScoreMode)
             {
                 case ScoreMode.WeightedAverage:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / item.TotalKeyWeight;
+                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s=>s.Key.Weight);
                 case ScoreMode.WeightedMaxScore:
                     return scores.Max(s => s.Score * s.Key.Weight);
                 case ScoreMode.WeightedMinScore:
                     return scores.Min(s => s.Score * s.Key.Weight);
                 default:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / item.TotalKeyWeight;
+                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
+            }
+        }
+
+        internal float ComputePreliminaryScore(ISearchItem<string> item, string input)
+        {
+            var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1), Key = k });
+
+            switch (item.ScoreMode)
+            {
+                case ScoreMode.WeightedAverage:
+                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
+                case ScoreMode.WeightedMaxScore:
+                    return scores.Max(s => s.Score * s.Key.Weight);
+                case ScoreMode.WeightedMinScore:
+                    return scores.Min(s => s.Score * s.Key.Weight);
+                default:
+                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
             }
         }
 
@@ -116,7 +133,7 @@ namespace QuickSearch
                     if (!string.IsNullOrEmpty(input))
                     {
                         var canditates = searchItems.AsParallel()
-                        .Where(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1)) / item.TotalKeyWeight >= searchPlugin.settings.Threshold)
+                        .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
                         .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
                         var maxResults = canditates.Length;
                         if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
