@@ -109,34 +109,36 @@ namespace QuickSearch
         internal float ComputeScore(ISearchItem<string> item, string input)
         {
             var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k});
-
+            var weightSum = scores.Sum(s => s.Key.Weight);
+            if (weightSum <= 0) weightSum = 1;
             switch (item.ScoreMode)
             {
                 case ScoreMode.WeightedAverage:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s=>s.Key.Weight);
+                    return scores.Sum(s => s.Score * s.Key.Weight) / weightSum;
                 case ScoreMode.WeightedMaxScore:
                     return scores.Max(s => s.Score * s.Key.Weight);
                 case ScoreMode.WeightedMinScore:
                     return scores.Min(s => s.Score * s.Key.Weight);
                 default:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
+                    return scores.Sum(s => s.Score * s.Key.Weight) / weightSum;
             }
         }
 
         internal float ComputePreliminaryScore(ISearchItem<string> item, string input)
         {
             var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1), Key = k });
-
+            var weightSum = scores.Sum(s => s.Key.Weight);
+            if (weightSum <= 0) weightSum = 1;
             switch (item.ScoreMode)
             {
                 case ScoreMode.WeightedAverage:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
+                    return scores.Sum(s => s.Score * s.Key.Weight) / weightSum;
                 case ScoreMode.WeightedMaxScore:
                     return scores.Max(s => s.Score * s.Key.Weight);
                 case ScoreMode.WeightedMinScore:
                     return scores.Min(s => s.Score * s.Key.Weight);
                 default:
-                    return scores.Sum(s => s.Score * s.Key.Weight) / scores.Sum(s => s.Key.Weight);
+                    return scores.Sum(s => s.Score * s.Key.Weight) / weightSum;
             }
         }
 
