@@ -35,7 +35,7 @@ namespace QuickSearch.SearchItems
         public float Weight => string.IsNullOrEmpty(game.Source?.Name) ? 0f : 0.05f;
     }
 
-    class GameActions : ISearchAction<string>
+    class ContextAction : ISearchAction<string>
     {
         public string Name { get; set; }
 #pragma warning disable CS0067
@@ -55,6 +55,32 @@ namespace QuickSearch.SearchItems
             if (searchItem is GameSearchItem game)
             {
                 SearchPlugin.Instance.PlayniteApi.StartGame(game.game.Id);
+            }
+        }
+    }
+
+    public class GameAction : ISearchAction<string>
+    {
+        public Action<Game> Action { get; set; }
+
+        public string Name { get; set; }
+#pragma warning disable CS0067
+        public event EventHandler CanExecuteChanged;
+#pragma warning restore CS0067
+        public bool CanExecute(object searchItem)
+        {
+            if (searchItem is GameSearchItem game)
+            {
+                return SearchPlugin.Instance.PlayniteApi.Database.Games.Get(game.game.Id) is Game;
+            }
+            return false;
+        }
+
+        public void Execute(object searchItem)
+        {
+            if (searchItem is GameSearchItem game)
+            {
+                Action(game.game);
             }
         }
     }
@@ -85,9 +111,30 @@ namespace QuickSearch.SearchItems
 
     public class GameSearchSource : ISearchItemSource<string>
     {
+        public IList<GameAction> GameActions { get; set; } = new List<GameAction>();
+
         public IEnumerable<ISearchItem<string>> GetItems()
         {
-            return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g => new SearchItems.GameSearchItem(g));
+            GameActions.Clear();
+            if (SearchPlugin.Instance.settings.EnableExternalGameActions)
+            {
+                foreach(var item in QuickSearchSDK.gameActions)
+                {
+                    GameActions.Add(new GameAction() { Name = item.Key, Action = item.Value });
+                }
+            }
+            return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g => 
+            { 
+                var item =  new GameSearchItem(g);
+                if (SearchPlugin.Instance.settings.EnableExternalGameActions)
+                {
+                    foreach(var action in GameActions)
+                    {
+                        item.Actions.Add(action);
+                    }
+                }
+                return item;
+            });
         }
     }
 
@@ -110,15 +157,19 @@ namespace QuickSearch.SearchItems
         private readonly IList<ISearchKey<string>> keys;
         public IList<ISearchKey<string>> Keys => keys;
 
+        private IList<ISearchAction<string>> actions;
         public IList<ISearchAction<string>> Actions
         {
             get
             {
-                var action = new GameActions();
-                action.Name = game.IsInstalled ?
-                    Application.Current.FindResource("LOCPlayGame") as string :
-                    Application.Current.FindResource("LOCInstallGame") as string;
-                var actions = new List<ISearchAction<string>> { action };
+                if (actions == null)
+                {
+                    var action = new ContextAction();
+                    action.Name = game.IsInstalled ?
+                        Application.Current.FindResource("LOCPlayGame") as string :
+                        Application.Current.FindResource("LOCInstallGame") as string;
+                    actions = new List<ISearchAction<string>> { action };
+                }
                 return actions;
             }
         }

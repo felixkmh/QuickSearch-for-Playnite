@@ -49,6 +49,21 @@ namespace QuickSearch
             InitializeComponent();
             searchPlugin = plugin;
             SearchResults.SelectionChanged += SearchResults_SelectionChanged;
+            ListDataContext.CollectionChanged += ListDataContext_CollectionChanged;
+        }
+
+        private void ListDataContext_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (ListDataContext.Count > 0 && ActionsListBox.Visibility == Visibility.Hidden)
+            {
+                ActionsListBox.Visibility = Visibility.Visible;
+                SearchResults.Visibility = Visibility.Visible;
+            }
+            if (ListDataContext.Count == 0 && ActionsListBox.Visibility == Visibility.Visible)
+            {
+                ActionsListBox.Visibility = Visibility.Hidden;
+                SearchResults.Visibility = Visibility.Hidden;
+            }
 
         }
 
@@ -68,7 +83,20 @@ namespace QuickSearch
         {
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
-                searchItems = QuickSearchSDK.searchItemSources.Values.AsParallel().SelectMany(source => source.GetItems()).ToArray();
+                if (SearchPlugin.Instance.settings.EnableExternalItems)
+                {
+                    searchItems = QuickSearchSDK.searchItemSources.Values
+                    .Concat(SearchPlugin.Instance.searchItemSources.Values)
+                    .AsParallel()
+                    .SelectMany(source => source.GetItems())
+                    .ToArray();
+                } else
+                {
+                    searchItems = SearchPlugin.Instance.searchItemSources.Values
+                    .AsParallel()
+                    .SelectMany(source => source.GetItems())
+                    .ToArray();
+                }
             });
         }
 

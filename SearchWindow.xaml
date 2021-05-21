@@ -23,7 +23,9 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
                  PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
-                 Padding="2" Background="{x:Null}" MaxWidth="230">
+                 Padding="2" Background="{x:Null}" MaxWidth="260"
+                 Visibility="Hidden"
+                 >
             <ListBox.OpacityMask>
                 <VisualBrush Visual="{Binding ElementName=SearchBox}" AutoLayoutContent="True" Stretch="None" AlignmentX="Right" AlignmentY="Center">
                     <VisualBrush.Transform>
@@ -72,6 +74,7 @@
                  VirtualizingPanel.VirtualizationMode="Recycling"
                  ItemsSource="{Binding ListDataContext}"
                  ScrollViewer.CanContentScroll="True"
+                 Visibility="Hidden"
                  >
             <ListBox.ItemTemplate>
                 <DataTemplate>

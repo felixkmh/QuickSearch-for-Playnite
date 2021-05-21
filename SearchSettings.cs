@@ -38,6 +38,8 @@ namespace QuickSearch
         public bool ShowSeperator { get; set; } = false;
         public bool IncrementalUpdate { get; set; } = false;
         public int MaxNumberResults { get; set; } = 20;
+        public bool EnableExternalGameActions { get; set; } = false;
+        public bool EnableExternalItems { get; set; } = false;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -71,6 +73,8 @@ namespace QuickSearch
                 ShowSeperator = savedSettings.ShowSeperator;
                 IncrementalUpdate = savedSettings.IncrementalUpdate;
                 MaxNumberResults = savedSettings.MaxNumberResults;
+                EnableExternalGameActions = savedSettings.EnableExternalGameActions;
+                EnableExternalItems = savedSettings.EnableExternalItems;
             }
         }
 
@@ -93,6 +97,8 @@ namespace QuickSearch
             this.ShowSeperator = previousSettings.ShowSeperator;
             this.IncrementalUpdate = previousSettings.IncrementalUpdate;
             this.MaxNumberResults = previousSettings.MaxNumberResults;
+            this.EnableExternalGameActions = previousSettings.EnableExternalGameActions;
+            this.EnableExternalItems = previousSettings.EnableExternalItems;
             previousSettings = null;
         }
 
@@ -107,6 +113,8 @@ namespace QuickSearch
             changed |= ShowSeperator     != previousSettings.ShowSeperator;
             changed |= IncrementalUpdate != previousSettings.IncrementalUpdate;
             changed |= MaxNumberResults  != previousSettings.MaxNumberResults;
+            changed |= EnableExternalGameActions != previousSettings.EnableExternalGameActions;
+            changed |= EnableExternalItems != previousSettings.EnableExternalItems;
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;
