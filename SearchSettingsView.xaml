@@ -6,39 +6,39 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <StackPanel Margin="10">
-        <TextBlock Text="Hotkey to open the search popup:" Margin="2"/>
+        <TextBlock Text="Hotkey to open the search popup:" Margin="2" Foreground="{StaticResource TextBrush}"/>
         <StackPanel Orientation="Horizontal" Margin="2">
-            <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False"/>
+            <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False" Foreground="{StaticResource TextBrush}"/>
             <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
         </StackPanel>
-        <TextBlock Text="Fuzzy search threshold (higher value = more strict):" Margin="2"/>
+        <TextBlock Text="Fuzzy search threshold (higher value = more strict):" Margin="2" Foreground="{StaticResource TextBrush}"/>
         <StackPanel Orientation="Horizontal" Margin="2">
             <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="200" HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"/>
-            <TextBlock Text="{Binding Threshold}"/>
+            <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="5">
-            <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center"/>
-            <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" TextChanged="MaxNumberResultsTextBox_TextChanged"/>
+            <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+            <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" TextChanged="MaxNumberResultsTextBox_TextChanged" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding ExpandAllItems}" Margin="5"/>
-            <TextBlock Text="Expand all items" VerticalAlignment="Center"/>
+            <TextBlock Text="Expand all items" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding ShowSeperator}" Margin="5"/>
-            <TextBlock Text="Show seperator" VerticalAlignment="Center"/>
+            <TextBlock Text="Show seperator" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
-            <TextBlock Text="Lower priority of adding results (Enable if search performance is slow)" VerticalAlignment="Center"/>
+            <TextBlock Text="Lower priority of adding results (Enable if search performance is slow)" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5"/>
-            <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center"/>
+            <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5"/>
-            <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center"/>
+            <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
         </StackPanel>
     </StackPanel>
 </UserControl>
