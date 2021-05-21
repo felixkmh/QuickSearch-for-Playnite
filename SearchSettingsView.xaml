@@ -20,10 +20,25 @@
             <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center"/>
             <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" TextChanged="MaxNumberResultsTextBox_TextChanged"/>
         </StackPanel>
-        <CheckBox Content="Expand all items" IsChecked="{Binding ExpandAllItems}" Margin="5"/>
-        <CheckBox Content="Show seperator" IsChecked="{Binding ShowSeperator}" Margin="5"/>
-        <CheckBox Content="Lower priority of adding results (Enable if search performance is slow)" IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
-        <CheckBox Content="Enable Items added by other extensions." IsChecked="{Binding EnableExternalItems}" Margin="5"/>
-        <CheckBox Content="Enable Game Actions added by other extensions." IsChecked="{Binding EnableExternalGameActions}" Margin="5"/>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox  IsChecked="{Binding ExpandAllItems}" Margin="5"/>
+            <TextBlock Text="Expand all items" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox  IsChecked="{Binding ShowSeperator}" Margin="5"/>
+            <TextBlock Text="Show seperator" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox  IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
+            <TextBlock Text="Lower priority of adding results (Enable if search performance is slow)" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5"/>
+            <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5"/>
+            <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>
