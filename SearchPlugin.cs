@@ -22,8 +22,6 @@ namespace QuickSearch
         public static SearchPlugin Instance { get => instance; }
         private static SearchPlugin instance;
 
-        internal IDictionary<string, ISearchItemSource<string>> searchItemSources = new Dictionary<string, ISearchItemSource<string>>();
-
         public SearchSettings settings { get; set; }
 
         private InputBinding HotkeyBinding { get; set; }
@@ -98,8 +96,8 @@ namespace QuickSearch
         public override void OnApplicationStarted()
         {
             instance = this;
-            searchItemSources.Add("QuickSearch_Games", new GameSearchSource());
-            searchItemSources.Add("QuickSearch_Commands", QuickSearchSDK.simpleCommands);
+            QuickSearchSDK.AddItemSource("Games", new GameSearchSource());
+            QuickSearchSDK.AddItemSource("Commands", QuickSearchSDK.simpleCommands);
             // Add code to be executed when Playnite is initialized.
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {

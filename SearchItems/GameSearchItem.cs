@@ -170,5 +170,7 @@ namespace QuickSearch.SearchItems
                 return sum > 0 ? sum : 1;
             }
         }
+
+        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
     }
 }

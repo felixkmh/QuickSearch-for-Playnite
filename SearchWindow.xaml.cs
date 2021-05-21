@@ -68,7 +68,7 @@ namespace QuickSearch
         {
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
-                searchItems = SearchPlugin.Instance.searchItemSources.Values.AsParallel().SelectMany(source => source.GetItems()).ToArray();
+                searchItems = QuickSearchSDK.searchItemSources.Values.AsParallel().SelectMany(source => source.GetItems()).ToArray();
             });
         }
 
@@ -76,6 +76,23 @@ namespace QuickSearch
             public ISearchItem<string> Item;
             public float Score;
             public bool Marked;
+        }
+
+        internal float ComputeScore(ISearchItem<string> item, string input)
+        {
+            var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k});
+
+            switch (item.ScoreMode)
+            {
+                case ScoreMode.WeightedAverage:
+                    return scores.Sum(s => s.Score * s.Key.Weight) / item.TotalKeyWeight;
+                case ScoreMode.WeightedMaxScore:
+                    return scores.Max(s => s.Score * s.Key.Weight);
+                case ScoreMode.WeightedMinScore:
+                    return scores.Min(s => s.Score * s.Key.Weight);
+                default:
+                    return scores.Sum(s => s.Score * s.Key.Weight) / item.TotalKeyWeight;
+            }
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -100,7 +117,7 @@ namespace QuickSearch
                     {
                         var canditates = searchItems.AsParallel()
                         .Where(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1)) / item.TotalKeyWeight >= searchPlugin.settings.Threshold)
-                        .Select(item => new Candidate{ Marked = false, Item = item, Score = item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * GetCombinedScore(input, k.Key)) / item.TotalKeyWeight}).ToArray();
+                        .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
                         var maxResults = canditates.Length;
                         if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
                         {
