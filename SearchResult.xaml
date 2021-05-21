@@ -26,7 +26,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding Icon}" 
+                <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}}" 
                        MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
                        Width="{Binding ActualHeight, ElementName=PlatformStack}"
                        RenderOptions.BitmapScalingMode="Fant"
@@ -73,7 +73,7 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon}" Width="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
+                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Width="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="SelectedImage"
                        Effect="{StaticResource IconDropShadow}"/>

@@ -2,6 +2,6 @@
 Name: QuickSearch
 Author: felixkmh
 Version: 0.4.2
-Module: Search.dll
+Module: QuickSearch.dll
 Type: GenericPlugin
 Icon: icon.png

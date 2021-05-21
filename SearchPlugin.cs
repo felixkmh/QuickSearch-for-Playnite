@@ -1,6 +1,7 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using QuickSearch.SearchItems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,6 @@ namespace QuickSearch
         private static SearchPlugin instance;
 
         internal IDictionary<string, ISearchItemSource<string>> searchItemSources = new Dictionary<string, ISearchItemSource<string>>();
-        internal static SearchItems.SimpleCommandItemSource simpleCommands = new SearchItems.SimpleCommandItemSource();
 
         public SearchSettings settings { get; set; }
 
@@ -33,18 +33,6 @@ namespace QuickSearch
         public SearchPlugin(IPlayniteAPI api) : base(api)
         {
             settings = new SearchSettings(this);
-        }
-
-        public static SearchItems.SimpleCommandItem AddCommand(string name, Action action, string descripton = null, string absoluteIconPath = null)
-        {
-            var item = new SearchItems.SimpleCommandItem(name, action, descripton, absoluteIconPath);
-            simpleCommands.Items.Add(item);
-            return item;
-        }
-
-        public static bool RemoveCommand(SearchItems.SimpleCommandItem item)
-        {
-            return simpleCommands.Items.Remove(item);
         }
 
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
@@ -110,8 +98,8 @@ namespace QuickSearch
         public override void OnApplicationStarted()
         {
             instance = this;
-            searchItemSources.Add("QuickSearch_Games", new SearchItems.GameSearchSource());
-            searchItemSources.Add("QuickSearch_Commands", simpleCommands);
+            searchItemSources.Add("QuickSearch_Games", new GameSearchSource());
+            searchItemSources.Add("QuickSearch_Commands", QuickSearchSDK.simpleCommands);
             // Add code to be executed when Playnite is initialized.
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -121,7 +109,7 @@ namespace QuickSearch
                 window.InputBindings.Add(HotkeyBinding);
             }
 
-            AddCommand("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.");
+            QuickSearchSDK.AddCommand("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.");
         }
 
         public Popup popup;

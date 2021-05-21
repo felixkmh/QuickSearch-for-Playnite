@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 using QuickSearch.Controls;
+using QuickSearch.SearchItems;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -71,6 +72,12 @@ namespace QuickSearch
             });
         }
 
+        struct Candidate {
+            public ISearchItem<string> Item;
+            public float Score;
+            public bool Marked;
+        }
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
@@ -88,90 +95,130 @@ namespace QuickSearch
                         return;
                     }
 
-                    var results = new List<Game>().AsEnumerable();
-                    var searchResults = new List<ISearchItem<string>>().AsEnumerable();
+                    int addedItems = 0;
                     if (!string.IsNullOrEmpty(input))
                     {
-                        //results = searchPlugin.PlayniteApi.Database.Games
-                        //.Where(g => MatchingLetterPairs(input, g.Name, ScoreNormalization.Str1) >= searchPlugin.settings.Threshold)
-                        //.OrderByDescending(g => GetCombinedScore(input, g.Name))
-                        //.ThenBy(g => RemoveDiacritics(g.Name))
-                        //.ThenByDescending(g => g.LastActivity ?? DateTime.MinValue)
-                        //.ThenByDescending(g => g.IsInstalled);
-
-                        searchResults = searchItems.AsParallel()
+                        var canditates = searchItems.AsParallel()
                         .Where(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1)) / item.TotalKeyWeight >= searchPlugin.settings.Threshold)
-                        .OrderByDescending(item => item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * GetCombinedScore(input, k.Key) / item.TotalKeyWeight))
-                        .ThenBy(g =>
+                        .Select(item => new Candidate{ Marked = false, Item = item, Score = item.Keys.Where(k => k.Weight > 0).Sum(k => k.Weight * GetCombinedScore(input, k.Key)) / item.TotalKeyWeight}).ToArray();
+                        var maxResults = canditates.Length;
+                        if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
                         {
-                            if (g is SearchItems.GameSearchItem game) 
-                                return RemoveDiacritics(game.game.Name); 
-                            else 
-                                return string.Empty;
-                        })
-                        .ThenByDescending(g =>
-                        {
-                            if (g is SearchItems.GameSearchItem game) 
-                                return game.game.LastActivity ?? DateTime.MinValue; 
-                            else 
-                                return DateTime.MinValue;
-                        })
-                        .ThenByDescending(g =>
-                        {
-                            if (g is SearchItems.GameSearchItem game) 
-                                return game.game.IsInstalled; 
-                            else 
-                                return false;
-                        });
-
-                        if (searchPlugin.settings.MaxNumberResults > 0)
-                        {
-                            searchResults = searchResults.Take(searchPlugin.settings.MaxNumberResults);
-                        }
-                    }
-                    int count = 0;
-                    foreach (var result in searchResults)
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            oldSource.Dispose();
-                            return;
+                            maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
                         }
 
-                        Dispatcher.Invoke(() => { 
-                            if (count < ListDataContext.Count)
+
+                        bool unmarkedLeft = true;
+
+                        while(unmarkedLeft && addedItems < maxResults)
+                        {
+                            if (cancellationToken.IsCancellationRequested)
                             {
-                                ListDataContext[count] = result;
-                            } else
-                            {
-                                ListDataContext.Add(result);
+                                oldSource.Dispose();
+                                return;
                             }
 
-                            if (SearchResults.Items.Count > 0 && count == 0)
+                            unmarkedLeft = false;
+
+                            float maxScore = float.NegativeInfinity;
+                            int maxIdx = -1;
+
+                            for (int i = 0; i < canditates.Length; ++i)
                             {
-                                SearchResults.SelectedIndex = 0;
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    oldSource.Dispose();
+                                    return;
+                                }
+
+                                if (canditates[i].Marked)
+                                {
+                                    continue;
+                                }
+                                unmarkedLeft = true;
+                                var item = canditates[i].Item;
+                                float score = canditates[i].Score;
+
+                                if (score >= maxScore)
+                                {
+                                    bool updateMax = false;
+                                    if (score > maxScore)
+                                    {
+                                        updateMax = true;
+                                    } else
+                                    {
+                                        if (item is SearchItems.GameSearchItem gameItem)
+                                        {
+                                            if (canditates[maxIdx].Item is SearchItems.GameSearchItem maxGameItem)
+                                            {
+                                                if (RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name)) < 0)
+                                                {
+                                                    updateMax = true;
+                                                } else if ((gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue) > 0)
+                                                {
+                                                    updateMax = true;
+                                                } else if (gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled) > 0)
+                                                {
+                                                    updateMax = true;
+                                                }
+                                            } 
+                                        }
+                                    }
+
+                                    if (updateMax)
+                                    {
+                                        maxIdx = i;
+                                        maxScore = score;
+                                    }
+                                }
                             }
 
-                            if (count == 2)
+                            if (maxIdx >= 0)
                             {
-                                UpdateListBox(searchResults.Count());
+                                canditates[maxIdx].Marked = true;
+                                Dispatcher.Invoke(() =>
+                                {
+                                    if(ListDataContext.Count > addedItems)
+                                    {
+                                        ListDataContext[addedItems] = canditates[maxIdx].Item;
+                                    } else
+                                    {
+                                        ListDataContext.Add(canditates[maxIdx].Item);
+                                    }
+
+                                    if (ListDataContext.Count > 0 && addedItems == 0)
+                                    {
+                                        SearchResults.SelectedIndex = 0;
+                                    }
+
+                                    if (addedItems == 2)
+                                    {
+                                        UpdateListBox(maxResults);
+                                    }
+                                }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+
+                                addedItems += 1;
                             }
-                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
-                        count++;
+
+                        }
+
+                        
                     }
+
                     Dispatcher.Invoke(() =>
                     {
-                        for (int i = SearchResults.Items.Count - 1; i >= count; --i)
+                        for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
                         {
                             ListDataContext.RemoveAt(i);
                         }
-                        if (SearchResults.Items.Count > 0)
+                        if (ListDataContext.Count > 0)
                         {
                             SearchResults.SelectedIndex = 0;
                         }
-                        UpdateListBox(searchResults.Count());
-                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
+                        UpdateListBox(ListDataContext.Count);
+                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
                     oldSource.Dispose();
+
                 }, tokenSource.Token);
             }
         }

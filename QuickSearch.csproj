@@ -7,8 +7,8 @@
     <ProjectGuid>{4FDF1E89-5BC3-4C72-8FDA-0D580E7A5D5F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Search</RootNamespace>
-    <AssemblyName>Search</AssemblyName>
+    <RootNamespace>QuickSearch</RootNamespace>
+    <AssemblyName>QuickSearch</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -57,7 +57,6 @@
     <Compile Include="Controls\ActionButton.xaml.cs">
       <DependentUpon>ActionButton.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SearchItems\SimpleCommandItem.cs" />
     <Compile Include="SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
@@ -65,7 +64,6 @@
       <DependentUpon>GameResult.xaml</DependentUpon>
     </Compile>
     <Compile Include="Matching.cs" />
-    <Compile Include="ISearchItem.cs" />
     <Compile Include="SearchItems\GameSearchItem.cs" />
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="SearchSettings.cs" />
@@ -109,6 +107,12 @@
     <None Include="icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuickSearchSDK\QuickSearchSDK.csproj">
+      <Project>{0425a0c6-c410-48fc-8218-6f7b124eeca5}</Project>
+      <Name>QuickSearchSDK</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
