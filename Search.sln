@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearch", "QuickSearch.csproj", "{4FDF1E89-5BC3-4C72-8FDA-0D580E7A5D5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK", "..\QuickSearchSDK\QuickSearchSDK.csproj", "{0425A0C6-C410-48FC-8218-6F7B124EECA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK", "QuickSearchSDK\QuickSearchSDK.csproj", "{0425A0C6-C410-48FC-8218-6F7B124EECA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -109,7 +109,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuickSearchSDK\QuickSearchSDK.csproj">
+    <ProjectReference Include="QuickSearchSDK\QuickSearchSDK.csproj">
       <Project>{0425a0c6-c410-48fc-8218-6f7b124eeca5}</Project>
       <Name>QuickSearchSDK</Name>
     </ProjectReference>
