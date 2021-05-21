@@ -114,7 +114,7 @@ namespace QuickSearch
             }
             var settingsCommand = new CommandItem("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.");
             simpleCommands.Items.Add(settingsCommand);
-            QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
+            // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
         }
 
         public Popup popup;
