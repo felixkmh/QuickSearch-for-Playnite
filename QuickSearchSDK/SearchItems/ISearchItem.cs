@@ -61,8 +61,15 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Returns <see cref="ISearchItem{TKey}"/>s.
         /// </summary>
+        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>.</param>
         /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>.</returns>
-        IEnumerable<ISearchItem<TKey>> GetItems();
+        IEnumerable<ISearchItem<TKey>> GetItems(string query);
+
+        /// <summary>
+        /// Indicates whether this source supplies items dependign on the current search query.
+        /// Returning true unnecessarily can slow down the search.
+        /// </summary>
+        bool DependsOnQuery { get; }
     }
     /// <summary>
     /// Item that holds data on how to search for it,

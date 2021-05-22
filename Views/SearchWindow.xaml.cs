@@ -30,7 +30,7 @@ namespace QuickSearch
         SearchPlugin searchPlugin;
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
-        ISearchItem<string>[] searchItems = Array.Empty<ISearchItem<string>>();
+        List<ISearchItem<string>> searchItems = new List<ISearchItem<string>>();
 
         private double heightSelected = double.NaN;
         private double heightNotSelected = double.NaN;
@@ -87,15 +87,17 @@ namespace QuickSearch
                 {
                     searchItems = QuickSearchSDK.searchItemSources.Values
                     .Concat(SearchPlugin.Instance.searchItemSources.Values)
+                    .Where(source => !source.DependsOnQuery)
                     .AsParallel()
-                    .SelectMany(source => source.GetItems())
-                    .ToArray();
+                    .SelectMany(source => source.GetItems(null))
+                    .ToList();
                 } else
                 {
                     searchItems = SearchPlugin.Instance.searchItemSources.Values
                     .AsParallel()
-                    .SelectMany(source => source.GetItems())
-                    .ToArray();
+                    .Where(source => !source.DependsOnQuery)
+                    .SelectMany(source => source.GetItems(null))
+                    .ToList();
                 }
             });
         }
@@ -162,9 +164,32 @@ namespace QuickSearch
                     int addedItems = 0;
                     if (!string.IsNullOrEmpty(input))
                     {
-                        var canditates = searchItems.AsParallel()
-                        .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                        .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
+                        IEnumerable<ISearchItem<string>> queryDependantItems;
+                        if (SearchPlugin.Instance.settings.EnableExternalItems)
+                        {
+                            queryDependantItems = QuickSearchSDK.searchItemSources.Values
+                            .Concat(SearchPlugin.Instance.searchItemSources.Values)
+                            .Where(source => source.DependsOnQuery)
+                            .SelectMany(source => source.GetItems(input));
+                        }
+                        else
+                        {
+                            queryDependantItems = SearchPlugin.Instance.searchItemSources.Values
+                            .Where(source => source.DependsOnQuery)
+                            .SelectMany(source => source.GetItems(input));
+                        }
+                        Candidate[] canditates = Array.Empty<Candidate>();
+                        if (queryDependantItems.Any())
+                        {
+                            canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
+                            .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                        } else
+                        {
+                            canditates = searchItems.AsParallel()
+                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
+                            .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
+                        }
                         var maxResults = canditates.Length;
                         if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
                         {

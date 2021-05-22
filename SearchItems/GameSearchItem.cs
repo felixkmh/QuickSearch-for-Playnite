@@ -113,22 +113,24 @@ namespace QuickSearch.SearchItems
     {
         public IList<GameAction> GameActions { get; set; } = new List<GameAction>();
 
-        public IEnumerable<ISearchItem<string>> GetItems()
+        public bool DependsOnQuery => false;
+
+        public IEnumerable<ISearchItem<string>> GetItems(string query)
         {
             GameActions.Clear();
             if (SearchPlugin.Instance.settings.EnableExternalGameActions)
             {
-                foreach(var item in QuickSearchSDK.gameActions)
+                foreach (var item in QuickSearchSDK.gameActions)
                 {
                     GameActions.Add(new GameAction() { Name = item.Key, Action = item.Value });
                 }
             }
-            return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g => 
-            { 
-                var item =  new GameSearchItem(g);
+            return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g =>
+            {
+                var item = new GameSearchItem(g);
                 if (SearchPlugin.Instance.settings.EnableExternalGameActions)
                 {
-                    foreach(var action in GameActions)
+                    foreach (var action in GameActions)
                     {
                         item.Actions.Add(action);
                     }

@@ -112,8 +112,12 @@ namespace QuickSearch.SearchItems
         /// List holding the search items.
         /// </summary>
         public List<ISearchItem<string>> Items { get; set; } = new List<ISearchItem<string>>();
-        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems"/>
-        public IEnumerable<ISearchItem<string>> GetItems()
+
+        /// <inheritdoc cref="ISearchItemSource{TKey}.DependsOnQuery"/>
+        public bool DependsOnQuery => false;
+
+        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems(string)"/>
+        public IEnumerable<ISearchItem<string>> GetItems(string query)
         {
             return Items;
         }
