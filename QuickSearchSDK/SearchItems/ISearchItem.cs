@@ -61,7 +61,7 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Returns <see cref="ISearchItem{TKey}"/>s.
         /// </summary>
-        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>.</param>
+        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
         /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>.</returns>
         IEnumerable<ISearchItem<TKey>> GetItems(string query);
 
