@@ -43,6 +43,9 @@ namespace QuickSearch.SearchItems
     /// <summary>
     /// Action associated with a search result. 
     /// One result can have multiple actions.
+    /// The <see cref="ICommand.Execute(object)"/> and <see cref="ICommand.CanExecute(object)"/> methods
+    /// are called with the <see cref="ISearchItem{TKey}"/>
+    /// they belong to as its argument.
     /// </summary>
     /// <typeparam name="TKey">Type used for comparison.</typeparam>
     public interface ISearchAction<TKey> : ICommand
