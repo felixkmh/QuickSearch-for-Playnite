@@ -87,16 +87,20 @@ namespace QuickSearch
                 {
                     searchItems = QuickSearchSDK.searchItemSources.Values
                     .Concat(SearchPlugin.Instance.searchItemSources.Values)
-                    .Where(source => !source.DependsOnQuery)
                     .AsParallel()
-                    .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>())
+                    .Where(source => !source.DependsOnQuery)
+                    .Select(source => source.GetItems(null))
+                    .Where(items => items != null)
+                    .SelectMany(items => items)
                     .ToList();
                 } else
                 {
-                    searchItems = SearchPlugin.Instance.searchItemSources.Values
+                    searchItems = QuickSearchSDK.searchItemSources.Values
                     .AsParallel()
                     .Where(source => !source.DependsOnQuery)
-                    .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>())
+                    .Select(source => source.GetItems(null))
+                    .Where(items => items != null)
+                    .SelectMany(items => items)
                     .ToList();
                 }
             });
@@ -170,13 +174,17 @@ namespace QuickSearch
                             queryDependantItems = QuickSearchSDK.searchItemSources.Values
                             .Concat(SearchPlugin.Instance.searchItemSources.Values)
                             .Where(source => source.DependsOnQuery)
-                            .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>());
+                            .Select(source => source.GetItems(input))
+                            .Where(items => items != null)
+                            .SelectMany(items => items);
                         }
                         else
                         {
                             queryDependantItems = SearchPlugin.Instance.searchItemSources.Values
                             .Where(source => source.DependsOnQuery)
-                            .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>());
+                            .Select(source => source.GetItems(input))
+                            .Where(items => items != null)
+                            .SelectMany(items => items);
                         }
                         Candidate[] canditates = Array.Empty<Candidate>();
                         if (queryDependantItems.Any())
