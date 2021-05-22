@@ -121,6 +121,11 @@ namespace QuickSearch.SearchItems
         {
             return Items;
         }
+        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string)"/>
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
+        {
+            return null;
+        }
     }
     /// <inheritdoc cref="ISearchKey{TKey}"/>
     public class CommandItemKey : ISearchKey<string>

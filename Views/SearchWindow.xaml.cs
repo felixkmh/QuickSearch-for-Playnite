@@ -89,14 +89,14 @@ namespace QuickSearch
                     .Concat(SearchPlugin.Instance.searchItemSources.Values)
                     .Where(source => !source.DependsOnQuery)
                     .AsParallel()
-                    .SelectMany(source => source.GetItems(null))
+                    .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>())
                     .ToList();
                 } else
                 {
                     searchItems = SearchPlugin.Instance.searchItemSources.Values
                     .AsParallel()
                     .Where(source => !source.DependsOnQuery)
-                    .SelectMany(source => source.GetItems(null))
+                    .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>())
                     .ToList();
                 }
             });
@@ -170,13 +170,13 @@ namespace QuickSearch
                             queryDependantItems = QuickSearchSDK.searchItemSources.Values
                             .Concat(SearchPlugin.Instance.searchItemSources.Values)
                             .Where(source => source.DependsOnQuery)
-                            .SelectMany(source => source.GetItems(input));
+                            .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>());
                         }
                         else
                         {
                             queryDependantItems = SearchPlugin.Instance.searchItemSources.Values
                             .Where(source => source.DependsOnQuery)
-                            .SelectMany(source => source.GetItems(input));
+                            .SelectMany(source => source.GetItems(null) ?? Array.Empty<ISearchItem<string>>());
                         }
                         Candidate[] canditates = Array.Empty<Candidate>();
                         if (queryDependantItems.Any())
@@ -240,13 +240,16 @@ namespace QuickSearch
                                         {
                                             if (canditates[maxIdx].Item is SearchItems.GameSearchItem maxGameItem)
                                             {
-                                                if (RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name)) < 0)
+                                                var name = RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name));
+                                                var lastPlayed = (gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue);
+                                                var installed = gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled);
+                                                if (name < 0)
                                                 {
                                                     updateMax = true;
-                                                } else if ((gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue) > 0)
+                                                } else if (name == 0 && lastPlayed > 0)
                                                 {
                                                     updateMax = true;
-                                                } else if (gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled) > 0)
+                                                } else if (name == 0 && lastPlayed == 0 && installed > 0)
                                                 {
                                                     updateMax = true;
                                                 }

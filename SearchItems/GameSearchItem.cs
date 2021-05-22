@@ -138,6 +138,11 @@ namespace QuickSearch.SearchItems
                 return item;
             });
         }
+
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
+        {
+            return null;
+        }
     }
 
     public class GameSearchItem : ISearchItem<string>

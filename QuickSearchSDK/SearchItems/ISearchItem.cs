@@ -62,8 +62,16 @@ namespace QuickSearch.SearchItems
         /// Returns <see cref="ISearchItem{TKey}"/>s.
         /// </summary>
         /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
-        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>.</returns>
+        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
         IEnumerable<ISearchItem<TKey>> GetItems(string query);
+
+        /// <summary>
+        /// Used to return search items asynchronously. Should not add same items as <see cref="ISearchItemSource{TKey}.GetItems(string)"/>.
+        /// This would create duplicate entries.
+        /// </summary>
+        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
+        /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
+        Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query);
 
         /// <summary>
         /// Indicates whether this source supplies items dependign on the current search query.
