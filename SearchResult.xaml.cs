@@ -121,17 +121,19 @@ namespace QuickSearch
                     }
 
                     SpinWait.SpinUntil(() => cancel, 1500);
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        BottomTextScroller.ScrollToHorizontalOffset(0);
-                    }, System.Windows.Threading.DispatcherPriority.Background);
                 } else
                 {
                     return;
                 }
 
-            }).ContinueWith(t => { t.Dispose(); cancel = false; });
+            }).ContinueWith(t => { 
+                t.Dispose(); 
+                cancel = false;
+                Dispatcher.Invoke(() =>
+                {
+                    BottomTextScroller.ScrollToHorizontalOffset(0);
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            });
         }
 
         private void Collapse()
