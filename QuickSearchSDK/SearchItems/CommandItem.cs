@@ -104,6 +104,8 @@ namespace QuickSearch.SearchItems
         public string BottomRight { get; set; } = null;
         /// <inheritdoc cref="ISearchItem{TKey}.ScoreMode"/>
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
+        /// <inheritdoc cref="ISearchItem{TKey}.IconChar"/>
+        public char? IconChar { get; set; } = null;
     }
     /// <inheritdoc cref="ISearchItemSource{TKey}"/>
     public class CommandItemSource : ISearchItemSource<string>

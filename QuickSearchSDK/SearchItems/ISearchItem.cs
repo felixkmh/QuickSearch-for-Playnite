@@ -64,20 +64,21 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Returns <see cref="ISearchItem{TKey}"/>s.
         /// </summary>
-        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
+        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case. Only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
         /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
         IEnumerable<ISearchItem<TKey>> GetItems(string query);
 
         /// <summary>
         /// Used to return search items asynchronously. Should not add same items as <see cref="ISearchItemSource{TKey}.GetItems(string)"/>.
-        /// This would create duplicate entries.
+        /// This would create duplicate entries. Uses this for items that depend on asynchronous data, like requesting data from a web api.
+        /// <see cref="ISearchItemSource{TKey}.GetItemsTask(string)"/> is only called after a short time in which the query was not changed.
         /// </summary>
-        /// <param name="query">The current search query, only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
+        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case.</param>
         /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
         Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query);
 
         /// <summary>
-        /// Indicates whether this source supplies items dependign on the current search query.
+        /// Indicates whether this source supplies items depending on the current search query.
         /// Returning true unnecessarily can slow down the search.
         /// </summary>
         bool DependsOnQuery { get; }
@@ -125,5 +126,10 @@ namespace QuickSearch.SearchItems
         /// Text on bottom right. Hidden if collapsed.
         /// </summary>
         string BottomRight { get; }
+        /// <summary>
+        /// Alternative way to set an icon. Set a Unicode Icon 
+        /// using the "icofont.ttf" that is included with Playnite by default.
+        /// </summary>
+        char? IconChar { get; }
     }
 }
