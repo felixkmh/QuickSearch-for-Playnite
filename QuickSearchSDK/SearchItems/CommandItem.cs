@@ -16,6 +16,14 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Create a simple command item.
         /// </summary>
+        public CommandItem()
+        {
+
+        }
+
+        /// <summary>
+        /// Create a simple command item.
+        /// </summary>
         /// <param name="name">Display name.</param>
         /// <param name="action">Action to execute.</param>
         /// <param name="descripton">Item description.</param>
