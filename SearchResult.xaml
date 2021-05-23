@@ -40,7 +40,7 @@
                     <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40" Margin="0,1.5" ClipToBounds="True">
+            <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,1.5" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="10"/>
