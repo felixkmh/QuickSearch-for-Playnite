@@ -33,7 +33,7 @@ namespace QuickSearch
         CancellationTokenSource textChangedTokeSource = new CancellationTokenSource();
         CancellationTokenSource openedSearchTokeSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
-        List<ISearchItem<string>> searchItems = new List<ISearchItem<string>>();
+        IList<ISearchItem<string>> searchItems = Array.Empty<ISearchItem<string>>();
         ConcurrentQueue<ISearchItem<string>> asyncItemsIndependent = new ConcurrentQueue<ISearchItem<string>>();
         ConcurrentQueue<ISearchItem<string>> asyncItemsDependent = new ConcurrentQueue<ISearchItem<string>>();
 
@@ -102,11 +102,11 @@ namespace QuickSearch
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
                 t.Dispose();
-                var itemsEnumerable = SearchPlugin.Instance.searchItemSources.Values.AsParallel();
+                var itemsEnumerable = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
 
                 if (SearchPlugin.Instance.settings.EnableExternalItems)
                 {
-                    var externalItems = QuickSearchSDK.searchItemSources.Values.AsParallel();
+                    var externalItems = QuickSearchSDK.searchItemSources.Values;
                     itemsEnumerable = itemsEnumerable.Concat(externalItems);
                 }
 
@@ -167,10 +167,12 @@ namespace QuickSearch
         {
             if (sender is TextBox textBox)
             {
+                PlaceholderText.Text = (string)Application.Current.FindResource("LOCSearchLabel");
                 PlaceholderText.Visibility = string.IsNullOrEmpty(textBox.Text) ? Visibility.Visible : Visibility.Hidden;
                 string input = textBox.Text.ToLower().Trim();
                 if (lastInput != input)
                 {
+                    var startTime = DateTime.Now;
                     lastInput = input;
                     textChangedTokeSource.Cancel();
                     var oldSource = textChangedTokeSource;
@@ -179,8 +181,6 @@ namespace QuickSearch
                     backgroundTask = backgroundTask.ContinueWith(t => {
                         t.Dispose();
                         Dispatcher.Invoke(() => IsLoadingResults = true);
-
-                        var startTime = DateTime.Now;
 
                         if (cancellationToken.IsCancellationRequested)
                         {
@@ -202,18 +202,17 @@ namespace QuickSearch
                             .Where(items => items != null)
                             .SelectMany(items => items);
 
-
-                            Candidate[] canditates = Array.Empty<Candidate>();
-
-                            canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                            var canditates = searchItems.Concat(queryDependantItems).AsParallel()
                             .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
                             .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
                            
-                            maxResults = canditates.Length;
+                            maxResults = canditates.Count();
                             if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
                             {
                                 maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
                             }
+
+                            addedCandidates.Capacity = maxResults;
 
                             while(addedItems < maxResults)
                             {
@@ -230,14 +229,17 @@ namespace QuickSearch
                                     addedCandidates.Add(canditates[maxIdx]);
                                     Dispatcher.Invoke(() =>
                                     {
-                                        if(ListDataContext.Count > addedItems)
+                                        if (ListDataContext.Count > addedItems)
                                         {
                                             ListDataContext[addedItems] = canditates[maxIdx].Item;
                                         } else
                                         {
                                             ListDataContext.Add(canditates[maxIdx].Item);
                                         }
-
+#if DEBUG
+                                        PlaceholderText.Text = SearchBox.Text + " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
+                                        PlaceholderText.Visibility = Visibility.Visible;
+#endif
                                         if (ListDataContext.Count > 0 && addedItems == 0)
                                         {
                                             SearchResults.SelectedIndex = 0;
@@ -405,6 +407,7 @@ namespace QuickSearch
                 }
             }
 
+            allTasks.Dispose();
         }
 
         private int FindMax(in IList<Candidate> canditates, in CancellationToken cancellationToken)
