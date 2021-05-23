@@ -204,17 +204,11 @@ namespace QuickSearch
 
 
                             Candidate[] canditates = Array.Empty<Candidate>();
-                            if (queryDependantItems.Any())
-                            {
-                                canditates = searchItems.Concat(queryDependantItems).AsParallel()
-                                .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                                .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
-                            } else
-                            {
-                                canditates = searchItems.AsParallel()
-                                .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                                .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
-                            }
+
+                            canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
+                            .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                           
                             maxResults = canditates.Length;
                             if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
                             {
