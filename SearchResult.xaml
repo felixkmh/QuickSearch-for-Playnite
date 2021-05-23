@@ -18,9 +18,9 @@
             <DropShadowEffect x:Key="IconDropShadow" ShadowDepth="0" Color="Black" Opacity="0.5" BlurRadius="4" RenderingBias="Performance"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel ClipToBounds="True" IsHitTestVisible="False">
+    <StackPanel IsHitTestVisible="False">
         <Grid ClipToBounds="True">
-           <Grid x:Name="DefaultView" Height="22" ClipToBounds="True">
+           <Grid x:Name="DefaultView" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="22"/>
                     <ColumnDefinition Width="10"/> 
@@ -40,7 +40,7 @@
                     <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,1.5" ClipToBounds="True">
+            <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,2" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="10"/>
@@ -88,7 +88,7 @@
                            />
             </Grid>
         </Grid>
-        <Separator x:Name="Seperator" Margin="0,0,0,-5" Padding="0" Foreground="Red"
+        <Separator x:Name="Seperator" Margin="0,0,0,-5" Padding="0"
                    Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
     </StackPanel>
 </UserControl>
