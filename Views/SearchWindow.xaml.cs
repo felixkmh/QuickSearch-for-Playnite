@@ -18,6 +18,8 @@ using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 using QuickSearch.Controls;
 using QuickSearch.SearchItems;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -28,12 +30,22 @@ namespace QuickSearch
     public partial class SearchWindow : UserControl
     {
         SearchPlugin searchPlugin;
-        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        CancellationTokenSource textChangedTokeSource = new CancellationTokenSource();
+        CancellationTokenSource openedSearchTokeSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
         List<ISearchItem<string>> searchItems = new List<ISearchItem<string>>();
+        ConcurrentQueue<ISearchItem<string>> asyncItemsIndependent = new ConcurrentQueue<ISearchItem<string>>();
+        ConcurrentQueue<ISearchItem<string>> asyncItemsDependent = new ConcurrentQueue<ISearchItem<string>>();
 
         private double heightSelected = double.NaN;
         private double heightNotSelected = double.NaN;
+
+        public Boolean IsLoadingResults { 
+            get => (Boolean)GetValue(IsLoadingResultsProperty); 
+            set => SetValue(IsLoadingResultsProperty, value); 
+        }
+        public static DependencyProperty IsLoadingResultsProperty =
+            DependencyProperty.Register(nameof(IsLoadingResults), typeof(Boolean), typeof(SearchWindow), new PropertyMetadata(false));
 
         public void Reset()
         {
@@ -41,6 +53,7 @@ namespace QuickSearch
             heightNotSelected = double.NaN;
             SearchBox.Text = string.Empty;
         }
+
 
         public ObservableCollection<ISearchItem<string>> ListDataContext { get; private set; } = new ObservableCollection<ISearchItem<string>>();
 
@@ -76,37 +89,37 @@ namespace QuickSearch
                 {
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
                 }
+                SearchResults.ScrollIntoView(e.AddedItems[0]);
             }
         }
 
         public void QueueIndexUpdate()
         {
+            openedSearchTokeSource.Cancel();
+            var oldSource = textChangedTokeSource;
+            openedSearchTokeSource = new CancellationTokenSource();
+            var cancellationToken = textChangedTokeSource.Token;
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
+                t.Dispose();
+                var itemsEnumerable = SearchPlugin.Instance.searchItemSources.Values.AsParallel();
+
                 if (SearchPlugin.Instance.settings.EnableExternalItems)
                 {
-                    searchItems = QuickSearchSDK.searchItemSources.Values
-                    .Concat(SearchPlugin.Instance.searchItemSources.Values)
-                    .AsParallel()
-                    .Where(source => !source.DependsOnQuery)
-                    .Select(source => source.GetItems(null))
-                    .Where(items => items != null)
-                    .SelectMany(items => items)
-                    .ToList();
-                } else
-                {
-                    searchItems = QuickSearchSDK.searchItemSources.Values
-                    .AsParallel()
-                    .Where(source => !source.DependsOnQuery)
-                    .Select(source => source.GetItems(null))
-                    .Where(items => items != null)
-                    .SelectMany(items => items)
-                    .ToList();
+                    var externalItems = QuickSearchSDK.searchItemSources.Values.AsParallel();
+                    itemsEnumerable = itemsEnumerable.Concat(externalItems);
                 }
+
+                searchItems = itemsEnumerable
+                    .Where(source => !source.DependsOnQuery)
+                    .Select(source => source.GetItems(null))
+                    .Where(items => items != null)
+                    .SelectMany(items => items)
+                    .ToList();
             });
         }
 
-        struct Candidate {
+        class Candidate {
             public ISearchItem<string> Item;
             public float Score;
             public bool Marked;
@@ -148,180 +161,327 @@ namespace QuickSearch
             }
         }
 
+        string lastInput = string.Empty;
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
+                PlaceholderText.Visibility = string.IsNullOrEmpty(textBox.Text) ? Visibility.Visible : Visibility.Hidden;
                 string input = textBox.Text.ToLower().Trim();
-                tokenSource.Cancel();
-                var oldSource = tokenSource;
-                tokenSource = new CancellationTokenSource();
-                var cancellationToken = tokenSource.Token;
-                backgroundTask = backgroundTask.ContinueWith(_ => {
+                if (lastInput != input)
+                {
+                    lastInput = input;
+                    textChangedTokeSource.Cancel();
+                    var oldSource = textChangedTokeSource;
+                    textChangedTokeSource = new CancellationTokenSource();
+                    var cancellationToken = textChangedTokeSource.Token;
+                    backgroundTask = backgroundTask.ContinueWith(t => {
+                        t.Dispose();
+                        Dispatcher.Invoke(() => IsLoadingResults = true);
 
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        oldSource.Dispose();
-                        return;
-                    }
+                        var startTime = DateTime.Now;
 
-                    int addedItems = 0;
-                    if (!string.IsNullOrEmpty(input))
-                    {
-                        IEnumerable<ISearchItem<string>> queryDependantItems;
-                        if (SearchPlugin.Instance.settings.EnableExternalItems)
+                        if (cancellationToken.IsCancellationRequested)
                         {
-                            queryDependantItems = QuickSearchSDK.searchItemSources.Values
-                            .Concat(SearchPlugin.Instance.searchItemSources.Values)
-                            .Where(source => source.DependsOnQuery)
-                            .Select(source => source.GetItems(input))
-                            .Where(items => items != null)
-                            .SelectMany(items => items);
+                            return;
                         }
-                        else
+                        int maxResults = 0;
+                        int addedItems = 0;
+                        List<Candidate> addedCandidates = new List<Candidate>();
+                        if (!string.IsNullOrEmpty(input))
                         {
-                            queryDependantItems = SearchPlugin.Instance.searchItemSources.Values
-                            .Where(source => source.DependsOnQuery)
-                            .Select(source => source.GetItems(input))
-                            .Where(items => items != null)
-                            .SelectMany(items => items);
-                        }
-                        Candidate[] canditates = Array.Empty<Candidate>();
-                        if (queryDependantItems.Any())
-                        {
-                            canditates = searchItems.Concat(queryDependantItems).AsParallel()
-                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                            .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
-                        } else
-                        {
-                            canditates = searchItems.AsParallel()
-                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                            .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
-                        }
-                        var maxResults = canditates.Length;
-                        if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
-                        {
-                            maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
-                        }
-
-
-                        bool unmarkedLeft = true;
-
-                        while(unmarkedLeft && addedItems < maxResults)
-                        {
-                            if (cancellationToken.IsCancellationRequested)
+                            var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
+                            if (SearchPlugin.Instance.settings.EnableExternalItems)
                             {
-                                oldSource.Dispose();
-                                return;
+                                sources = sources.Concat(QuickSearchSDK.searchItemSources.Values);
+                            }
+                            var queryDependantItems = sources
+                            .Where(source => source.DependsOnQuery)
+                            .Select(source => source.GetItems(input))
+                            .Where(items => items != null)
+                            .SelectMany(items => items);
+
+
+                            Candidate[] canditates = Array.Empty<Candidate>();
+                            if (queryDependantItems.Any())
+                            {
+                                canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                                .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
+                                .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                            } else
+                            {
+                                canditates = searchItems.AsParallel()
+                                .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
+                                .Select(item => new Candidate{ Marked = false, Item = item, Score = ComputeScore(item, input)}).ToArray();
+                            }
+                            maxResults = canditates.Length;
+                            if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
+                            {
+                                maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
                             }
 
-                            unmarkedLeft = false;
-
-                            float maxScore = float.NegativeInfinity;
-                            int maxIdx = -1;
-
-                            for (int i = 0; i < canditates.Length; ++i)
+                            while(addedItems < maxResults)
                             {
                                 if (cancellationToken.IsCancellationRequested)
                                 {
-                                    oldSource.Dispose();
                                     return;
                                 }
 
-                                if (canditates[i].Marked)
-                                {
-                                    continue;
-                                }
-                                unmarkedLeft = true;
-                                var item = canditates[i].Item;
-                                float score = canditates[i].Score;
+                                var maxIdx = FindMax(canditates, cancellationToken);
 
-                                if (score >= maxScore)
+                                if (maxIdx >= 0)
                                 {
-                                    bool updateMax = false;
-                                    if (score > maxScore)
+                                    canditates[maxIdx].Marked = true;
+                                    addedCandidates.Add(canditates[maxIdx]);
+                                    Dispatcher.Invoke(() =>
                                     {
-                                        updateMax = true;
-                                    } else
-                                    {
-                                        if (item is SearchItems.GameSearchItem gameItem)
+                                        if(ListDataContext.Count > addedItems)
                                         {
-                                            if (canditates[maxIdx].Item is SearchItems.GameSearchItem maxGameItem)
-                                            {
-                                                var name = RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name));
-                                                var lastPlayed = (gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue);
-                                                var installed = gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled);
-                                                if (name < 0)
-                                                {
-                                                    updateMax = true;
-                                                } else if (name == 0 && lastPlayed > 0)
-                                                {
-                                                    updateMax = true;
-                                                } else if (name == 0 && lastPlayed == 0 && installed > 0)
-                                                {
-                                                    updateMax = true;
-                                                }
-                                            } 
+                                            ListDataContext[addedItems] = canditates[maxIdx].Item;
+                                        } else
+                                        {
+                                            ListDataContext.Add(canditates[maxIdx].Item);
                                         }
-                                    }
 
-                                    if (updateMax)
-                                    {
-                                        maxIdx = i;
-                                        maxScore = score;
-                                    }
-                                }
-                            }
+                                        if (ListDataContext.Count > 0 && addedItems == 0)
+                                        {
+                                            SearchResults.SelectedIndex = 0;
+                                        }
 
-                            if (maxIdx >= 0)
-                            {
-                                canditates[maxIdx].Marked = true;
-                                Dispatcher.Invoke(() =>
+                                        if (addedItems == 2)
+                                        {
+                                            UpdateListBox(maxResults);
+                                        }
+                                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+
+                                    addedItems += 1;
+                                } else
                                 {
-                                    if(ListDataContext.Count > addedItems)
-                                    {
-                                        ListDataContext[addedItems] = canditates[maxIdx].Item;
-                                    } else
-                                    {
-                                        ListDataContext.Add(canditates[maxIdx].Item);
-                                    }
+                                    break;
+                                }
 
-                                    if (ListDataContext.Count > 0 && addedItems == 0)
-                                    {
-                                        SearchResults.SelectedIndex = 0;
-                                    }
-
-                                    if (addedItems == 2)
-                                    {
-                                        UpdateListBox(maxResults);
-                                    }
-                                }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
-
-                                addedItems += 1;
                             }
-
-                        }
-
                         
-                    }
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
-                        {
-                            ListDataContext.RemoveAt(i);
                         }
-                        if (ListDataContext.Count > 0)
-                        {
-                            SearchResults.SelectedIndex = 0;
-                        }
-                        UpdateListBox(ListDataContext.Count);
-                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
-                    oldSource.Dispose();
 
-                }, tokenSource.Token);
+                        Dispatcher.Invoke(() =>
+                        {
+                            for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
+                            {
+                                ListDataContext.RemoveAt(i);
+                            }
+                            if (ListDataContext.Count > 0)
+                            {
+                                SearchResults.SelectedIndex = 0;
+                            }
+                            UpdateListBox(ListDataContext.Count);
+
+                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+
+                        var elapsedMs = (int)(DateTime.Now - startTime).TotalMilliseconds;
+
+                        var remainingWaitTime = Math.Max(SearchPlugin.Instance.settings.AsyncItemsDelay - elapsedMs, 0);
+                        if (SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested, remainingWaitTime))
+                        {
+                            return;
+                        }
+                        
+                        InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults);
+                        
+
+                    }, textChangedTokeSource.Token);
+                    backgroundTask = backgroundTask.ContinueWith(t => {
+                        t.Dispose();
+                        Dispatcher.Invoke(() => { 
+                            IsLoadingResults = false;
+                            oldSource.Dispose();
+                        });
+                    });
+                }
             }
         }
+
+        private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, in IList<Candidate> addedCandidates, float threshold, int maxItems)
+        {
+            var queue = new ConcurrentQueue<ISearchItem<string>>();
+
+            TaskFactory factory = new TaskFactory();
+
+            var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
+
+            if (SearchPlugin.Instance.settings.EnableExternalItems)
+            {
+                sources = sources.Concat(QuickSearchSDK.searchItemSources.Values);
+            }
+
+            var tasks = sources
+                .AsParallel()
+                .Select(source => source.GetItemsTask(input))
+                .Where(task => task != null);
+
+            if (!tasks.Any())
+            {
+                return;
+            }
+
+            var itemTasks = tasks.Select(task =>
+            {
+                return task.ContinueWith(t =>
+                {
+                    var items = t.Result;
+                    if (items != null)
+                    {
+                        foreach (var item in items)
+                        {
+                            queue.Enqueue(item);
+                        }
+                    }
+                    t.Dispose();
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            });
+
+            var allTasks = factory.ContinueWhenAll(itemTasks.ToArray(), completed => {
+                foreach(var t in completed)
+                {
+                    t.Dispose();
+                }
+            });
+
+            while(!cancellationToken.IsCancellationRequested)
+            {
+                if (allTasks.IsCompleted && queue.IsEmpty)
+                {
+                    break;
+                }
+                SpinWait.SpinUntil(() => !queue.IsEmpty || cancellationToken.IsCancellationRequested || allTasks.IsCompleted);
+
+                while (queue.TryDequeue(out var item) && !cancellationToken.IsCancellationRequested)
+                {
+                    var preliminaryScore = ComputePreliminaryScore(item, input); 
+                    if (preliminaryScore > threshold)
+                    {
+                        var score = ComputeScore(item, input);
+                        int insertionIdx = addedCandidates.Count;
+                        for(int i = 0; i < addedCandidates.Count; ++i)
+                        {
+                            if (score > addedCandidates[i].Score)
+                            {
+                                insertionIdx = i;
+                                break;
+                            } else if (score == addedCandidates[i].Score)
+                            {
+                                if (CompareSearchItems(item, addedCandidates[i].Item) < 0)
+                                {
+                                    insertionIdx = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (insertionIdx >= 0 && (insertionIdx < maxItems || maxItems < 1))
+                        {
+                            addedCandidates.Insert(insertionIdx, new Candidate() { Item = item, Score = score });
+
+                            if (addedCandidates.Count > maxItems && maxItems > 0)
+                            {
+                                addedCandidates.RemoveAt(maxItems);
+                            }
+                            Dispatcher.Invoke(() =>
+                            {
+                                ListDataContext.Insert(insertionIdx, item);
+
+                                if (ListDataContext.Count > maxItems && maxItems > 0)
+                                {
+                                    ListDataContext.RemoveAt(maxItems);
+                                }
+
+                                if (SearchResults.SelectedIndex == -1)
+                                {
+                                    SearchResults.SelectedIndex = 0;
+                                } else
+                                {
+                                    var selected = SearchResults.SelectedIndex;
+                                    SearchResults.SelectedIndex = -1;
+                                    SearchResults.SelectedIndex = selected;
+                                }
+                            }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private int FindMax(in IList<Candidate> canditates, in CancellationToken cancellationToken)
+        {
+            float maxScore = float.NegativeInfinity;
+            int maxIdx = -1;
+
+            for (int i = 0; i < canditates.Count; ++i)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return -1;
+                }
+
+                if (canditates[i].Marked)
+                {
+                    continue;
+                }
+
+                var item = canditates[i].Item;
+                float score = canditates[i].Score;
+
+                if (score >= maxScore)
+                {
+                    bool updateMax = false;
+                    if (score > maxScore)
+                    {
+                        updateMax = true;
+                    }
+                    else
+                    {
+                        updateMax = CompareSearchItems(item, canditates[maxIdx].Item) < 0;
+                    }
+
+                    if (updateMax)
+                    {
+                        maxIdx = i;
+                        maxScore = score;
+                    }
+                }
+            }
+
+            return maxIdx;
+        }
+
+        private int CompareSearchItems(in ISearchItem<string> a, in ISearchItem<string> b)
+        {
+            if (a is GameSearchItem gameItem)
+            {
+                if (b is GameSearchItem maxGameItem)
+                {
+                    var name = RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name));
+                    var lastPlayed = (gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue);
+                    var installed = gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled);
+                    if (name < 0)
+                    {
+                        return -1;
+                    }
+                    else if (name == 0 && lastPlayed > 0)
+                    {
+                        return -1;
+                    }
+                    else if (name == 0 && lastPlayed == 0 && installed > 0)
+                    {
+                        return -1;
+                    }
+                }
+            }
+
+            return 0;
+        } 
 
         private void UpdateListBox(int items)
         {
@@ -442,7 +602,6 @@ namespace QuickSearch
                 {
                     idx = (idx + count) % count;
                 }
-                SearchResults.ScrollIntoView(SearchResults.Items[idx]);
                 SearchResults.SelectedIndex = idx;
                 if (e.Key == Key.Enter || e.Key == Key.Return)
                 {

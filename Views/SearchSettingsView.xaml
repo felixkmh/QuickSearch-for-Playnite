@@ -11,14 +11,29 @@
             <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False" Foreground="{StaticResource TextBrush}"/>
             <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
         </StackPanel>
-        <TextBlock Text="Fuzzy search threshold (higher value = more strict):" Margin="2" Foreground="{StaticResource TextBrush}"/>
+        <TextBlock Text="Fuzzy search threshold (higher value = more strict = potentially faster search):" Margin="2" Foreground="{StaticResource TextBrush}"/>
         <StackPanel Orientation="Horizontal" Margin="2">
-            <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="200" HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"/>
-            <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}"/>
+            <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="230" 
+                    HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                    VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <TextBlock Text="Amount of time in milliseconds to wait before requesting async items:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+        <StackPanel Orientation="Horizontal" Margin="2">
+            <Slider Value="{Binding AsyncItemsDelay}" Minimum="10" Maximum="1000" Width="230" 
+                    HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                    VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding AsyncItemsDelay}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+            <TextBlock Text="ms" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="5">
             <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-            <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" TextChanged="MaxNumberResultsTextBox_TextChanged" Foreground="{StaticResource TextBrush}"/>
+            <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" 
+                     PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" 
+                     TextChanged="MaxNumberResultsTextBox_TextChanged" 
+                     Foreground="{StaticResource TextBrush}"
+                     MinWidth="50" TextAlignment="Center"
+                     />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <CheckBox  IsChecked="{Binding ExpandAllItems}" Margin="5"/>

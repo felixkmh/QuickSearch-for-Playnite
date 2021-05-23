@@ -18,31 +18,35 @@
             <DropShadowEffect x:Key="IconDropShadow" ShadowDepth="0" Color="Black" Opacity="0.5" BlurRadius="4" RenderingBias="Performance"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel>
-        <Grid>
-           <Grid x:Name="DefaultView">
+    <StackPanel ClipToBounds="True" IsHitTestVisible="False">
+        <Grid ClipToBounds="True">
+           <Grid x:Name="DefaultView" Height="22" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="22"/>
+                    <ColumnDefinition Width="10"/> 
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}}" 
-                       MaxHeight="{Binding ActualHeight, ElementName=PlatformStack}" Stretch="Uniform" Margin="0,0,10,0"
-                       Width="{Binding ActualHeight, ElementName=PlatformStack}"
+                       Stretch="Uniform" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="DefaultIcon"
                        Effect="{StaticResource IconDropShadow}"/>
-                <TextBlock Text="{Binding TopLeft}" Grid.Column="1" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="Bold"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
-                    <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3"/>
+                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="22" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontFamily="{DynamicResource FontIcoFont}"
+                           />
+                <TextBlock Text="{Binding TopLeft}" Grid.Column="2" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="Bold"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="3" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
+                    <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40" Margin="0,1.5" >
+            <Grid x:Name="SelectedView" Visibility="Collapsed" Height="40" Margin="0,1.5" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="10"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -57,7 +61,7 @@
                             <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
-                            <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Row="1" Opacity="{StaticResource DetailsOpacity}">
@@ -66,17 +70,22 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom"/>
+                        <ScrollViewer x:Name="BottomTextScroller" ClipToBounds="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" MaxWidth="600">
+                            <TextBlock Text="{Binding BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
+                        </ScrollViewer>
                         <TextBlock Text="{Binding BottomCenter}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
-                            <TextBlock Text="{Binding BottomRight}"/>
+                            <TextBlock Text="{Binding BottomRight}" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Width="40" Height="40" Stretch="Uniform" Margin="0,0,10,0"
+                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Stretch="Uniform" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="SelectedImage"
                        Effect="{StaticResource IconDropShadow}"/>
+                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="40" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontFamily="{DynamicResource FontIcoFont}"
+                           />
             </Grid>
         </Grid>
         <Separator x:Name="Seperator" Margin="0,0,0,-5" Padding="0" Foreground="Red"

@@ -1,9 +1,11 @@
 ﻿using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -139,9 +141,46 @@ namespace QuickSearch.SearchItems
             });
         }
 
+        string quote = null;
+
         public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
         {
-            return null;
+            return Task.Run(() => 
+            {
+                List<ISearchItem<string>> items = new List<ISearchItem<string>>();
+                if (query.Contains("quote"))
+                {
+                    if (quote == null)
+                    {
+                        using (var client = new System.Net.Http.HttpClient())
+                        {
+                            client.GetStringAsync("https://zenquotes.io/api/today").ContinueWith(t => { 
+                                dynamic json = Newtonsoft.Json.Linq.JArray.Parse(t.Result);
+                                quote = (string)json[0]["q"] + " - " + (string)json[0]["a"];
+                                t.Dispose();
+                            }, TaskContinuationOptions.OnlyOnRanToCompletion).Wait(10000);
+                        }
+                    }
+                    items.Add(new CommandItem("Quote of the Day", () => Process.Start("https://zenquotes.io"), quote, "Go to Url") 
+                    { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = ''});
+
+                    string random = null;
+                    using (var client = new System.Net.Http.HttpClient())
+                    {
+                        client.GetStringAsync("https://zenquotes.io/api/random").ContinueWith(t => {
+                            dynamic json = Newtonsoft.Json.Linq.JArray.Parse(t.Result);
+                            random = (string)json[0]["q"] + " - " + (string)json[0]["a"];
+                            t.Dispose();
+                        }, TaskContinuationOptions.OnlyOnRanToCompletion).Wait(10000);
+                    }
+                    if (random is string)
+                    {
+                        items.Add(new CommandItem("Random Quote", () => Process.Start("https://zenquotes.io"), random, "Go to Url")
+                        { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = '' });
+                    }
+                }
+                return items.AsEnumerable();
+            });
         }
     }
 
@@ -221,5 +260,7 @@ namespace QuickSearch.SearchItems
         }
 
         public ScoreMode ScoreMode => ScoreMode.WeightedAverage;
+
+        public char? IconChar => null;
     }
 }

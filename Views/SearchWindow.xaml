@@ -10,13 +10,53 @@
     <UserControl.Effect>
         <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1"/>
     </UserControl.Effect>
-    <Grid Width="620" Height="450" x:Name="WindowGrid">
+    <UserControl.Resources>
+        <TextBlock x:Key="LoadingTextIcon" Text="&#xeffa;" FontFamily="{DynamicResource FontIcoFont}" Style="{StaticResource {x:Type TextBlock}}" FontSize="50"/>
+    </UserControl.Resources>
+    <Grid Width="650"  Height="450" x:Name="WindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="SearchBox" Grid.Row="0" Padding="7" TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_KeyDown"
-                 Background="{DynamicResource PopupBackgroundBrush}"/>
+
+        <TextBox x:Name="SearchBox" Grid.Row="0" Padding="30,8,8,8" TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_KeyDown"
+                 Background="{DynamicResource PopupBackgroundBrush}" TextAlignment="Left" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="PlaceholderText" Grid.Row="0" Padding="30,8,8,8" IsReadOnly="True" IsHitTestVisible="False" BorderBrush="Transparent"
+                 Background="Transparent" TextAlignment="Left" VerticalContentAlignment="Center" 
+                 Text="{DynamicResource LOCSearchLabel}" Opacity="0.4"/>
+        <TextBlock x:Name="SearchIcon" Text="&#xed11;" Visibility="{Binding IsLoadingResults, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                   FontFamily="{DynamicResource FontIcoFont}" 
+                   HorizontalAlignment="Left" 
+                   TextAlignment="Center" 
+                   Foreground="{DynamicResource TextBrush}" 
+                   VerticalAlignment="Center" 
+                   FontSize="18"
+                   Margin="6" Padding="1"/>
+        <TextBlock x:Name="LoadIcon" Text="&#xeffa;" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
+                   FontFamily="{DynamicResource FontIcoFont}" 
+                   HorizontalAlignment="Left" 
+                   TextAlignment="Center" 
+                   Foreground="{DynamicResource TextBrush}" 
+                   VerticalAlignment="Center" 
+                   FontSize="22"
+                   Margin="6" Padding="1"
+                   RenderTransformOrigin="0.477, 0.509772727"
+                   >
+            <TextBlock.RenderTransform>
+                <RotateTransform x:Name="IconRotation"/>
+            </TextBlock.RenderTransform>
+            <TextBlock.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard x:Name="Loading">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Angle" Storyboard.TargetName="IconRotation" IsCumulative="True" RepeatBehavior="Forever">
+                                <DiscreteDoubleKeyFrame KeyTime="0:0:0.1" Value="45"/>
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </TextBlock.Triggers>
+        </TextBlock>
         <ListBox x:Name="ActionsListBox" Height="{Binding ActualHeight, ElementName=SearchBox}" Grid.Row="0" HorizontalAlignment="Right"
                  ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Actions}" 
                  ScrollViewer.CanContentScroll="False"
@@ -47,7 +87,7 @@
                             local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem}"
                             MouseEnter="ActionButton_MouseEnter"
                             IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="1"
-                                           Padding="5,0"
+                            Padding="6,0"
                             Opacity="{Binding Converter={StaticResource OpacityBoolConverter}, RelativeSource={RelativeSource Mode=Self}, Path=IsSelected, Mode=OneWay}">
                     </controls:ActionButton>
                 </DataTemplate>

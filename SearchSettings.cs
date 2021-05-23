@@ -40,6 +40,8 @@ namespace QuickSearch
         public int MaxNumberResults { get; set; } = 20;
         public bool EnableExternalGameActions { get; set; } = false;
         public bool EnableExternalItems { get; set; } = false;
+        public int AsyncItemsDelay { get; set; } = 250;
+
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -75,6 +77,7 @@ namespace QuickSearch
                 MaxNumberResults = savedSettings.MaxNumberResults;
                 EnableExternalGameActions = savedSettings.EnableExternalGameActions;
                 EnableExternalItems = savedSettings.EnableExternalItems;
+                AsyncItemsDelay = savedSettings.AsyncItemsDelay;
             }
         }
 
@@ -99,6 +102,7 @@ namespace QuickSearch
             this.MaxNumberResults = previousSettings.MaxNumberResults;
             this.EnableExternalGameActions = previousSettings.EnableExternalGameActions;
             this.EnableExternalItems = previousSettings.EnableExternalItems;
+            this.AsyncItemsDelay = previousSettings.AsyncItemsDelay;
             previousSettings = null;
         }
 
@@ -108,13 +112,14 @@ namespace QuickSearch
             // This method should save settings made to Option1 and Option2.
             bool changed = false;
             changed |= !SearchShortcut.Equals(previousSettings.SearchShortcut);
-            changed |= Threshold         != previousSettings.Threshold;
-            changed |= ExpandAllItems    != previousSettings.ExpandAllItems;
-            changed |= ShowSeperator     != previousSettings.ShowSeperator;
-            changed |= IncrementalUpdate != previousSettings.IncrementalUpdate;
-            changed |= MaxNumberResults  != previousSettings.MaxNumberResults;
+            changed |= Threshold                 != previousSettings.Threshold;
+            changed |= ExpandAllItems            != previousSettings.ExpandAllItems;
+            changed |= ShowSeperator             != previousSettings.ShowSeperator;
+            changed |= IncrementalUpdate         != previousSettings.IncrementalUpdate;
+            changed |= MaxNumberResults          != previousSettings.MaxNumberResults;
             changed |= EnableExternalGameActions != previousSettings.EnableExternalGameActions;
-            changed |= EnableExternalItems != previousSettings.EnableExternalItems;
+            changed |= EnableExternalItems       != previousSettings.EnableExternalItems;
+            changed |= AsyncItemsDelay           != previousSettings.AsyncItemsDelay;
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;

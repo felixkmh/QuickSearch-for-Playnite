@@ -1,4 +1,6 @@
-﻿using Playnite.SDK;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
@@ -6,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -112,13 +115,14 @@ namespace QuickSearch
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
                 window.InputBindings.Add(HotkeyBinding);
             }
-            var settingsCommand = new CommandItem("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.", "Open");
+            var settingsCommand = new CommandItem("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.", "Open") { IconChar = '' };
             simpleCommands.Items.Add(settingsCommand);
-            // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
+            QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
         }
 
         public Popup popup;
         SearchWindow searchWindow;
+
         private void ToggleSearch()
         {
             //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
