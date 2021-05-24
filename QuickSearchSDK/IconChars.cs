@@ -39,5 +39,6 @@ namespace QuickSearch
         public const char Exit = '\uEF7C';
         public const char Refresh = '\uEFD1';
         public const char Zipped = '\uF02E';
+        public const char Terminal = '\uF00A';
     }
 }
