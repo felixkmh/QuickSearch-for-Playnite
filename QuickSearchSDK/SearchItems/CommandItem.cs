@@ -14,7 +14,7 @@ namespace QuickSearch.SearchItems
     public class CommandItem : ISearchItem<string>
     {
         /// <summary>
-        /// Create a simple command item.
+        /// Create a empty simple command item.
         /// </summary>
         public CommandItem()
         {
