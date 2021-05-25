@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace QuickSearch
 {
-    static class IconChars
+    /// <summary>
+    /// Some char constants to use as <see cref="QuickSearch.SearchItems.ISearchItem{TKey}.IconChar"/>
+    /// </summary>
+    public static class IconChars
     {
         /// <summary>Settings Icon</summary>
         public const char Settings = '';
@@ -72,5 +75,7 @@ namespace QuickSearch
         public const char Zipped = '\uF02E';
         /// <summary>Terminal Icon</summary>
         public const char Terminal = '\uF00A';
+        /// <summary>Two overlapping documents icon</summary>
+        public const char Copy = '';
     }
 }
