@@ -78,62 +78,59 @@ namespace QuickSearch
                 Collapse();
             }
 
-            cancel = true;
+            BottomTextScroller.IsAnimating = false;
         }
-
-        Task animation = Task.CompletedTask;
-
-        bool cancel = false;
 
         private void GameResult_Selected(object sender, RoutedEventArgs e)
         {
             Expand();
-            cancel = true;
-            animation = animation.ContinueWith(t => { t.Dispose();  cancel = false; })
-            .ContinueWith((t) =>
-            {
-                t.Dispose();
-                if (SpinWait.SpinUntil(() => cancel, 1500)) return;
-                double offset = 0;
-                Dispatcher.Invoke(() =>
-                {
-                    offset = ((TextBlock)BottomTextScroller.Content).DesiredSize.Width - BottomTextScroller.ActualWidth;
-                }, System.Windows.Threading.DispatcherPriority.Background);
+            BottomTextScroller.IsAnimating = true;
+            //cancel = true;
+            //animation = animation.ContinueWith(t => { t.Dispose();  cancel = false; })
+            //.ContinueWith((t) =>
+            //{
+            //    t.Dispose();
+            //    if (SpinWait.SpinUntil(() => cancel, 1500)) return;
+            //    double offset = 0;
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        offset = ((TextBlock)BottomTextScroller.Content).DesiredSize.Width - BottomTextScroller.ActualWidth;
+            //    }, System.Windows.Threading.DispatcherPriority.Background);
 
-                if (offset > 0)
-                {
-                    var start = DateTime.Now;
-                    var elapsed = (DateTime.Now - start).TotalSeconds;
-                    var duration = offset / 20.0;
-                    while (elapsed < duration)
-                    {
-                        if (cancel)
-                        {
-                            return;
-                        }
-                        if (SpinWait.SpinUntil(() => cancel, 17)) return;
-                        Dispatcher.Invoke(() =>
-                        {
-                            BottomTextScroller.ScrollToHorizontalOffset((elapsed / duration) * offset);
-                        }, System.Windows.Threading.DispatcherPriority.Background);
+            //    if (offset > 0)
+            //    {
+            //        var start = DateTime.Now;
+            //        var elapsed = (DateTime.Now - start).TotalSeconds;
+            //        var duration = offset / 20.0;
+            //        while (elapsed < duration)
+            //        {
+            //            if (cancel)
+            //            {
+            //                return;
+            //            }
+            //            if (SpinWait.SpinUntil(() => cancel, 17)) return;
+            //            Dispatcher.Invoke(() =>
+            //            {
+            //                BottomTextScroller.ScrollToHorizontalOffset((elapsed / duration) * offset);
+            //            }, System.Windows.Threading.DispatcherPriority.Background);
 
-                        elapsed = (DateTime.Now - start).TotalSeconds;
-                    }
+            //            elapsed = (DateTime.Now - start).TotalSeconds;
+            //        }
 
-                    SpinWait.SpinUntil(() => cancel, 1500);
-                } else
-                {
-                    return;
-                }
+            //        SpinWait.SpinUntil(() => cancel, 1500);
+            //    } else
+            //    {
+            //        return;
+            //    }
 
-            }).ContinueWith(t => { 
-                t.Dispose(); 
-                cancel = false;
-                Dispatcher.Invoke(() =>
-                {
-                    BottomTextScroller.ScrollToHorizontalOffset(0);
-                }, System.Windows.Threading.DispatcherPriority.Background);
-            });
+            //}).ContinueWith(t => { 
+            //    t.Dispose(); 
+            //    cancel = false;
+            //    Dispatcher.Invoke(() =>
+            //    {
+            //        BottomTextScroller.ScrollToHorizontalOffset(0);
+            //    }, System.Windows.Threading.DispatcherPriority.Background);
+            //});
         }
 
         private void Collapse()

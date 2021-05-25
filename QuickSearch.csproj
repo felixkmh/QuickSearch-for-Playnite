@@ -57,6 +57,8 @@
     <Compile Include="Controls\ActionButton.xaml.cs">
       <DependentUpon>ActionButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AnimatedScrollViewer.cs" />
+    <Compile Include="Controls\AutoScrollViewer.cs" />
     <Compile Include="SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>

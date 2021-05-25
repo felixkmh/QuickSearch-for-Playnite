@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuickSearch"
              xmlns:items="clr-namespace:QuickSearch.SearchItems"
-             xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK" xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:Playnite="clr-namespace:Playnite.SDK;assembly=Playnite.SDK" xmlns:system="clr-namespace:System;assembly=mscorlib" xmlns:controls="clr-namespace:QuickSearch.Controls"
              mc:Ignorable="d"
              KeyboardNavigation.IsTabStop="False"
              KeyboardNavigation.ControlTabNavigation="None"
@@ -70,9 +70,13 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <ScrollViewer x:Name="BottomTextScroller" ClipToBounds="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" MaxWidth="600">
+                        <controls:AutoScrollViewer x:Name="BottomTextScroller" 
+                                                   ClipToBounds="True" 
+                                                   HorizontalScrollBarVisibility="Hidden" 
+                                                   VerticalScrollBarVisibility="Disabled" 
+                                                   MaxWidth="600">
                             <TextBlock Text="{Binding BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
-                        </ScrollViewer>
+                        </controls:AutoScrollViewer>
                         <TextBlock Text="{Binding BottomCenter}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
                             <TextBlock Text="{Binding BottomRight}" TextTrimming="CharacterEllipsis"/>

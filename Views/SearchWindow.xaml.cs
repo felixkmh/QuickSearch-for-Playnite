@@ -34,8 +34,6 @@ namespace QuickSearch
         CancellationTokenSource openedSearchTokeSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
         IList<ISearchItem<string>> searchItems = Array.Empty<ISearchItem<string>>();
-        ConcurrentQueue<ISearchItem<string>> asyncItemsIndependent = new ConcurrentQueue<ISearchItem<string>>();
-        ConcurrentQueue<ISearchItem<string>> asyncItemsDependent = new ConcurrentQueue<ISearchItem<string>>();
 
         private double heightSelected = double.NaN;
         private double heightNotSelected = double.NaN;
@@ -298,6 +296,8 @@ namespace QuickSearch
             }
         }
 
+        private List<Task> allTasksList = new List<Task>();
+
         private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, in IList<Candidate> addedCandidates, float threshold, int maxItems)
         {
             var queue = new ConcurrentQueue<ISearchItem<string>>();
@@ -325,16 +325,19 @@ namespace QuickSearch
             {
                 return task.ContinueWith(t =>
                 {
-                    var items = t.Result;
-                    if (items != null)
+                    if (t.Status == TaskStatus.RanToCompletion)
                     {
-                        foreach (var item in items)
+                        var items = t.Result;
+                        if (items != null)
                         {
-                            queue.Enqueue(item);
+                            foreach (var item in items)
+                            {
+                                queue.Enqueue(item);
+                            }
                         }
                     }
                     t.Dispose();
-                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                });
             });
 
             var allTasks = factory.ContinueWhenAll(itemTasks.ToArray(), completed => {
@@ -343,6 +346,18 @@ namespace QuickSearch
                     t.Dispose();
                 }
             });
+
+            for(int i = allTasksList.Count -1; i >= 0; --i)
+            {
+                var task = allTasksList[i];
+                if (task.IsCompleted || task.IsCanceled || task.IsFaulted)
+                {
+                    task.Dispose();
+                }
+                allTasksList.RemoveAt(i);
+            }
+
+            allTasksList.Add(allTasks);
 
             while(!cancellationToken.IsCancellationRequested)
             {
@@ -407,7 +422,7 @@ namespace QuickSearch
                 }
             }
 
-            allTasks.Dispose();
+
         }
 
         private int FindMax(in IList<Candidate> canditates, in CancellationToken cancellationToken)
