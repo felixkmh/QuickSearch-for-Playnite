@@ -40,7 +40,7 @@ namespace QuickSearch
         public int MaxNumberResults { get; set; } = 20;
         public bool EnableExternalGameActions { get; set; } = false;
         public bool EnableExternalItems { get; set; } = false;
-        public int AsyncItemsDelay { get; set; } = 250;
+        public int AsyncItemsDelay { get; set; } = 500;
 
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
