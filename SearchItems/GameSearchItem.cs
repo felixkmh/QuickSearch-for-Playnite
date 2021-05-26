@@ -232,16 +232,23 @@ namespace QuickSearch.SearchItems
             }
         }
 
+        internal bool IsURL(string path)
+        {
+            return path.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+        }
+
         public Uri Icon 
         {
             get
             {
                 if (!string.IsNullOrEmpty(game.Icon)) { 
-                    var path = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(game.Icon);
-                    // path = Path.Combine(path, "files", game.Icon);
-                    if (Path.IsPathRooted(game.Icon))
+                    string path = null;
+                    if (IsURL(game.Icon) || Path.IsPathRooted(game.Icon))
                     {
                         path = game.Icon;
+                    } else
+                    {
+                        path = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(game.Icon);
                     }
                     if (File.Exists(path))
                     {
