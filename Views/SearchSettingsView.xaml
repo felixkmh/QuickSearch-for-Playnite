@@ -65,7 +65,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <CheckBox  IsChecked="{Binding InstallationStatusFirst}" Margin="5"/>
-                    <TextBlock Text="Sort by installation status first if score is equal instead of the name" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    <TextBlock Text="Sort by installation status before name if score is equal" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                 </StackPanel>
             </StackPanel>
         </TabItem>
