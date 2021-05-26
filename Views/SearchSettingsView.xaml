@@ -74,7 +74,7 @@
                     <Label Content="Items" Grid.Column="2"/>
                     <Label Content="Actions" Grid.Column="4"/>
                 </Grid>
-                <ScrollViewer MaxHeight="220" HorizontalAlignment="Left" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer MaxHeight="220" HorizontalAlignment="Left">
                     <ItemsControl ItemsSource="{Binding EnabledAssemblies}" Margin="5">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
