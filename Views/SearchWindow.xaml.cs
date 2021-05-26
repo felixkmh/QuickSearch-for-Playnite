@@ -256,8 +256,10 @@ namespace QuickSearch
                                             SearchResults.SelectedIndex = 0;
                                         }
 
-                                        UpdateListBox(addedItems);
-
+                                        if (addedItems == 2)
+                                        {
+                                            UpdateListBox(maxResults);
+                                        }
                                     }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
 
                                     addedItems += 1;
@@ -282,7 +284,12 @@ namespace QuickSearch
                             }
                             UpdateListBox(ListDataContext.Count);
 
-                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Background);
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            UpdateListBox(ListDataContext.Count);
+                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
 
                         var elapsedMs = (int)(DateTime.Now - startTime).TotalMilliseconds;
 
