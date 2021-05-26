@@ -300,7 +300,12 @@ namespace QuickSearch
                         }
                         
                         InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults);
-                        
+
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            UpdateListBox(ListDataContext.Count);
+                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
 
                     }, textChangedTokeSource.Token);
                     backgroundTask = backgroundTask.ContinueWith(t => {
