@@ -238,8 +238,8 @@ namespace QuickSearch.SearchItems
             {
                 if (!string.IsNullOrEmpty(game.Icon)) 
                 {
-                    var path = SearchPlugin.Instance.PlayniteApi.Paths.ConfigurationPath;
-                    path = Path.Combine(path, "library", "files", game.Icon);
+                    var path = SearchPlugin.Instance.PlayniteApi.Database.DatabasePath;
+                    path = Path.Combine(path, "files", game.Icon);
                     if (File.Exists(path))
                     {
                         return new Uri(path);
