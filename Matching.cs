@@ -34,7 +34,7 @@ namespace QuickSearch
         public static float GetCombinedScore(in string str1, in string str2)
         {
             return 10 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
-                 + LongestCommonSubstring(str1, str2, ScoreNormalization.Str1).Score 
+                 + LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score 
                  + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1);
         }
 
@@ -200,6 +200,78 @@ namespace QuickSearch
                     result.Score /= 0.5f * (str1.Length + str2.Length + a.IndexOf(lcs) + b.IndexOf(lcs));
                     break;
             }
+            return result;
+        }
+
+        // see https://www.programmingalgorithms.com/algorithm/longest-common-substring/
+        public static LcsResult LongestCommonSubstringDP(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
+        {
+            var a = RemoveDiacritics(str1.ToLower());
+            var b = RemoveDiacritics(str2.ToLower());
+
+            var subStr = string.Empty;
+
+            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
+                return new LcsResult() { Score = 0, String = subStr };
+
+            int[,] num = new int[a.Length, b.Length];
+            int maxlen = 0;
+            int lastSubsBegin = 0;
+            StringBuilder subStrBuilder = new StringBuilder();
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                for (int j = 0; j < b.Length; j++)
+                {
+                    if (a[i] != b[j])
+                    {
+                        num[i, j] = 0;
+                    }
+                    else
+                    {
+                        if ((i == 0) || (j == 0))
+                            num[i, j] = 1;
+                        else
+                            num[i, j] = 1 + num[i - 1, j - 1];
+
+                        if (num[i, j] > maxlen)
+                        {
+                            maxlen = num[i, j];
+
+                            int thisSubsBegin = i - num[i, j] + 1;
+
+                            if (lastSubsBegin == thisSubsBegin)
+                            {
+                                subStrBuilder.Append(a[i]);
+                            }
+                            else
+                            {
+                                lastSubsBegin = thisSubsBegin;
+                                subStrBuilder.Length = 0;
+                                subStrBuilder.Append(a.Substring(lastSubsBegin, (i + 1) - lastSubsBegin));
+                            }
+                        }
+                    }
+                }
+            }
+
+            subStr = subStrBuilder.ToString();
+
+            var result = new LcsResult { String = subStr, Score = subStr.Length };
+
+            switch (normalization)
+            {
+                case ScoreNormalization.Str1:
+                    result.Score /= a.Length + b.IndexOf(subStr);
+                    break;
+                case ScoreNormalization.Str2:
+                    result.Score /= b.Length + a.IndexOf(subStr);
+                    break;
+                case ScoreNormalization.Both:
+                    result.Score /= 0.5f * (a.Length + b.Length + a.IndexOf(subStr) + b.IndexOf(subStr));
+                    break;
+            }
+
             return result;
         }
 
