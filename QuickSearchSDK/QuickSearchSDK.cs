@@ -118,8 +118,8 @@ namespace QuickSearch
         /// <param name="descripton">Description displayed on the bottem left. Not visible when collapsed.</param>
         /// <param name="actionName">Very short name for the action. Displayed next to the search query.</param>
         /// <param name="iconPath">Path to an image file. Used like a game icon on the left.</param>
-        /// <returns>The <see cref="ISearchItemSource{TKey}"/> that was added or already existed and has the same <paramref name="name"/>. Can be used to remove it.</returns>
-        public static ISearchItem<string> AddCommand(string name, Action action, string descripton = null, string actionName = "Run", string iconPath = null)
+        /// <returns>The <see cref="CommandItem"/> that was added or already existed and has the same <paramref name="name"/>. Can be used to remove it.</returns>
+        public static CommandItem AddCommand(string name, Action action, string descripton = null, string actionName = "Run", string iconPath = null)
         {
             var assembly = Assembly.GetCallingAssembly();
             string assemblyName = assembly?.GetName()?.Name ?? "Null";
@@ -148,7 +148,7 @@ namespace QuickSearch
             {
                 source.entries.Add(key, item);
             }
-            return source.entries[key];
+            return source.entries[key] as CommandItem;
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace QuickSearch
         /// <param name="actions">List of actions shown in the search box when this item is selected.</param>
         /// <param name="descripton">Description displayed on the bottem left. Not visible when collapsed.</param>
         /// <param name="iconPath">Path to an image file. Used like a game icon on the left.</param>
-        /// <returns>The <see cref="ISearchItemSource{TKey}"/> that was added. Can be used to remove it.</returns>
-        public static ISearchItem<string> AddCommand(string name, IList<CommandAction> actions, string descripton = null, string iconPath = null)
+        /// <returns>The <see cref="CommandItem"/> that was added. Can be used to remove it.</returns>
+        public static CommandItem AddCommand(string name, IList<CommandAction> actions, string descripton = null, string iconPath = null)
         {
             var assembly = Assembly.GetCallingAssembly();
             string assemblyName = assembly?.GetName()?.Name ?? "Null";
@@ -190,7 +190,7 @@ namespace QuickSearch
             {
                 source.entries.Add(key, item);
             }
-            return source.entries[key];
+            return source.entries[key] as CommandItem;
         }
 
         /// <summary>
