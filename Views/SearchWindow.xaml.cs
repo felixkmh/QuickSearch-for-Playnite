@@ -91,6 +91,12 @@ namespace QuickSearch
             }
         }
 
+        private string GetAssemblyName(string name)
+        {
+            var sep = name.IndexOf('_');
+            return name.Substring(0, sep);
+        }
+
         public void QueueIndexUpdate()
         {
             openedSearchTokeSource.Cancel();
@@ -104,7 +110,9 @@ namespace QuickSearch
 
                 if (SearchPlugin.Instance.settings.EnableExternalItems)
                 {
-                    var externalItems = QuickSearchSDK.searchItemSources.Values;
+                    var externalItems = QuickSearchSDK.searchItemSources
+                    .Where(e => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
+                    .Select(e => e.Value);
                     itemsEnumerable = itemsEnumerable.Concat(externalItems);
                 }
 
@@ -192,7 +200,12 @@ namespace QuickSearch
                             var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
                             if (SearchPlugin.Instance.settings.EnableExternalItems)
                             {
-                                sources = sources.Concat(QuickSearchSDK.searchItemSources.Values);
+                                sources = sources
+                                .Concat(
+                                    QuickSearchSDK.searchItemSources
+                                    .Where(entry => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(entry.Key)].Items)
+                                    .Select(entry => entry.Value)
+                                );
                             }
                             var queryDependantItems = sources
                             .Where(source => source.DependsOnQuery)
@@ -308,7 +321,12 @@ namespace QuickSearch
 
             if (SearchPlugin.Instance.settings.EnableExternalItems)
             {
-                sources = sources.Concat(QuickSearchSDK.searchItemSources.Values);
+                sources = sources
+                .Concat(
+                    QuickSearchSDK.searchItemSources
+                    .Where(entry => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(entry.Key)].Items)
+                    .Select(entry => entry.Value)
+                );
             }
 
             var tasks = sources

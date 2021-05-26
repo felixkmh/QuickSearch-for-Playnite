@@ -113,6 +113,12 @@ namespace QuickSearch.SearchItems
 
     public class GameSearchSource : ISearchItemSource<string>
     {
+        private static Tuple<string, string> GetAssemblyName(string name)
+        {
+            var sep = name.IndexOf('_');
+            return new Tuple<string, string>(name.Substring(0, sep), name.Substring(sep + 1));
+        }
+
         public IList<GameAction> GameActions { get; set; } = new List<GameAction>();
 
         public bool DependsOnQuery => false;
@@ -124,7 +130,13 @@ namespace QuickSearch.SearchItems
             {
                 foreach (var item in QuickSearchSDK.gameActions)
                 {
-                    GameActions.Add(new GameAction() { Name = item.Key, Action = item.Value });
+                    var extracted = GetAssemblyName(item.Key);
+                    var assembly = extracted.Item1;
+                    var name = extracted.Item2;
+                    if (SearchPlugin.Instance.settings.EnabledAssemblies[assembly].Actions)
+                    {
+                        GameActions.Add(new GameAction() { Name = name, Action = item.Value });
+                    }
                 }
             }
             return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g =>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -168,6 +169,24 @@ namespace QuickSearch.SearchItems
         public void Execute(object parameter)
         {
             Action?.Invoke();
+        }
+    }
+
+
+    internal class ExternalCommandItemSource : ISearchItemSource<string>
+    {
+        public Dictionary<string, ISearchItem<string>> entries = new Dictionary<string, ISearchItem<string>>();
+
+        public bool DependsOnQuery => false;
+
+        public IEnumerable<ISearchItem<string>> GetItems(string query)
+        {
+            return entries.Values;
+        }
+
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
+        {
+            return null;
         }
     }
 }

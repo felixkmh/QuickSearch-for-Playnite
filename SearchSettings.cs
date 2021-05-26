@@ -2,6 +2,7 @@
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,13 @@ namespace QuickSearch
         public bool EnableExternalGameActions { get; set; } = false;
         public bool EnableExternalItems { get; set; } = false;
         public int AsyncItemsDelay { get; set; } = 500;
+        public Dictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new Dictionary<string, AssemblyOptions>();
 
+        public class AssemblyOptions
+        {
+            public bool Items { get; set; } = true;
+            public bool Actions { get; set; } = true;
+        }
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -78,6 +85,7 @@ namespace QuickSearch
                 EnableExternalGameActions = savedSettings.EnableExternalGameActions;
                 EnableExternalItems = savedSettings.EnableExternalItems;
                 AsyncItemsDelay = savedSettings.AsyncItemsDelay;
+                EnabledAssemblies = savedSettings.EnabledAssemblies;
             }
         }
 
@@ -103,6 +111,7 @@ namespace QuickSearch
             this.EnableExternalGameActions = previousSettings.EnableExternalGameActions;
             this.EnableExternalItems = previousSettings.EnableExternalItems;
             this.AsyncItemsDelay = previousSettings.AsyncItemsDelay;
+            this.EnabledAssemblies = previousSettings.EnabledAssemblies;
             previousSettings = null;
         }
 
@@ -120,6 +129,7 @@ namespace QuickSearch
             changed |= EnableExternalGameActions != previousSettings.EnableExternalGameActions;
             changed |= EnableExternalItems       != previousSettings.EnableExternalItems;
             changed |= AsyncItemsDelay           != previousSettings.AsyncItemsDelay;
+            //changed |= EnabledAssemblies         != previousSettings.EnabledAssemblies;
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;

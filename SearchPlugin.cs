@@ -105,8 +105,8 @@ namespace QuickSearch
         {
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
-            searchItemSources.Add("Commands", simpleCommands);
-            QuickSearchSDK.AddItemSource("QuickSearch_Commands", QuickSearchSDK.simpleCommands);
+            // searchItemSources.Add("Commands", simpleCommands);
+            // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
             // Add code to be executed when Playnite is initialized.
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -116,7 +116,7 @@ namespace QuickSearch
                 window.InputBindings.Add(HotkeyBinding);
             }
             var settingsCommand = new CommandItem("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.", "Open") { IconChar = IconChars.Settings };
-            simpleCommands.Items.Add(settingsCommand);
+            QuickSearchSDK.AddCommand(settingsCommand);
             // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
         }
 
@@ -141,6 +141,14 @@ namespace QuickSearch
             popup.IsOpen = !popup.IsOpen;
             if (popup.IsOpen)
             {
+                foreach(var assembly in QuickSearchSDK.registeredAssemblies)
+                {
+                    if (!settings.EnabledAssemblies.ContainsKey(assembly))
+                    {
+                        settings.EnabledAssemblies.Add(assembly, new SearchSettings.AssemblyOptions());
+                    }
+                }
+                
                 searchWindow.Dispatcher.Invoke(() => {
                     searchWindow.QueueIndexUpdate();
                     searchWindow.SearchBox.SelectAll();

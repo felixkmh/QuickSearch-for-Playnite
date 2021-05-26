@@ -17,11 +17,11 @@ namespace QuickSearch
     /// </summary>
     public static class QuickSearchSDK
     {
-        internal static CommandItemSource simpleCommands = new CommandItemSource();
-
         internal static ConcurrentDictionary<string, ISearchItemSource<string>> searchItemSources = new ConcurrentDictionary<string, ISearchItemSource<string>>();
 
         internal static ConcurrentDictionary<string, Action<Playnite.SDK.Models.Game>> gameActions = new ConcurrentDictionary<string, Action<Playnite.SDK.Models.Game>>();
+
+        internal static ConcurrentBag<string> registeredAssemblies = new ConcurrentBag<string>();
 
         /// <summary>
         /// Add action that is shown in the search bar when a game is selected.
@@ -31,7 +31,15 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if action was added. <see langword="false"/>, if action with <paramref name="name"/> already exists.</returns>
         public static bool AddGameAction(string name, Action<Playnite.SDK.Models.Game> action)
         {
-            return gameActions.TryAdd(name, action);
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            var key = $"{assemblyName}_{name}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
+            return gameActions.TryAdd(key, action);
         }
 
         /// <summary>
@@ -41,6 +49,14 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if action was removed. <see langword="false"/>, if action with <paramref name="name"/> could not be found.</returns>
         public static bool RemoveGameAction(string name)
         {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            var key = $"{assemblyName}_{name}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
             return gameActions.TryRemove(name, out var _);
         }
 
@@ -54,9 +70,17 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if source was added. <see langword="false"/>, if a source with ID <paramref name="id"/> already existed.</returns>
         public static bool AddItemSource(string id, ISearchItemSource<string> source)
         {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            var key = $"{assemblyName}_{id}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
             if (id is string && source is ISearchItemSource<string>)
             {
-                return searchItemSources.TryAdd(id, source);
+                return searchItemSources.TryAdd(key, source);
             }
             return false;
         }
@@ -69,9 +93,17 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if source was removed. <see langword="false"/>, if no source with ID <paramref name="id"/> was found.</returns>
         public static bool RemoveItemSource(string id)
         {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            var key = $"{assemblyName}_{id}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
             if (id is string)
             {
-                return searchItemSources.TryRemove(id, out var _);
+                return searchItemSources.TryRemove(key, out var _);
             }
             return false;
         }
@@ -86,12 +118,37 @@ namespace QuickSearch
         /// <param name="descripton">Description displayed on the bottem left. Not visible when collapsed.</param>
         /// <param name="actionName">Very short name for the action. Displayed next to the search query.</param>
         /// <param name="iconPath">Path to an image file. Used like a game icon on the left.</param>
-        /// <returns>The <see cref="ISearchItemSource{TKey}"/> that was added. Can be used to remove it.</returns>
+        /// <returns>The <see cref="ISearchItemSource{TKey}"/> that was added or already existed and has the same <paramref name="name"/>. Can be used to remove it.</returns>
         public static ISearchItem<string> AddCommand(string name, Action action, string descripton = null, string actionName = "Run", string iconPath = null)
         {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            var key = $"{assemblyName}_{name}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
+
+            var sourceName = "___UNNAMEDITEMSOURCE___";
+            var combined = $"{assemblyName}_{sourceName}";
+
+            ExternalCommandItemSource source;
+            if (searchItemSources.TryGetValue(combined, out var existing))
+            {
+                source = (ExternalCommandItemSource)existing;
+            } else
+            {
+                source = new ExternalCommandItemSource();
+                searchItemSources.TryAdd(combined, source);
+            }
+
             var item = new CommandItem(name, action, descripton, actionName, iconPath);
-            simpleCommands.Items.Add(item);
-            return item;
+            if (!source.entries.ContainsKey(key))
+            {
+                source.entries.Add(key, item);
+            }
+            return source.entries[key];
         }
 
         /// <summary>
@@ -105,9 +162,35 @@ namespace QuickSearch
         /// <returns>The <see cref="ISearchItemSource{TKey}"/> that was added. Can be used to remove it.</returns>
         public static ISearchItem<string> AddCommand(string name, IList<CommandAction> actions, string descripton = null, string iconPath = null)
         {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " "); ;
+            var key = $"{assemblyName}_{name}";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
             var item = new CommandItem(name, actions, descripton, iconPath);
-            simpleCommands.Items.Add(item);
-            return item;
+
+            var sourceName = "___UNNAMEDITEMSOURCE___";
+            var combined = $"{assemblyName}_{sourceName}";
+
+            ExternalCommandItemSource source;
+            if (searchItemSources.TryGetValue(combined, out var existing))
+            {
+                source = (ExternalCommandItemSource)existing;
+            }
+            else
+            {
+                source = new ExternalCommandItemSource();
+                searchItemSources.TryAdd(combined, source);
+            }
+
+            if (!source.entries.ContainsKey(key))
+            {
+                source.entries.Add(key, item);
+            }
+            return source.entries[key];
         }
 
         /// <summary>
@@ -117,12 +200,35 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if item was added. <see langword="false"/>, if item already existed.</returns>
         public static bool AddCommand(ISearchItem<string> item) 
         {
-            if (simpleCommands.Items.Contains(item))
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+            if (!registeredAssemblies.Contains(assemblyName))
             {
-                return false;
+                registeredAssemblies.Add(assemblyName);
             }
-            simpleCommands.Items.Add(item);
-            return true;
+            var key = $"{assemblyName}_{item.TopLeft}";
+
+            var sourceName = "___UNNAMEDITEMSOURCE___";
+            var combined = $"{assemblyName}_{sourceName}";
+
+            ExternalCommandItemSource source;
+            if (searchItemSources.TryGetValue(combined, out var existing))
+            {
+                source = (ExternalCommandItemSource)existing;
+            }
+            else
+            {
+                source = new ExternalCommandItemSource();
+                searchItemSources.TryAdd(combined, source);
+            }
+
+            if (!source.entries.ContainsKey(key))
+            {
+                source.entries.Add(key, item);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -132,7 +238,28 @@ namespace QuickSearch
         /// <returns><see langword="true"/>, if <paramref name="item"/> was removed. <see langword="false"/>, if <paramref name="item"/> was not found.</returns>
         public static bool RemoveCommand(ISearchItem<string> item)
         {
-            return simpleCommands.Items.Remove(item);
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " ");
+
+            var sourceName = "___UNNAMEDITEMSOURCE___";
+            var combined = $"{assemblyName}_{sourceName}";
+
+            if (searchItemSources.TryGetValue(combined, out var existing))
+            {
+                ExternalCommandItemSource source = (ExternalCommandItemSource)existing;
+                var key = source.entries.Where(e => e.Value == item).Select(e => e.Key).FirstOrDefault();
+                if (key != null)
+                {
+                    source.entries.Remove(key);
+                    return true;
+                }
+                if (source.entries.Count == 0)
+                {
+                    searchItemSources.TryRemove(combined, out var _);
+                }
+            }
+            return false;
         }
     }
 }
