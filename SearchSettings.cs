@@ -33,7 +33,7 @@ namespace QuickSearch
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
         public string HotkeyText { get; set; } = string.Empty;
 
-        public double Threshold { get; set; } = 0.3;
+        public double Threshold { get; set; } = 0.55;
 
         public bool ExpandAllItems { get; set; } = false;
         public bool ShowSeperator { get; set; } = false;
