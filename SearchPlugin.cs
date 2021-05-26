@@ -201,6 +201,10 @@ namespace QuickSearch
                                 key.Key = "> " + key.Key;
                             }
                         }
+                        if (keyGesture.Key == Key.F3 && keyGesture.Modifiers == ModifierKeys.None)
+                        {
+                            QuickSearchSDK.AddGameAction("Edit", g => binding.Command.Execute(g));
+                        }
                     }
                 }
                 QuickSearchSDK.AddCommand(addGameCommand);
