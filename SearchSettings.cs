@@ -45,6 +45,7 @@ namespace QuickSearch
         public Dictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new Dictionary<string, AssemblyOptions>();
         public float PrioritizationThreshold { get; set; } = 0.55f;
         public int MaxPrioritizedGames { get; set; } = 1;
+        public bool InstallationStatusFirst { get; set; } = false;
 
         public class AssemblyOptions : IEquatable<AssemblyOptions>
         {
@@ -113,6 +114,7 @@ namespace QuickSearch
                 EnabledAssemblies = savedSettings.EnabledAssemblies;
                 PrioritizationThreshold = savedSettings.PrioritizationThreshold;
                 MaxPrioritizedGames = savedSettings.MaxPrioritizedGames;
+                InstallationStatusFirst = savedSettings.InstallationStatusFirst;
             }
         }
 
@@ -141,6 +143,7 @@ namespace QuickSearch
             this.EnabledAssemblies = previousSettings.EnabledAssemblies;
             this.MaxPrioritizedGames = previousSettings.MaxPrioritizedGames;
             this.PrioritizationThreshold = previousSettings.PrioritizationThreshold;
+            this.InstallationStatusFirst = previousSettings.InstallationStatusFirst;
             previousSettings = null;
         }
 
@@ -161,6 +164,7 @@ namespace QuickSearch
             changed |= EnabledAssemblies.Count   != previousSettings.EnabledAssemblies.Count;
             changed |= PrioritizationThreshold   != previousSettings.PrioritizationThreshold;
             changed |= MaxPrioritizedGames       != previousSettings.MaxPrioritizedGames;
+            changed |= InstallationStatusFirst != previousSettings.InstallationStatusFirst;
             changed |= EnabledAssemblies.Keys
                 .Concat(previousSettings.EnabledAssemblies.Keys)
                 .Aggregate(false, (v, key) => v || !(EnabledAssemblies

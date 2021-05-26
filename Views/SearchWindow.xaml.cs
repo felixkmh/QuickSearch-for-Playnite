@@ -194,6 +194,8 @@ namespace QuickSearch
                         }
                         int maxResults = 0;
                         int addedItems = 0;
+                        int firstUninstalledIdx = 0;
+                        int prioritizedGames = 0;
                         List<Candidate> addedCandidates = new List<Candidate>();
                         if (!string.IsNullOrEmpty(input))
                         {
@@ -238,8 +240,32 @@ namespace QuickSearch
                                 {
                                     canditates[maxIdx].Marked = true;
                                     addedCandidates.Add(canditates[maxIdx]);
+
+                                    //bool prioritized = false;
+                                    //if (prioritizedGames < SearchPlugin.Instance.settings.MaxNumberResults)
+                                    //{
+                                    //    if (canditates[maxIdx].Item is GameSearchItem gameItem)
+                                    //    {
+                                    //        if (gameItem.game.IsInstalled)
+                                    //        {
+                                    //            if (ComputePreliminaryScore(gameItem, input) >= SearchPlugin.Instance.settings.PrioritizationThreshold)
+                                    //            {
+                                    //                addedCandidates.Insert(firstUninstalledIdx, canditates[maxIdx]);
+                                    //                prioritizedGames += 1;
+                                    //                prioritized = true;
+                                    //            }
+                                    //            firstUninstalledIdx += 1;
+                                    //        }
+                                    //    }
+                                    //} 
+                                    //if (!prioritized)
+                                    //{
+                                    //    addedCandidates.Add(canditates[maxIdx]);
+                                    //}
+
                                     Dispatcher.Invoke(() =>
                                     {
+
                                         if (ListDataContext.Count > addedItems)
                                         {
                                             ListDataContext[addedItems] = canditates[maxIdx].Item;
@@ -260,6 +286,8 @@ namespace QuickSearch
                                         {
                                             UpdateListBox(maxResults);
                                         }
+
+                                        
                                     }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
 
                                     addedItems += 1;
@@ -505,18 +533,36 @@ namespace QuickSearch
                     var name = RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name));
                     var lastPlayed = (gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue);
                     var installed = gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled);
-                    if (name < 0)
+
+                    if (SearchPlugin.Instance.settings.InstallationStatusFirst)
                     {
-                        return -1;
-                    }
-                    else if (name == 0 && lastPlayed > 0)
+                        if (installed > 0)
+                        {
+                            return -1;
+                        }
+                        else if (installed == 0 && name < 0)
+                        {
+                            return -1;
+                        }
+                        else if (name == 0 && installed == 0 && lastPlayed > 0)
+                        {
+                            return -1;
+                        }
+                    } else
                     {
-                        return -1;
-                    }
-                    else if (name == 0 && lastPlayed == 0 && installed > 0)
-                    {
-                        return -1;
-                    }
+                        if (name < 0)
+                        {
+                            return -1;
+                        }
+                        else if (name == 0 && lastPlayed > 0)
+                        {
+                            return -1;
+                        }
+                        else if (name == 0 && lastPlayed == 0 && installed > 0)
+                        {
+                            return -1;
+                        }
+                    }                   
                 }
             }
 
