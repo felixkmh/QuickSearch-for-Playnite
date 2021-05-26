@@ -44,10 +44,28 @@ namespace QuickSearch
         public int AsyncItemsDelay { get; set; } = 500;
         public Dictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new Dictionary<string, AssemblyOptions>();
 
-        public class AssemblyOptions
+        public class AssemblyOptions : IEquatable<AssemblyOptions>
         {
             public bool Items { get; set; } = true;
             public bool Actions { get; set; } = true;
+
+            public bool Equals(AssemblyOptions other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+                return Items == other.Items && Actions == other.Actions;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is AssemblyOptions options)
+                {
+                    return Equals(options);
+                }
+                return false;
+            }
         }
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
@@ -129,7 +147,12 @@ namespace QuickSearch
             changed |= EnableExternalGameActions != previousSettings.EnableExternalGameActions;
             changed |= EnableExternalItems       != previousSettings.EnableExternalItems;
             changed |= AsyncItemsDelay           != previousSettings.AsyncItemsDelay;
-            //changed |= EnabledAssemblies         != previousSettings.EnabledAssemblies;
+            changed |= EnabledAssemblies.Count   != previousSettings.EnabledAssemblies.Count;
+            changed |= EnabledAssemblies.Keys
+                .Concat(previousSettings.EnabledAssemblies.Keys)
+                .Aggregate(false, (v, key) => v || !(EnabledAssemblies
+                    .Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault()?.Equals( 
+                    previousSettings.EnabledAssemblies.Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault())??true));
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;
