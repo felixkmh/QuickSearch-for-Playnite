@@ -17,8 +17,22 @@
                 <StackPanel Orientation="Horizontal" Margin="2">
                     <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="230" 
                     HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
-                    VerticalAlignment="Center"/>
+                    VerticalAlignment="Center" x:Name="SearchThreshold"/>
                     <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="Threshold for installed games to be prioritized:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <Slider Minimum="{Binding ElementName=SearchThreshold, Path=Value, Mode=OneWay}" Maximum="1.0" Width="230" 
+                    HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                    VerticalAlignment="Center" x:Name="PrioThreshold" Value="{Binding PrioritizationThreshold}"/>
+                    <TextBlock Text="{Binding PrioritizationThreshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="Maximum number of prioritized installed games:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <Slider Maximum="{Binding MaxNumberResults, Mode=OneWay}" Minimum="0" Width="230" 
+                    HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                    VerticalAlignment="Center" Value="{Binding MaxPrioritizedGames}"/>
+                    <TextBlock Text="{Binding MaxPrioritizedGames}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="Amount of time in milliseconds to wait before requesting async items:" Margin="2" Foreground="{StaticResource TextBrush}"/>
                 <StackPanel Orientation="Horizontal" Margin="2">

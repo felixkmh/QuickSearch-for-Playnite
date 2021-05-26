@@ -43,6 +43,8 @@ namespace QuickSearch
         public bool EnableExternalItems { get; set; } = false;
         public int AsyncItemsDelay { get; set; } = 500;
         public Dictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new Dictionary<string, AssemblyOptions>();
+        public float PrioritizationThreshold { get; set; } = 0.55f;
+        public int MaxPrioritizedGames { get; set; } = 1;
 
         public class AssemblyOptions : IEquatable<AssemblyOptions>
         {
@@ -109,6 +111,8 @@ namespace QuickSearch
                 EnableExternalItems = savedSettings.EnableExternalItems;
                 AsyncItemsDelay = savedSettings.AsyncItemsDelay;
                 EnabledAssemblies = savedSettings.EnabledAssemblies;
+                PrioritizationThreshold = savedSettings.PrioritizationThreshold;
+                MaxPrioritizedGames = savedSettings.MaxPrioritizedGames;
             }
         }
 
@@ -135,6 +139,8 @@ namespace QuickSearch
             this.EnableExternalItems = previousSettings.EnableExternalItems;
             this.AsyncItemsDelay = previousSettings.AsyncItemsDelay;
             this.EnabledAssemblies = previousSettings.EnabledAssemblies;
+            this.MaxPrioritizedGames = previousSettings.MaxPrioritizedGames;
+            this.PrioritizationThreshold = previousSettings.PrioritizationThreshold;
             previousSettings = null;
         }
 
@@ -153,6 +159,8 @@ namespace QuickSearch
             changed |= EnableExternalItems       != previousSettings.EnableExternalItems;
             changed |= AsyncItemsDelay           != previousSettings.AsyncItemsDelay;
             changed |= EnabledAssemblies.Count   != previousSettings.EnabledAssemblies.Count;
+            changed |= PrioritizationThreshold   != previousSettings.PrioritizationThreshold;
+            changed |= MaxPrioritizedGames       != previousSettings.MaxPrioritizedGames;
             changed |= EnabledAssemblies.Keys
                 .Concat(previousSettings.EnabledAssemblies.Keys)
                 .Aggregate(false, (v, key) => v || !(EnabledAssemblies
