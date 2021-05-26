@@ -237,8 +237,8 @@ namespace QuickSearch.SearchItems
             get
             {
                 if (!string.IsNullOrEmpty(game.Icon)) { 
-                    var path = SearchPlugin.Instance.PlayniteApi.Database.DatabasePath;
-                    path = Path.Combine(path, "files", game.Icon);
+                    var path = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(game.Icon);
+                    // path = Path.Combine(path, "files", game.Icon);
                     if (Path.IsPathRooted(game.Icon))
                     {
                         path = game.Icon;
