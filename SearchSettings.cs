@@ -66,6 +66,11 @@ namespace QuickSearch
                 }
                 return false;
             }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
