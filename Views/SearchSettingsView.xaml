@@ -54,14 +54,14 @@
         <TabItem Header="External">
             <StackPanel Margin="10" Grid.IsSharedSizeScope="True">
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5"/>
+                    <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5" x:Name="GlobalItemsEnabled"/>
                     <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5"/>
+                    <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5" x:Name="GlobalActionsEnabled"/>
                     <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                 </StackPanel>
-                <Label Content="Enable Items and Actions per extension:" Margin="0,10,0,0"/>
+                <Label Content="Enable Items and Game Actions per extension:" Margin="0,10,0,0"/>
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
@@ -74,7 +74,7 @@
                     <Label Content="Items" Grid.Column="2"/>
                     <Label Content="Actions" Grid.Column="4"/>
                 </Grid>
-                <ScrollViewer Height="220" HorizontalAlignment="Left" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer MaxHeight="220" HorizontalAlignment="Left" VerticalScrollBarVisibility="Visible">
                     <ItemsControl ItemsSource="{Binding EnabledAssemblies}" Margin="5">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -87,8 +87,8 @@
                                         <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
                                     </Grid.ColumnDefinitions>
                                     <Label Content="{Binding Key}" Foreground="{StaticResource TextBrush}"/>
-                                    <CheckBox IsChecked="{Binding Value.Items}" Margin="3" Grid.Column="2" HorizontalAlignment="Center"/>
-                                    <CheckBox IsChecked="{Binding Value.Actions}" Margin="3" Grid.Column="4" HorizontalAlignment="Center"/>
+                                    <CheckBox IsChecked="{Binding Value.Items}" Margin="3" Grid.Column="2" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalItemsEnabled}"/>
+                                    <CheckBox IsChecked="{Binding Value.Actions}" Margin="3" Grid.Column="4" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalActionsEnabled}"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
