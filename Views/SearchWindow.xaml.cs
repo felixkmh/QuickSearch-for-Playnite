@@ -256,10 +256,8 @@ namespace QuickSearch
                                             SearchResults.SelectedIndex = 0;
                                         }
 
-                                        if (addedItems == 2)
-                                        {
-                                            UpdateListBox(maxResults);
-                                        }
+                                        UpdateListBox(addedItems);
+
                                     }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
 
                                     addedItems += 1;
