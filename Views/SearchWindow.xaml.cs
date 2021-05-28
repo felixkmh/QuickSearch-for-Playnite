@@ -707,7 +707,10 @@ namespace QuickSearch
                         {
                             if (SearchResults.SelectedItem is ISearchItem<string> item)
                             {
-                                action.Execute(item);
+                                if (action.CanExecute(item))
+                                {
+                                    action.Execute(item);
+                                }
                             }
                         }
                     }
