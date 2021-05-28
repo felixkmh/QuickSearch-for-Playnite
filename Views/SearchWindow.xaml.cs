@@ -190,8 +190,6 @@ namespace QuickSearch
                         }
                         int maxResults = 0;
                         int addedItems = 0;
-                        int firstUninstalledIdx = 0;
-                        int prioritizedGames = 0;
                         List<Candidate> addedCandidates = new List<Candidate>();
                         if (!string.IsNullOrEmpty(input))
                         {
@@ -237,27 +235,6 @@ namespace QuickSearch
                                     canditates[maxIdx].Marked = true;
                                     addedCandidates.Add(canditates[maxIdx]);
 
-                                    //bool prioritized = false;
-                                    //if (prioritizedGames < SearchPlugin.Instance.settings.MaxNumberResults)
-                                    //{
-                                    //    if (canditates[maxIdx].Item is GameSearchItem gameItem)
-                                    //    {
-                                    //        if (gameItem.game.IsInstalled)
-                                    //        {
-                                    //            if (ComputePreliminaryScore(gameItem, input) >= SearchPlugin.Instance.settings.PrioritizationThreshold)
-                                    //            {
-                                    //                addedCandidates.Insert(firstUninstalledIdx, canditates[maxIdx]);
-                                    //                prioritizedGames += 1;
-                                    //                prioritized = true;
-                                    //            }
-                                    //            firstUninstalledIdx += 1;
-                                    //        }
-                                    //    }
-                                    //} 
-                                    //if (!prioritized)
-                                    //{
-                                    //    addedCandidates.Add(canditates[maxIdx]);
-                                    //}
 
                                     Dispatcher.Invoke(() =>
                                     {

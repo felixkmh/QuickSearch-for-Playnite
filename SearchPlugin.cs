@@ -111,7 +111,9 @@ namespace QuickSearch
 
             public string Name { get; set; }
             public InputBinding Binding { get; set; }
+#pragma warning disable CS0067
             public event EventHandler CanExecuteChanged;
+#pragma warning restore CS0067
 
             public bool CanExecute(object parameter)
             {
