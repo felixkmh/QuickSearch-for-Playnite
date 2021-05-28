@@ -101,6 +101,38 @@ namespace QuickSearch
             }
         }
 
+        private class InputBindingWrapper : ISearchAction<string>
+        {
+            public InputBindingWrapper(string name, InputBinding binding)
+            {
+                Name = name;
+                Binding = binding;
+            }
+
+            public string Name { get; set; }
+            public InputBinding Binding { get; set; }
+            public event EventHandler CanExecuteChanged;
+
+            public bool CanExecute(object parameter)
+            {
+                if (Binding?.Command != null)
+                {
+                    return Binding.Command.CanExecute(Binding.CommandParameter);
+                }
+                return false;
+            }
+
+            public void Execute(object parameter)
+            {
+                if (Binding?.Command != null)
+                {
+                    if (CanExecute(null)) {
+                        Binding.Command.Execute(Binding.CommandParameter);
+                    }
+                }
+            }
+        }
+
         public override void OnApplicationStarted()
         {
             instance = this;
@@ -125,6 +157,7 @@ namespace QuickSearch
                             string name = (string)Application.Current.FindResource("LOCSettingsWindowTitle");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Playnite Settings", "Open");
                             item.IconChar = IconChars.Settings;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach(CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -135,6 +168,7 @@ namespace QuickSearch
                             string name = (string)Application.Current.FindResource("LOCUpdateAll") + " " + (string)Application.Current.FindResource("LOCLibraries");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Update All Libraries", (string)Application.Current.FindResource("LOCUpdateAll"));
                             item.IconChar = IconChars.Refresh;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -145,6 +179,7 @@ namespace QuickSearch
                             string name = (string)Application.Current.FindResource("LOCExitPlaynite");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Exit Playnite", (string)Application.Current.FindResource("LOCExitAppLabel"));
                             item.IconChar = IconChars.Exit;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -155,6 +190,7 @@ namespace QuickSearch
                             string name = (string)Application.Current.FindResource("LOCMenuOpenFullscreen");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Switch to Fullscreen Mode", "Switch");
                             item.IconChar = IconChars.Maximize;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -174,6 +210,7 @@ namespace QuickSearch
                             name = name.Replace("…", "");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Library Manager", "Open");
                             item.IconChar = IconChars.Settings;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -185,6 +222,7 @@ namespace QuickSearch
                             name = name.Replace("…", "");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Configure Emulators", "Configure");
                             item.IconChar = IconChars.Settings;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
@@ -196,6 +234,7 @@ namespace QuickSearch
                             name = name.Replace("…", "");
                             var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Download Metadata", "Open");
                             item.IconChar = IconChars.Copy;
+                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                             foreach (CommandItemKey key in item.Keys)
                             {
                                 key.Key = "> " + key.Key;
