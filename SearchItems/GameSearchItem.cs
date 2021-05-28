@@ -252,7 +252,10 @@ namespace QuickSearch.SearchItems
                     }
                     if (File.Exists(path))
                     {
-                        return new Uri(path);
+                        if (Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out var uri)) 
+                        {
+                            return uri;
+                        }
                     }
                 }
                 return (Application.Current.FindResource("TrayIcon") as BitmapImage).UriSource;
