@@ -566,7 +566,10 @@ namespace QuickSearch
                 }
             }
 
-            return 0;
+            var aIsGame = a is GameSearchItem;
+            var bIsGame = b is GameSearchItem;
+
+            return bIsGame.CompareTo(aIsGame);
         } 
 
         private void UpdateListBox(int items)
