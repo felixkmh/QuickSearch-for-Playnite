@@ -367,9 +367,15 @@ namespace QuickSearch
                 );
             }
 
+            var highestScore = 0.0f;
+            if (addedCandidates.Count > 0)
+            {
+                highestScore = ComputePreliminaryScore(addedCandidates.First().Item, input);
+            }
+
             var tasks = sources
                 .AsParallel()
-                .Select(source => source.GetItemsTask(input))
+                .Select(source => source.GetItemsTask(input, highestScore))
                 .Where(task => task != null);
 
             if (!tasks.Any())

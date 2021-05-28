@@ -74,11 +74,12 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Used to return search items asynchronously. Should not add same items as <see cref="ISearchItemSource{TKey}.GetItems(string)"/>.
         /// This would create duplicate entries. Uses this for items that depend on asynchronous data, like requesting data from a web api.
-        /// <see cref="ISearchItemSource{TKey}.GetItemsTask(string)"/> is only called after a short time in which the query was not changed.
+        /// <see cref="ISearchItemSource{TKey}.GetItemsTask(string,float)"/> is only called after a short time in which the query was not changed.
         /// </summary>
         /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case.</param>
+        /// <param name="highestScore">Score of the first item in the list (between 0.0 and 1.0) after processing all non-asynchronous items.</param>
         /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
-        Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query);
+        Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query, float highestScore);
 
         /// <summary>
         /// Indicates whether this source supplies items depending on the current search query.

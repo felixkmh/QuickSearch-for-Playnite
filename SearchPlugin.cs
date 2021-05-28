@@ -258,6 +258,7 @@ namespace QuickSearch
                     key.Key = "> " + key.Key;
                 }
                 QuickSearchSDK.AddCommand(settingsCommand);
+                QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
             }
             // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
 

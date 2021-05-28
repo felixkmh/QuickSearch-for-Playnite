@@ -132,8 +132,8 @@ namespace QuickSearch.SearchItems
         {
             return Items;
         }
-        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string)"/>
-        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
+        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string,float)"/>
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, float highestScore)
         {
             return null;
         }
@@ -184,7 +184,7 @@ namespace QuickSearch.SearchItems
             return entries.Values;
         }
 
-        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query)
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, float highestScore)
         {
             return null;
         }
