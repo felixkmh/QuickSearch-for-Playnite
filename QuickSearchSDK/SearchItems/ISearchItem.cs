@@ -12,6 +12,22 @@ using System.Windows.Input;
 namespace QuickSearch.SearchItems
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public class Candidate
+    {
+        /// <summary>
+        /// The <see cref="ISearchItem{TKey}"/> associated with this candidate
+        /// </summary>
+        public ISearchItem<string> Item { get; internal set; }
+        /// <summary>
+        /// The final combined score for this candidate used to sort in descending order.
+        /// </summary>
+        public float Score { get; internal set; }
+        internal bool Marked;
+    }
+
+    /// <summary>
     /// Controls how scores of multiple keys are combined.
     /// </summary>
     public enum ScoreMode
@@ -74,12 +90,12 @@ namespace QuickSearch.SearchItems
         /// <summary>
         /// Used to return search items asynchronously. Should not add same items as <see cref="ISearchItemSource{TKey}.GetItems(string)"/>.
         /// This would create duplicate entries. Uses this for items that depend on asynchronous data, like requesting data from a web api.
-        /// <see cref="ISearchItemSource{TKey}.GetItemsTask(string,float)"/> is only called after a short time in which the query was not changed.
+        /// <see cref="ISearchItemSource{TKey}.GetItemsTask(string, IReadOnlyList{Candidate})"/> is only called after a short time in which the query was not changed.
         /// </summary>
         /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case.</param>
-        /// <param name="highestScore">Score of the first item in the list (between 0.0 and 1.0) after processing all non-asynchronous items.</param>
+        /// <param name="addedItems">List of already added search item candicates sorted by score.</param>
         /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
-        Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query, float highestScore);
+        Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems);
 
         /// <summary>
         /// Indicates whether this source supplies items depending on the current search query.

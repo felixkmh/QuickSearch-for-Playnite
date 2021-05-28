@@ -125,11 +125,7 @@ namespace QuickSearch
             });
         }
 
-        class Candidate {
-            public ISearchItem<string> Item;
-            public float Score;
-            public bool Marked;
-        }
+        float Clamp01(float f) => Math.Min(Math.Max(0f, f), 1f);
 
         internal float ComputeScore(ISearchItem<string> item, string input)
         {
@@ -349,7 +345,7 @@ namespace QuickSearch
 
         private List<Task> allTasksList = new List<Task>();
 
-        private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, in IList<Candidate> addedCandidates, float threshold, int maxItems)
+        private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, IList<Candidate> addedCandidates, float threshold, int maxItems)
         {
             var queue = new ConcurrentQueue<ISearchItem<string>>();
 
@@ -373,9 +369,13 @@ namespace QuickSearch
                 highestScore = ComputePreliminaryScore(addedCandidates.First().Item, input);
             }
 
+            List<Candidate> addedItems = addedCandidates.ToList();
             var tasks = sources
                 .AsParallel()
-                .Select(source => source.GetItemsTask(input, highestScore))
+                .Select(source =>
+                {
+                    return source.GetItemsTask(input, addedItems);
+                })
                 .Where(task => task != null);
 
             if (!tasks.Any())

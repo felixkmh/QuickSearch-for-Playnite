@@ -155,7 +155,7 @@ namespace QuickSearch.SearchItems
 
         string quote = null;
 
-        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, float highestScore)
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
         {
             return Task.Run(() => 
             {
