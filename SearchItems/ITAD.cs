@@ -81,7 +81,7 @@ namespace QuickSearch.SearchItems
                                         SearchPlugin.Instance.settings.EnabledITADShops.Add(store.ID, new SearchSettings.ITADShopOption(store.Title) { Enabled = defaultStores.Contains(store.ID)});
                                     }
                                 }
-                                var toRemove = SearchPlugin.Instance.settings.EnabledITADShops.Keys.Where(key => !stores.Data.Any(s => s.ID == key)).ToList();
+                                var toRemove = SearchPlugin.Instance.settings.EnabledITADShops.Keys.ToArray().Where(key => !stores.Data.Any(s => s.ID == key)).ToArray();
                                 foreach (var key in toRemove)
                                 {
                                     SearchPlugin.Instance.settings.EnabledITADShops.Remove(key);
@@ -171,7 +171,7 @@ namespace QuickSearch.SearchItems
                                                 {
                                                     IconChar = IconChars.ShoppingCart,
                                                     BottomLeft = priceRange,
-                                                    BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}, {country.ToUpper()}"),
+                                                    BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}{(country!=null?", ":string.Empty)}{country?.ToUpper()??string.Empty}"),
                                                     // TopRight = "Available in " + game.Value.Prices.Count.ToString() + " Shop" + (game.Value.Prices.Count != 1 ? "s" : string.Empty),
                                                     Keys = new List<ISearchKey<string>>() { new CommandItemKey() { Key = title, Weight = 1 } }
                                                 };
