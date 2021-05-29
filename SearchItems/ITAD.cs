@@ -33,7 +33,7 @@ namespace QuickSearch.SearchItems
 
         string makePriceQuery(string plain)
         {
-            var c = string.IsNullOrEmpty(region) ? string.Empty : $"&country={Uri.EscapeDataString(country)}";
+            var c = string.IsNullOrEmpty(country) ? string.Empty : $"&country={Uri.EscapeDataString(country)}";
             var r = string.IsNullOrEmpty(region) ? string.Empty : $"&region={Uri.EscapeDataString(region)}";
             var shops = SearchPlugin.Instance.settings.EnabledITADShops.Where(s => s.Value.Enabled).Select(s => s.Key);
             return baseUrl + $"v01/game/prices/?key={Properties.Resources.ITAD}&plains={Uri.EscapeDataString(plain)}{r}{c}&shops={Uri.EscapeDataString(string.Join(",", shops))}";
@@ -53,11 +53,19 @@ namespace QuickSearch.SearchItems
                         var currentRegion = RegionInfo.CurrentRegion.TwoLetterISORegionName;
                         var data = (JObject)json["data"];
                         var foundRegion = regionsResponse.Data.FirstOrDefault(i => i.Value.Countries.Contains(currentRegion));
-                        if (foundRegion.Value != null)
+                        if (foundRegion.Value != null || currentRegion == "150")
                         {
-                            currencySign = foundRegion.Value.Currency.Sign;
-                            country = currentRegion;
-                            region = foundRegion.Key;
+                            if (currentRegion == "150")
+                            {
+                                currencySign = "€";
+                                country = null;
+                                region = "eu1";
+                            } else
+                            {
+                                currencySign = foundRegion.Value.Currency.Sign;
+                                country = currentRegion;
+                                region = foundRegion.Key;
+                            }
 
                             var storesResponse = client.GetStringAsync($"https://api.isthereanydeal.com/v02/web/stores/?region={region}").Result;
 
