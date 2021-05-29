@@ -97,7 +97,7 @@ namespace QuickSearch.SearchItems
         string region = null;
         string country = null;
         string currencySign = null;
-        List<string> defaultStores = new List<string>() { "steam", "battlenet", "gog", "humblestore", "itchio", "microsoft", "origin", "squenix", "uplay", "epic"};
+        List<string> defaultStores = new List<string>() { "steam", "battlenet", "gog", "microsoft", "origin", "squenix", "uplay", "epic"};
 
         
 
