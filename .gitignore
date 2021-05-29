@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Resource file
 Properties/Resources.resx
+Properties/Resources.Designer.cs
