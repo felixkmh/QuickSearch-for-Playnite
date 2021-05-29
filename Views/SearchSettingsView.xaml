@@ -5,114 +5,167 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
-    <TabControl>
+    <TabControl ClipToBounds="True" MaxHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Panel}}, Path=ActualHeight, Mode=OneWay}">
         <TabItem Header="Common">
-            <StackPanel Margin="10">
-                <TextBlock Text="Hotkey to open the search popup:" Margin="2" Foreground="{StaticResource TextBrush}"/>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False" Foreground="{StaticResource TextBrush}"/>
-                    <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Hotkey to open the search popup:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False" Foreground="{StaticResource TextBrush}"/>
+                        <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
+                    </StackPanel>
+                    <TextBlock Text="Fuzzy search threshold (higher value = more strict = quicker search):" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center" x:Name="SearchThreshold"/>
+                        <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <!--<TextBlock Text="Threshold for installed games to be prioritized:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Minimum="{Binding ElementName=SearchThreshold, Path=Value, Mode=OneWay}" Maximum="1.0" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center" x:Name="PrioThreshold" Value="{Binding PrioritizationThreshold}"/>
+                        <TextBlock Text="{Binding PrioritizationThreshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Maximum number of prioritized installed games:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Maximum="{Binding MaxNumberResults, Mode=OneWay}" Minimum="0" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center" Value="{Binding MaxPrioritizedGames}"/>
+                        <TextBlock Text="{Binding MaxPrioritizedGames}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>-->
+                    <TextBlock Text="Amount of time in milliseconds to wait before requesting async items:" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Value="{Binding AsyncItemsDelay}" Minimum="10" Maximum="1000" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding AsyncItemsDelay}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ms" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                        <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" 
+                         PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" 
+                         TextChanged="MaxNumberResultsTextBox_TextChanged" 
+                         Foreground="{StaticResource TextBrush}"
+                         MinWidth="50" TextAlignment="Center"
+                         />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding ExpandAllItems}" Margin="5"/>
+                        <TextBlock Text="Expand all items" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding ShowSeperator}" Margin="5"/>
+                        <TextBlock Text="Show seperator" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
+                        <TextBlock Text="Lower priority of adding results (Enable if typing seems laggy)" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding InstallationStatusFirst}" Margin="5"/>
+                        <TextBlock Text="Sort by installation status before name if score is equal" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
-                <TextBlock Text="Fuzzy search threshold (higher value = more strict = quicker search):" Margin="2" Foreground="{StaticResource TextBrush}"/>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="230" 
-                    HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
-                    VerticalAlignment="Center" x:Name="SearchThreshold"/>
-                    <TextBlock Text="{Binding Threshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <!--<TextBlock Text="Threshold for installed games to be prioritized:" Margin="2" Foreground="{StaticResource TextBrush}"/>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <Slider Minimum="{Binding ElementName=SearchThreshold, Path=Value, Mode=OneWay}" Maximum="1.0" Width="230" 
-                    HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
-                    VerticalAlignment="Center" x:Name="PrioThreshold" Value="{Binding PrioritizationThreshold}"/>
-                    <TextBlock Text="{Binding PrioritizationThreshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="Maximum number of prioritized installed games:" Margin="2" Foreground="{StaticResource TextBrush}"/>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <Slider Maximum="{Binding MaxNumberResults, Mode=OneWay}" Minimum="0" Width="230" 
-                    HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
-                    VerticalAlignment="Center" Value="{Binding MaxPrioritizedGames}"/>
-                    <TextBlock Text="{Binding MaxPrioritizedGames}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                </StackPanel>-->
-                <TextBlock Text="Amount of time in milliseconds to wait before requesting async items:" Margin="2" Foreground="{StaticResource TextBrush}"/>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <Slider Value="{Binding AsyncItemsDelay}" Minimum="10" Maximum="1000" Width="230" 
-                    HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
-                    VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding AsyncItemsDelay}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                    <TextBlock Text="ms" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="Max number of results (0 = no limit): " VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                    <TextBox x:Name="MaxNumberResultsTextBox" Text="{Binding MaxNumberResults}" 
-                     PreviewTextInput="MaxNumberResultsTextBox_PreviewTextInput" 
-                     TextChanged="MaxNumberResultsTextBox_TextChanged" 
-                     Foreground="{StaticResource TextBrush}"
-                     MinWidth="50" TextAlignment="Center"
-                     />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding ExpandAllItems}" Margin="5"/>
-                    <TextBlock Text="Expand all items" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding ShowSeperator}" Margin="5"/>
-                    <TextBlock Text="Show seperator" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding IncrementalUpdate}" Margin="5"/>
-                    <TextBlock Text="Lower priority of adding results (Enable if typing seems laggy)" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding InstallationStatusFirst}" Margin="5"/>
-                    <TextBlock Text="Sort by installation status before name if score is equal" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="External">
-            <StackPanel Margin="10" Grid.IsSharedSizeScope="True">
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5" x:Name="GlobalItemsEnabled"/>
-                    <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center" />
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="10" Grid.IsSharedSizeScope="True">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5" x:Name="GlobalItemsEnabled"/>
+                        <TextBlock Text="Enable Items added by other extensions." VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5" x:Name="GlobalActionsEnabled"/>
+                        <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
+                    <Label Content="Enable Items and Game Actions per extension:" Margin="0,10,0,0"/>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Extension"/>
+                        <Label Content="Items" Grid.Column="2"/>
+                        <Label Content="Actions" Grid.Column="4"/>
+                    </Grid>
+                    <ScrollViewer MaxHeight="220" HorizontalAlignment="Left">
+                        <ItemsControl ItemsSource="{Binding EnabledAssemblies}" Margin="5">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="{Binding Key}" Foreground="{StaticResource TextBrush}"/>
+                                        <CheckBox IsChecked="{Binding Value.Items}" Margin="3" Grid.Column="2" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalItemsEnabled}"/>
+                                        <CheckBox IsChecked="{Binding Value.Actions}" Margin="3" Grid.Column="4" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalActionsEnabled}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox  IsChecked="{Binding EnableExternalGameActions}" Margin="5" x:Name="GlobalActionsEnabled"/>
-                    <TextBlock Text="Enable Game Actions added by other extensions." VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem Header="IsThereAnyDeal">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.IsSharedSizeScope="True">
+                <StackPanel Margin="10">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding ITADEnabled}" Margin="5" x:Name="EnableITADCheckbox"/>
+                        <TextBlock Text="Enable searching via IsThereAnyDeal.com API" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="ITAD threshold. If the score of the best result is less than this value, search on ITAD:" Margin="2" Foreground="{StaticResource TextBrush}" IsEnabled="{Binding ITADEnabled}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2" IsEnabled="{Binding ITADEnabled}">
+                        <Slider Value="{Binding ITADThreshold}" Minimum="0.0" Maximum="1.0" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center" x:Name="ITADThreshold"/>
+                        <TextBlock Text="{Binding ITADThreshold}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="2" ToolTip="Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding." IsEnabled="{Binding ITADEnabled}">
+                        <TextBlock Text="Manual override suffix:" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding ITADOverride}" Margin="2" MinWidth="50"/>
+                    </StackPanel>
+                    <Label Content="Enable available Shops to search in:" Margin="0,10,0,5"/>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Shop"/>
+                        <Label Content="Enabled" Grid.Column="2"/>
+                    </Grid>
+                    <ScrollViewer MaxHeight="220" HorizontalAlignment="Left" IsEnabled="{Binding ITADEnabled}">
+                        <ItemsControl ItemsSource="{Binding EnabledITADShops}" Margin="5" x:Name="ShopItems">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="{Binding Value.Name}" Foreground="{StaticResource TextBrush}"/>
+                                        <CheckBox IsChecked="{Binding Value.Enabled}" Margin="4" Grid.Column="4" VerticalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=EnableITADCheckbox}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </StackPanel>
-                <Label Content="Enable Items and Game Actions per extension:" Margin="0,10,0,0"/>
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
-                        <ColumnDefinition Width="12"/>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
-                        <ColumnDefinition Width="12"/>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Content="Extension"/>
-                    <Label Content="Items" Grid.Column="2"/>
-                    <Label Content="Actions" Grid.Column="4"/>
-                </Grid>
-                <ScrollViewer MaxHeight="220" HorizontalAlignment="Left">
-                    <ItemsControl ItemsSource="{Binding EnabledAssemblies}" Margin="5">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
-                                        <ColumnDefinition Width="12"/>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
-                                        <ColumnDefinition Width="12"/>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="{Binding Key}" Foreground="{StaticResource TextBrush}"/>
-                                    <CheckBox IsChecked="{Binding Value.Items}" Margin="3" Grid.Column="2" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalItemsEnabled}"/>
-                                    <CheckBox IsChecked="{Binding Value.Actions}" Margin="3" Grid.Column="4" HorizontalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=GlobalActionsEnabled}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </StackPanel>
+            </ScrollViewer>
         </TabItem>
     </TabControl>
 </UserControl>

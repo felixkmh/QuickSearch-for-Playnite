@@ -30,22 +30,63 @@ namespace QuickSearch
             }
         }
 
+        public static void CopyProperties(SearchSettings from, SearchSettings to)
+        {
+            if (from == null || to == null)
+            {
+                return;
+            }
+            var type = typeof(SearchSettings);
+            foreach(var property in type.GetProperties())
+            {
+                if (property.CanRead && property.CanWrite && !Attribute.IsDefined(property, typeof(JsonIgnoreAttribute)))
+                {
+                    property.SetValue(to, property.GetValue(from));
+                }
+            }
+        }
+
+        public static bool ValuePropertyChanged(SearchSettings a, SearchSettings b)
+        {
+            if (a == null || b == null)
+            {
+                return true;
+            }
+            var type = typeof(SearchSettings);
+            foreach (var property in type.GetProperties())
+            {
+                if (property.PropertyType.IsValueType && property.CanRead && !Attribute.IsDefined(property, typeof(JsonIgnoreAttribute)))
+                {
+                    if (!property.GetValue(a).Equals(property.GetValue(b)))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
         public string HotkeyText { get; set; } = string.Empty;
 
         public double Threshold { get; set; } = 0.55;
 
-        public bool ExpandAllItems { get; set; } = false;
+        public bool ExpandAllItems { get; set; } = true;
         public bool ShowSeperator { get; set; } = false;
         public bool IncrementalUpdate { get; set; } = false;
         public int MaxNumberResults { get; set; } = 20;
-        public bool EnableExternalGameActions { get; set; } = false;
-        public bool EnableExternalItems { get; set; } = false;
+        public bool EnableExternalGameActions { get; set; } = true;
+        public bool EnableExternalItems { get; set; } = true;
         public int AsyncItemsDelay { get; set; } = 500;
-        public Dictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new Dictionary<string, AssemblyOptions>();
+        public SortedDictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new SortedDictionary<string, AssemblyOptions>();
         public float PrioritizationThreshold { get; set; } = 0.55f;
         public int MaxPrioritizedGames { get; set; } = 1;
-        public bool InstallationStatusFirst { get; set; } = false;
+        public bool InstallationStatusFirst { get; set; } = true;
+        public float ITADThreshold { get; set; } = 0.75f;
+        public string ITADOverride { get; set; } = "+";
+        public bool ITADEnabled { get; set; } = true;
+        public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
+        
 
         public class AssemblyOptions : IEquatable<AssemblyOptions>
         {
@@ -76,13 +117,18 @@ namespace QuickSearch
             }
         }
 
+        public class ITADShopOption
+        {
+            public ITADShopOption(string name)
+            {
+                Name = name;
+            }
+            public string Name { get; set; }
+            public bool Enabled { get; set; } = true;
+        }
+
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
-
-        // Playnite serializes settings object to a JSON object and saves it as text file.
-        // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
-        [JsonIgnore]
-        public bool OptionThatWontBeSaved { get; set; } = false;
 
         // Parameterless constructor must exist if you want to use LoadPluginSettings method.
         public SearchSettings()
@@ -101,20 +147,7 @@ namespace QuickSearch
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)
             {
-                SearchShortcut = savedSettings.SearchShortcut;
-                HotkeyText = $"{savedSettings.SearchShortcut.Modifiers} + {savedSettings.SearchShortcut.Key}";
-                Threshold = savedSettings.Threshold;
-                ExpandAllItems = savedSettings.ExpandAllItems;
-                ShowSeperator = savedSettings.ShowSeperator;
-                IncrementalUpdate = savedSettings.IncrementalUpdate;
-                MaxNumberResults = savedSettings.MaxNumberResults;
-                EnableExternalGameActions = savedSettings.EnableExternalGameActions;
-                EnableExternalItems = savedSettings.EnableExternalItems;
-                AsyncItemsDelay = savedSettings.AsyncItemsDelay;
-                EnabledAssemblies = savedSettings.EnabledAssemblies;
-                PrioritizationThreshold = savedSettings.PrioritizationThreshold;
-                MaxPrioritizedGames = savedSettings.MaxPrioritizedGames;
-                InstallationStatusFirst = savedSettings.InstallationStatusFirst;
+                CopyProperties(savedSettings, this);
             }
         }
 
@@ -129,21 +162,7 @@ namespace QuickSearch
 
         public void CancelEdit()
         {
-            // Code executed when user decides to cancel any changes made since BeginEdit was called.
-            // This method should revert any changes made to Option1 and Option2.
-            this.SearchShortcut = previousSettings.SearchShortcut;
-            this.Threshold = previousSettings.Threshold;
-            this.ExpandAllItems = previousSettings.ExpandAllItems;
-            this.ShowSeperator = previousSettings.ShowSeperator;
-            this.IncrementalUpdate = previousSettings.IncrementalUpdate;
-            this.MaxNumberResults = previousSettings.MaxNumberResults;
-            this.EnableExternalGameActions = previousSettings.EnableExternalGameActions;
-            this.EnableExternalItems = previousSettings.EnableExternalItems;
-            this.AsyncItemsDelay = previousSettings.AsyncItemsDelay;
-            this.EnabledAssemblies = previousSettings.EnabledAssemblies;
-            this.MaxPrioritizedGames = previousSettings.MaxPrioritizedGames;
-            this.PrioritizationThreshold = previousSettings.PrioritizationThreshold;
-            this.InstallationStatusFirst = previousSettings.InstallationStatusFirst;
+            CopyProperties(previousSettings, this);
             previousSettings = null;
         }
 
@@ -152,19 +171,7 @@ namespace QuickSearch
             // Code executed when user decides to confirm changes made since BeginEdit was called.
             // This method should save settings made to Option1 and Option2.
             bool changed = false;
-            changed |= !SearchShortcut.Equals(previousSettings.SearchShortcut);
-            changed |= Threshold                 != previousSettings.Threshold;
-            changed |= ExpandAllItems            != previousSettings.ExpandAllItems;
-            changed |= ShowSeperator             != previousSettings.ShowSeperator;
-            changed |= IncrementalUpdate         != previousSettings.IncrementalUpdate;
-            changed |= MaxNumberResults          != previousSettings.MaxNumberResults;
-            changed |= EnableExternalGameActions != previousSettings.EnableExternalGameActions;
-            changed |= EnableExternalItems       != previousSettings.EnableExternalItems;
-            changed |= AsyncItemsDelay           != previousSettings.AsyncItemsDelay;
-            changed |= EnabledAssemblies.Count   != previousSettings.EnabledAssemblies.Count;
-            changed |= PrioritizationThreshold   != previousSettings.PrioritizationThreshold;
-            changed |= MaxPrioritizedGames       != previousSettings.MaxPrioritizedGames;
-            changed |= InstallationStatusFirst != previousSettings.InstallationStatusFirst;
+            changed |= ValuePropertyChanged(this, previousSettings);
             changed |= EnabledAssemblies.Keys
                 .Concat(previousSettings.EnabledAssemblies.Keys)
                 .Aggregate(false, (v, key) => v || !(EnabledAssemblies

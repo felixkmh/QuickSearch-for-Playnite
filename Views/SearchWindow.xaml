@@ -63,7 +63,7 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
                  PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
-                 Padding="2" Background="{x:Null}" MaxWidth="260"
+                 Padding="2" Background="{x:Null}" MaxWidth="300"
                  Visibility="Hidden"
                  >
             <ListBox.OpacityMask>
