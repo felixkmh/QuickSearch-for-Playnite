@@ -73,7 +73,7 @@ namespace QuickSearch.SearchItems
                                         SearchPlugin.Instance.settings.EnabledITADShops.Add(store.ID, new SearchSettings.ITADShopOption(store.Title) { Enabled = defaultStores.Contains(store.ID)});
                                     }
                                 }
-                                var toRemove = SearchPlugin.Instance.settings.EnabledITADShops.Keys.Where(key => !stores.Data.Any(s => s.ID == key));
+                                var toRemove = SearchPlugin.Instance.settings.EnabledITADShops.Keys.Where(key => !stores.Data.Any(s => s.ID == key)).ToList();
                                 foreach (var key in toRemove)
                                 {
                                     SearchPlugin.Instance.settings.EnabledITADShops.Remove(key);
