@@ -28,7 +28,7 @@ namespace QuickSearch.SearchItems
 
         string makeSearchQuery(string name)
         {
-            return baseUrl + $"v02/search/search/?key={Properties.Resources.ITAD}&q={Uri.EscapeDataString(name)}";
+            return baseUrl + $"v02/search/search/?key={Properties.Resources.ITAD}&q={Uri.EscapeDataString(name)}&limit=20";
         }
 
         string makePriceQuery(string plain)
@@ -51,8 +51,12 @@ namespace QuickSearch.SearchItems
                     {
                         var regionsResponse = JsonConvert.DeserializeObject<RegionsResponse>(response);
                         var currentRegion = RegionInfo.CurrentRegion.TwoLetterISORegionName;
+                        var regKeyGeoId = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\International\Geo");
+                        var geoID = (string)regKeyGeoId.GetValue("Nation");
+                        var allRegions = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(x => new RegionInfo(x.ToString()));
+                        var regionInfo = allRegions.FirstOrDefault(r => r.GeoId == Int32.Parse(geoID));
                         var data = (JObject)json["data"];
-                        var foundRegion = regionsResponse.Data.FirstOrDefault(i => i.Value.Countries.Contains(currentRegion));
+                        var foundRegion = regionsResponse.Data.FirstOrDefault(i => i.Value.Countries.Contains(regionInfo.TwoLetterISORegionName));
                         if (foundRegion.Value != null || currentRegion == "150")
                         {
                             if (currentRegion == "150")
@@ -63,7 +67,7 @@ namespace QuickSearch.SearchItems
                             } else
                             {
                                 currencySign = foundRegion.Value.Currency.Sign;
-                                country = currentRegion;
+                                country = regionInfo.TwoLetterISORegionName;
                                 region = foundRegion.Key;
                             }
 
@@ -107,96 +111,92 @@ namespace QuickSearch.SearchItems
         string currencySign = null;
         List<string> defaultStores = new List<string>() { "steam", "battlenet", "gog", "microsoft", "origin", "squenix", "uplay", "epic"};
 
-        
-
-
-
         public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
         {
+            if (!SearchPlugin.Instance.settings.ITADEnabled)
+            {
+                return null;
+            }
             return Task.Run(() => 
             {
-                if (SearchPlugin.Instance.settings.ITADEnabled)
+                if (region == null)
                 {
-                    if (region == null)
-                    {
-                        GetRegion();
-                    }
-                    bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.settings.ITADThreshold;
-                    bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.settings.ITADOverride);
-                    if (!isBelowThreshold && !overrideStringPresent)
-                    {
-                        return null;
-                    }
-                    var input = query;
-                    var deals = new List<ISearchItem<string>>();
-                    if (!isBelowThreshold && overrideStringPresent)
-                    {
-                        input = query.Substring(0, query.Length - SearchPlugin.Instance.settings.ITADOverride.Length);
-                    }
+                    GetRegion();
+                }
+                bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.settings.ITADThreshold;
+                bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.settings.ITADOverride);
+                if (!isBelowThreshold && !overrideStringPresent)
+                {
+                    return null;
+                }
+                var input = query;
+                var deals = new List<ISearchItem<string>>();
+                if (!isBelowThreshold && overrideStringPresent)
+                {
+                    input = query.Substring(0, query.Length - SearchPlugin.Instance.settings.ITADOverride.Length);
+                }
 
-                    using (var client = new HttpClient())
+                using (var client = new HttpClient())
+                {
+                    try
                     {
-                        try
+                        var response = client.GetStringAsync(makeSearchQuery(input)).Result;
+                        var json = JObject.Parse(response);
+                        if (json.IsValid(SearchResponse.Schema))
                         {
-                            var response = client.GetStringAsync(makeSearchQuery(input)).Result;
-                            var json = JObject.Parse(response);
-                            if (json.IsValid(SearchResponse.Schema))
+                            var searchResponse = JsonConvert.DeserializeObject<SearchResponse>(response);
+
+                            if (searchResponse.Results.Data.Count > 0)
                             {
-                                var searchResponse = JsonConvert.DeserializeObject<SearchResponse>(response);
+                                var games = searchResponse.Results.Data;
+                                var plains = string.Join(",", searchResponse.Results.Data.Select(g => g.Plain));
 
-                                if (searchResponse.Results.Data.Count > 0)
+                                if (games.Count() > 0)
                                 {
-                                    var games = searchResponse.Results.Data;
-                                    var plains = string.Join(",", searchResponse.Results.Data.Select(g => g.Plain));
-
-                                    if (games.Count() > 0)
+                                    var prices = client.GetStringAsync(makePriceQuery(plains)).Result;
+                                    var pricesJson = JObject.Parse(prices);
+                                    if (pricesJson.IsValid(PricesResponse.Schema))
                                     {
-                                        var prices = client.GetStringAsync(makePriceQuery(plains)).Result;
-                                        var pricesJson = JObject.Parse(prices);
-                                        if (pricesJson.IsValid(PricesResponse.Schema))
+                                        var pricesResponse = JsonConvert.DeserializeObject<PricesResponse>(prices);
+
+                                        foreach (var game in pricesResponse.Data.Where(g => g.Value.Prices.Count > 0))
                                         {
-                                            var pricesResponse = JsonConvert.DeserializeObject<PricesResponse>(prices);
-
-                                            foreach (var game in pricesResponse.Data.Where(g => g.Value.Prices.Count > 0))
+                                            var bestPrice = game.Value.Prices[0];
+                                            var worstPrice = game.Value.Prices.Last();
+                                            var priceRange = bestPrice.NewPrice.ToString("0.00") + currencySign;
+                                            if (bestPrice.NewPrice != worstPrice.NewPrice)
                                             {
-                                                var bestPrice = game.Value.Prices[0];
-                                                var worstPrice = game.Value.Prices.Last();
-                                                var priceRange = bestPrice.NewPrice.ToString("0.00") + currencySign;
-                                                if (bestPrice.NewPrice != worstPrice.NewPrice)
-                                                {
-                                                    priceRange += " - " + worstPrice.NewPrice.ToString("0.00") + currencySign;
-                                                }
-                                                var title = games.First(g => g.Plain == game.Key).Title;
-                                                var item = new CommandItem(title, () => Process.Start(bestPrice.URL), bestPrice.Shop.Name, bestPrice.Shop.Name)
-                                                {
-                                                    IconChar = IconChars.ShoppingCart,
-                                                    BottomLeft = priceRange,
-                                                    BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}{(country!=null?", ":string.Empty)}{country?.ToUpper()??string.Empty}"),
-                                                    // TopRight = "Available in " + game.Value.Prices.Count.ToString() + " Shop" + (game.Value.Prices.Count != 1 ? "s" : string.Empty),
-                                                    Keys = new List<ISearchKey<string>>() { new CommandItemKey() { Key = title, Weight = 1 } }
-                                                };
-
-
-                                                for (int i = 1; i < game.Value.Prices.Count; ++i)
-                                                {
-                                                    PricesResponse.PricesItem pricesItem = game.Value.Prices[i];
-                                                    item.Actions.Add(new CommandAction { Name = pricesItem.Shop.Name, Action = () => Process.Start(pricesItem.URL) });
-                                                }
-
-                                                item.Actions.Add(new CommandAction { Name = "Go to ITAD", Action = () => Process.Start(game.Value.URLs["game"]) });
-
-                                                deals.Add(item);
+                                                priceRange += " - " + worstPrice.NewPrice.ToString("0.00") + currencySign;
                                             }
+                                            var title = games.First(g => g.Plain == game.Key).Title;
+                                            var item = new CommandItem(title, () => Process.Start(bestPrice.URL), bestPrice.Shop.Name, bestPrice.Shop.Name)
+                                            {
+                                                IconChar = IconChars.ShoppingCart,
+                                                BottomLeft = priceRange,
+                                                BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}{(country!=null?", ":string.Empty)}{country?.ToUpper()??string.Empty}"),
+                                                // TopRight = "Available in " + game.Value.Prices.Count.ToString() + " Shop" + (game.Value.Prices.Count != 1 ? "s" : string.Empty),
+                                                Keys = new List<ISearchKey<string>>() { new CommandItemKey() { Key = title, Weight = 1 } }
+                                            };
+
+
+                                            for (int i = 1; i < game.Value.Prices.Count; ++i)
+                                            {
+                                                PricesResponse.PricesItem pricesItem = game.Value.Prices[i];
+                                                item.Actions.Add(new CommandAction { Name = pricesItem.Shop.Name, Action = () => Process.Start(pricesItem.URL) });
+                                            }
+
+                                            item.Actions.Add(new CommandAction { Name = "Go to ITAD", Action = () => Process.Start(game.Value.URLs["game"]) });
+
+                                            deals.Add(item);
                                         }
                                     }
                                 }
                             }
                         }
-                        catch (Exception) { }
                     }
-                    return deals.AsEnumerable();
+                    catch (Exception) { }
                 }
-                return null;
+                return deals.AsEnumerable();
             });
         }
     }
