@@ -173,6 +173,7 @@ namespace QuickSearch
         {
             public string String;
             public float Score;
+            public int Index;
         } 
 
         public static LcsResult LongestCommonSubstring(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
@@ -257,7 +258,7 @@ namespace QuickSearch
 
             subStr = subStrBuilder.ToString();
 
-            var result = new LcsResult { String = subStr, Score = subStr.Length };
+            var result = new LcsResult { String = subStr, Score = subStr.Length, Index = b.IndexOf(subStr) };
 
             switch (normalization)
             {

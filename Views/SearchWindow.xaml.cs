@@ -259,8 +259,16 @@ namespace QuickSearch
                                         {
                                             ListDataContext.Add(canditates[maxIdx].Item);
                                         }
+                                        //var keys = ListDataContext.First().Keys.Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k.Key });
+                                        //var max = keys.OrderByDescending(k => k.Score).First();
+                                        //var lcs = LongestCommonSubstringDP(input, max.Key);
+                                        //if (lcs.Index + input.Length < max.Key.Length)
+                                        //{
+                                        //    PlaceholderText.Text += max.Key.Substring(lcs.Index + input.Length);
+                                        //}
 #if DEBUG
-                                        PlaceholderText.Text = SearchBox.Text + " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
+                                        PlaceholderText.Text = SearchBox.Text;
+                                        PlaceholderText.Text += " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
                                         PlaceholderText.Visibility = Visibility.Visible;
 #endif
                                         if (ListDataContext.Count > 0 && addedItems == 0)
