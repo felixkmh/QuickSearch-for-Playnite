@@ -367,7 +367,7 @@ namespace QuickSearch
             var margin = searchWindow.SearchResults.Margin;
             margin.Top = settings.OuterBorderThickness + 8;
             searchWindow.SearchResults.Margin = margin;
-            searchWindow.BackgroundBorder.Background = Application.Current.FindResource("PopupBackgroundBrush") as Brush;
+            searchWindow.BackgroundBorder.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
             searchWindow.HeaderBorder.Background = new SolidColorBrush { Color = Colors.Black, Opacity = 0.25 };
             ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
             ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
