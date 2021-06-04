@@ -86,6 +86,8 @@ namespace QuickSearch
         public string ITADOverride { get; set; } = "+";
         public bool ITADEnabled { get; set; } = true;
         public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
+        public bool EnableGlassEffect { get; set; } = true;
+        public int OuterBorderThickness { get; set; } = 12;
         
 
         public class AssemblyOptions : IEquatable<AssemblyOptions>

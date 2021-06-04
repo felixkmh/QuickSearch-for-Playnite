@@ -14,8 +14,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 
 namespace QuickSearch
 {
@@ -44,7 +47,15 @@ namespace QuickSearch
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
         {
             var window = Application.Current.MainWindow;
-            window.Dispatcher.Invoke(() => { 
+            window.Dispatcher.Invoke(() => {
+                if (newSettings.EnableGlassEffect)
+                {
+                    EnableGlassEffect();
+                }
+                else
+                {
+                    DisableGlassEffect();
+                }
                 window.InputBindings.Remove(HotkeyBinding);
                 popup?.InputBindings.Remove(HotkeyBinding);
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
@@ -268,6 +279,7 @@ namespace QuickSearch
 
         public Popup popup;
         SearchWindow searchWindow;
+        VisualBrush brush;
 
         private void ToggleSearch()
         {
@@ -276,6 +288,30 @@ namespace QuickSearch
             if (popup is null)
             {
                 popup = new Popup();
+                popup.Opened += (s, a) =>
+                {
+                    foreach (var assembly in QuickSearchSDK.registeredAssemblies)
+                    {
+                        if (!settings.EnabledAssemblies.ContainsKey(assembly))
+                        {
+                            settings.EnabledAssemblies.Add(assembly, new SearchSettings.AssemblyOptions());
+                        }
+                    }
+                    searchWindow.SearchResultsBackground.Viewport = new Rect(
+                        0, 0,
+                        searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right,
+                        searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom
+                        );
+                    searchWindow.QueueIndexUpdate();
+                    searchWindow.SearchBox.SelectAll();
+                    searchWindow.SearchBox.Focus();
+                };
+
+                popup.Closed += (s, e) =>
+                {
+                    searchWindow.QueueIndexClear();
+                };
+
                 popup.PlacementTarget = Application.Current.MainWindow;
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
@@ -283,24 +319,61 @@ namespace QuickSearch
                 searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
                 popup.InputBindings.Add(HotkeyBinding);
+                if (settings.EnableGlassEffect)
+                {
+                    EnableGlassEffect();
+                } else
+                {
+                    DisableGlassEffect();
+                }
             }
             popup.IsOpen = !popup.IsOpen;
-            if (popup.IsOpen)
+        }
+
+        private void EnableGlassEffect()
+        {
+            searchWindow.WindowGrid.Margin = new Thickness(settings.OuterBorderThickness);
+            searchWindow.GlassTint.Visibility = Visibility.Visible;
+            searchWindow.Noise.Visibility = Visibility.Visible;
+            var margin = searchWindow.SearchResults.Margin;
+            margin.Top = settings.OuterBorderThickness + 8;
+            searchWindow.SearchResults.Margin = margin;
+            var visual = (FrameworkElement)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
+            visual = (FrameworkElement)VisualTreeHelper.GetChild(visual, 0);
+            brush = new VisualBrush()
             {
-                foreach(var assembly in QuickSearchSDK.registeredAssemblies)
-                {
-                    if (!settings.EnabledAssemblies.ContainsKey(assembly))
-                    {
-                        settings.EnabledAssemblies.Add(assembly, new SearchSettings.AssemblyOptions());
-                    }
-                }
-                
-                searchWindow.Dispatcher.Invoke(() => {
-                    searchWindow.QueueIndexUpdate();
-                    searchWindow.SearchBox.SelectAll();
-                    searchWindow.SearchBox.Focus();
-                });
-            }
+                Stretch = Stretch.None,
+                Visual = visual,
+                AutoLayoutContent = false,
+                TileMode = TileMode.None
+            };
+            brush.AutoLayoutContent = false;
+            searchWindow.BackgroundBorder.Background = brush;
+            RenderOptions.SetCachingHint(brush, CachingHint.Cache);
+            RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
+            ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
+            ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
+            int radius = 80;
+            searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance };
+            searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + radius;
+            searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom + radius;
+        }
+
+        private void DisableGlassEffect()
+        {
+            searchWindow.WindowGrid.Margin = new Thickness(settings.OuterBorderThickness);
+            searchWindow.GlassTint.Visibility = Visibility.Hidden;
+            searchWindow.Noise.Visibility = Visibility.Hidden;
+            var margin = searchWindow.SearchResults.Margin;
+            margin.Top = settings.OuterBorderThickness + 8;
+            searchWindow.SearchResults.Margin = margin;
+            searchWindow.BackgroundBorder.Background = Application.Current.FindResource("PopupBackgroundBrush") as Brush;
+            searchWindow.HeaderBorder.Background = new SolidColorBrush { Color = Colors.Black, Opacity = 0.25 };
+            ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
+            ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
+            searchWindow.BackgroundBorder.Effect = null;
+            searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right;
+            searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom;
         }
 
         public override void OnApplicationStopped()

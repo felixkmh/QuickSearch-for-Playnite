@@ -71,6 +71,23 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        <TabItem Header="Appearance">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="10">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableGlassEffect}" Margin="5"/>
+                        <TextBlock Text="Enable transparent glass effect on search window" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="Width of the outer border of the search window:" Margin="2" Foreground="{StaticResource TextBrush}" IsEnabled="{Binding ITADEnabled}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2" IsEnabled="{Binding ITADEnabled}">
+                        <Slider Value="{Binding OuterBorderThickness}" Minimum="0" Maximum="30" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding OuterBorderThickness}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
         <TabItem Header="External">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="10" Grid.IsSharedSizeScope="True">

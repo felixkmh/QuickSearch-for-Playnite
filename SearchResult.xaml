@@ -20,7 +20,7 @@
     </UserControl.Resources>
     <StackPanel IsHitTestVisible="False">
         <Grid ClipToBounds="True">
-           <Grid x:Name="DefaultView" ClipToBounds="True">
+           <Grid x:Name="DefaultView" ClipToBounds="True" Margin="0,0,2,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="22"/>
                     <ColumnDefinition Width="10"/> 
@@ -40,7 +40,7 @@
                     <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,2" ClipToBounds="True">
+            <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,2,2,2" ClipToBounds="True">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="10"/>
@@ -92,7 +92,7 @@
                            />
             </Grid>
         </Grid>
-        <Separator x:Name="Seperator" Margin="0,0,0,-5" Padding="0"
+        <Separator x:Name="Seperator" Margin="0,0,0,-6.5" Padding="0"
                    Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
     </StackPanel>
 </UserControl>

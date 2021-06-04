@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +18,15 @@ namespace QuickSearch.SearchItems
     {
         public Game game;
         public string Key => game.Name;
+
+        public float Weight => 1f;
+    }
+
+    struct CleanNameKey : ISearchKey<string>
+    {
+        static public readonly Regex regex = new Regex("[" + Regex.Escape("{}&.,:;^°_`´~+!\"§$%&/()=?<>#|'’") + "]");
+        public Game game;
+        public string Key => regex.Replace(game.Name, string.Empty);
 
         public float Weight => 1f;
     }
@@ -204,6 +214,8 @@ namespace QuickSearch.SearchItems
             keys = new List<ISearchKey<string>>();
             if (!string.IsNullOrEmpty(game.Name))
                 keys.Add(new NameKey { game = game });
+            if (!string.IsNullOrEmpty(game.Name) && CleanNameKey.regex.IsMatch(game.Name))
+                keys.Add(new CleanNameKey { game = game });
             if (!string.IsNullOrEmpty(game.GameImagePath))
                 keys.Add(new RomKey { game = game });
             //if (!string.IsNullOrEmpty(game.Source?.Name))
@@ -284,7 +296,7 @@ namespace QuickSearch.SearchItems
             }
         }
 
-        public ScoreMode ScoreMode => ScoreMode.WeightedAverage;
+        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
 
         public char? IconChar => null;
     }

@@ -33,7 +33,7 @@ namespace QuickSearch
         CancellationTokenSource textChangedTokeSource = new CancellationTokenSource();
         CancellationTokenSource openedSearchTokeSource = new CancellationTokenSource();
         Task backgroundTask = Task.CompletedTask;
-        IList<ISearchItem<string>> searchItems = Array.Empty<ISearchItem<string>>();
+        internal IList<ISearchItem<string>> searchItems = Array.Empty<ISearchItem<string>>();
 
         private double heightSelected = double.NaN;
         private double heightNotSelected = double.NaN;
@@ -73,7 +73,7 @@ namespace QuickSearch
             if (ListDataContext.Count == 0 && ActionsListBox.Visibility == Visibility.Visible)
             {
                 ActionsListBox.Visibility = Visibility.Hidden;
-                SearchResults.Visibility = Visibility.Hidden;
+                SearchResults.Visibility = Visibility.Collapsed;
             }
 
         }
@@ -122,6 +122,19 @@ namespace QuickSearch
                     .Where(items => items != null)
                     .SelectMany(items => items)
                     .ToList();
+            });
+        }
+
+        public void QueueIndexClear()
+        {
+            backgroundTask = backgroundTask.ContinueWith((t) =>
+            {
+                if (searchItems != null)
+                {
+                    searchItems.Clear();
+                    GC.Collect();
+                }
+                t.Dispose();
             });
         }
 
@@ -255,7 +268,7 @@ namespace QuickSearch
                                             SearchResults.SelectedIndex = 0;
                                         }
 
-                                        if (addedItems == 2)
+                                        if (addedItems == 2 || (addedItems > 2 && (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))))
                                         {
                                             UpdateListBox(maxResults);
                                         }
@@ -575,16 +588,23 @@ namespace QuickSearch
                     availableHeight -= SearchBox.RenderSize.Height;
                     availableHeight -= heightSelected;
                     availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
+                    availableHeight -= SearchResults.Margin.Top + SearchResults.Margin.Bottom;
                     var maxItems = Math.Floor(availableHeight / heightNotSelected);
                     var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
                     Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
                     ScrollViewer scrollViewer = border.Child as ScrollViewer;
                     if (maxItems + 1 >= items)
                     {
+                        var margin = SearchResults.Margin;
+                        margin.Right = 0;
+                        SearchResults.Margin = margin;
                         scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                     }
                     else
                     {
+                        var margin = SearchResults.Margin;
+                        margin.Right = -SystemParameters.VerticalScrollBarWidth;
+                        SearchResults.Margin = margin;
                         scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
                     }
                     SearchResults.MaxHeight = maxHeight;
@@ -592,9 +612,15 @@ namespace QuickSearch
             }
             else
             {
-                Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
-                ScrollViewer scrollViewer = border.Child as ScrollViewer;
-                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                if (VisualTreeHelper.GetChildrenCount(SearchResults) > 0)
+                {
+                    Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                    ScrollViewer scrollViewer = border.Child as ScrollViewer;
+                    var margin = SearchResults.Margin;
+                    margin.Right = items > 5 ? -SystemParameters.VerticalScrollBarWidth : 0;
+                    SearchResults.Margin = margin;
+                    scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                }
             }
         }
 
