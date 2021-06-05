@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
@@ -44,9 +45,28 @@ namespace QuickSearch
             instance = this;
         }
 
+        internal bool RegisterGlobalHotkey()
+        {
+            var window = mainWindow;
+            var handle = mainWindowHandle;
+            source.AddHook(GlobalHotkeyCallback);
+            globalHotkeyRegistered = true;
+            return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, settings.SearchShortcut.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key));
+        }
+
+        internal bool UnregisterGlobalHotkey()
+        {
+            var window = mainWindow;
+            var handle = mainWindowHandle;
+            var success = HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
+            source.RemoveHook(GlobalHotkeyCallback);
+            globalHotkeyRegistered = false;
+            return success;
+        }
+
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
         {
-            var window = Application.Current.MainWindow;
+            var window = mainWindow;
             window.Dispatcher.Invoke(() => {
                 if (newSettings.EnableGlassEffect)
                 {
@@ -56,6 +76,16 @@ namespace QuickSearch
                 {
                     DisableGlassEffect();
                 }
+                if (globalHotkeyRegistered)
+                {
+                    UnregisterGlobalHotkey();
+                }
+
+                if (newSettings.EnableGlobalHotkey)
+                {
+                    RegisterGlobalHotkey();
+                }
+
                 window.InputBindings.Remove(HotkeyBinding);
                 popup?.InputBindings.Remove(HotkeyBinding);
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(newSettings.SearchShortcut.Key, newSettings.SearchShortcut.Modifiers));
@@ -146,6 +176,40 @@ namespace QuickSearch
             }
         }
 
+        private IntPtr GlobalHotkeyCallback(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (settings.EnableGlobalHotkey)
+            {
+                const int WM_HOTKEY = 0x0312;
+                switch (msg)
+                {
+                    case WM_HOTKEY:
+                        switch (wParam.ToInt32())
+                        {
+                            case HOTKEY_ID:
+                                uint vkey = ((uint)lParam >> 16) & 0xFFFF;
+                                if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key))
+                                {
+                                    Application.Current.MainWindow.Activate();
+                                    ToggleSearch();
+                                }
+                                handled = true;
+                                break;
+                        }
+                        break;
+                }
+            }
+            return IntPtr.Zero;
+        }
+
+        private const int HOTKEY_ID = 1337;
+
+        HwndSource source = null;
+        Window mainWindow;
+        IntPtr mainWindowHandle;
+        WindowInteropHelper windowInterop;
+        bool globalHotkeyRegistered = false;
+
         public override void OnApplicationStarted()
         {
             instance = this;
@@ -156,12 +220,20 @@ namespace QuickSearch
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
                 settings.SettingsChanged += OnSettingsChanged;
-                var window = Application.Current.MainWindow;
+                mainWindow = Application.Current.MainWindow;
+                windowInterop = new WindowInteropHelper(mainWindow);
+                mainWindowHandle = windowInterop.Handle;
+                source = HwndSource.FromHwnd(mainWindowHandle);
+                if (settings.EnableGlobalHotkey)
+                {
+                    RegisterGlobalHotkey();
+                }
+
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
-                window.InputBindings.Add(HotkeyBinding);
+                mainWindow.InputBindings.Add(HotkeyBinding);
                 CommandItem addGameCommand = new CommandItem((string)Application.Current.FindResource("LOCAddGames"), new List<CommandAction>(), "Add Games");
                 addGameCommand.IconChar = IconChars.GameConsole;
-                foreach(InputBinding binding in window.InputBindings)
+                foreach(InputBinding binding in mainWindow.InputBindings)
                 {
                     if (binding.Gesture is KeyGesture keyGesture)
                     {
@@ -379,6 +451,8 @@ namespace QuickSearch
         public override void OnApplicationStopped()
         {
             // Add code to be executed when Playnite is shutting down.
+            var handle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
+            HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
         }
 
         public override void OnLibraryUpdated()

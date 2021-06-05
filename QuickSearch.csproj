@@ -64,6 +64,7 @@
     <Compile Include="Controls\AnimatedScrollViewer.cs" />
     <Compile Include="Controls\AutoScrollViewer.cs" />
     <Compile Include="Converters\ElementToRelativeRectConverter.cs" />
+    <Compile Include="HotkeyHelper.cs" />
     <Compile Include="Models\ITAD.cs" />
     <Compile Include="Models\SchemaHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

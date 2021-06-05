@@ -14,6 +14,10 @@
                         <TextBox Text="{Binding HotkeyText}" x:Name="ShortcutText" IsReadOnly="True" Width="200" HorizontalAlignment="Left" Margin="5" Focusable="False" Foreground="{StaticResource TextBrush}"/>
                         <Button x:Name="SetHotkeyButton" Content="Set Hotkey" Click="SetHotkeyButton_Click"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableGlobalHotkey}" Margin="5"/>
+                        <TextBlock Text="Enable hotkey globally" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                     <TextBlock Text="Fuzzy search threshold (higher value = more strict = quicker search):" Margin="2" Foreground="{StaticResource TextBrush}"/>
                     <StackPanel Orientation="Horizontal" Margin="2">
                         <Slider Value="{Binding Threshold}" Minimum="0.0" Maximum="1.0" Width="230" 

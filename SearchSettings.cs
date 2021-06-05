@@ -88,6 +88,7 @@ namespace QuickSearch
         public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
         public bool EnableGlassEffect { get; set; } = true;
         public int OuterBorderThickness { get; set; } = 12;
+        public bool EnableGlobalHotkey { get; set; } = false;
         
 
         public class AssemblyOptions : IEquatable<AssemblyOptions>
