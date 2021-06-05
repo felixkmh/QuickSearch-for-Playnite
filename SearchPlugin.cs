@@ -190,7 +190,10 @@ namespace QuickSearch
                                 uint vkey = ((uint)lParam >> 16) & 0xFFFF;
                                 if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key))
                                 {
-                                    Application.Current.MainWindow.Activate();
+                                    if (!popup.IsOpen)
+                                    {
+                                        Application.Current.MainWindow.Activate();
+                                    }
                                     ToggleSearch();
                                 }
                                 handled = true;
