@@ -21,7 +21,7 @@
         <SolidColorBrush x:Key="PopupBackgroundBrush" Color="{DynamicResource PopupBackgroundColor}" Opacity="0.4"/>
         <ImageBrush x:Key="NoiseTextureBrush" ImageSource="pack://application:,,,/QuickSearch;component/Images/noise.png" Viewport="0,0,100,100" ViewportUnits="Absolute" TileMode="Tile" Opacity="0.4"/>
     </UserControl.Resources>
-    <Grid>
+    <Grid x:Name="BackgroundGrid">
         <Border CornerRadius="15" x:Name="OutsideBorder" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Border.Background>
                 <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="SearchResultsBackground">
@@ -38,7 +38,8 @@
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Border.Background>
-            <StackPanel Margin="{Binding Margin, ElementName=WindowGrid}">
+            <StackPanel x:Name="ContainerStackPanel"
+                        Margin="{Binding Margin, ElementName=WindowGrid}">
                 <Border Width="{Binding ActualWidth, ElementName=SearchBox}" 
                         Height="{Binding ActualHeight, ElementName=SearchBox}" 
                         Margin="{Binding Margin, ElementName=SearchBox}"/>

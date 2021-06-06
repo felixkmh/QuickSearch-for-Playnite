@@ -80,6 +80,9 @@
     <Compile Include="SearchItems\GameSearchItem.cs" />
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="SearchSettings.cs" />
+    <Compile Include="Views\PopupWindow.xaml.cs">
+      <DependentUpon>PopupWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SearchSettingsView.xaml.cs">
       <DependentUpon>SearchSettingsView.xaml</DependentUpon>
     </Compile>
@@ -102,6 +105,10 @@
     <Page Include="SearchResult.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PopupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SearchSettingsView.xaml">
       <SubType>Designer</SubType>

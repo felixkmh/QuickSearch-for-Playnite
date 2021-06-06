@@ -4,6 +4,7 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
+using QuickSearch.Views;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -190,11 +191,11 @@ namespace QuickSearch
                                 uint vkey = ((uint)lParam >> 16) & 0xFFFF;
                                 if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key))
                                 {
-                                    if (!popup.IsOpen)
-                                    {
-                                        Application.Current.MainWindow.Activate();
-                                    }
                                     ToggleSearch();
+                                    if (popup.IsOpen)
+                                    {
+                                        searchWindow.SearchBox.Focus();
+                                    }
                                 }
                                 handled = true;
                                 break;
@@ -355,6 +356,8 @@ namespace QuickSearch
         public Popup popup;
         SearchWindow searchWindow;
         VisualBrush brush;
+        Window dummyWindow;
+        bool glassActive = false;
 
         private void ToggleSearch()
         {
@@ -385,6 +388,7 @@ namespace QuickSearch
                 popup.Closed += (s, e) =>
                 {
                     searchWindow.QueueIndexClear();
+                    dummyWindow.Hide();
                 };
 
                 popup.PlacementTarget = Application.Current.MainWindow;
@@ -401,6 +405,36 @@ namespace QuickSearch
                 {
                     DisableGlassEffect();
                 }
+
+                dummyWindow = new PopupWindow() 
+                { 
+                    Width = 0,
+                    Height = 0,
+                };
+            }
+            if (mainWindow.IsActive && mainWindow.WindowState != WindowState.Minimized)
+            {
+                if (settings.EnableGlassEffect)
+                {
+                    EnableGlassEffect();
+                }
+                popup.PlacementTarget = Application.Current.MainWindow;
+                popup.Placement = PlacementMode.Center;
+                popup.StaysOpen = false;
+                popup.VerticalOffset = 0;
+                popup.HorizontalOffset = 0;
+            } else
+            {
+                DisableGlassEffect();
+                double primScreenHeight = System.Windows.SystemParameters.FullPrimaryScreenHeight;
+                double primScreenWidth = System.Windows.SystemParameters.FullPrimaryScreenWidth;
+                dummyWindow.Top = (primScreenHeight - dummyWindow.Height) / 2;
+                dummyWindow.Left = (primScreenWidth - dummyWindow.Width) / 2;
+                dummyWindow.Show();
+                dummyWindow.Activate();
+                popup.PlacementTarget = dummyWindow;
+                popup.Placement = PlacementMode.Center;
+                popup.StaysOpen = false;
             }
             popup.IsOpen = !popup.IsOpen;
         }
