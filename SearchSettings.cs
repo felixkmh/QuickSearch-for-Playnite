@@ -14,7 +14,7 @@ namespace QuickSearch
     {
         private readonly SearchPlugin plugin;
 
-        public struct Hotkey : IEquatable<Hotkey>
+        public class Hotkey : IEquatable<Hotkey>
         {
             public Hotkey(Key key, ModifierKeys modifier)
             {
@@ -67,7 +67,9 @@ namespace QuickSearch
         }
 
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
+        public Hotkey SearchShortcutGlobal { get; set; } = new Hotkey(Key.F, ModifierKeys.Control | ModifierKeys.Alt);
         public string HotkeyText { get; set; } = string.Empty;
+        public string HotkeyTextGlobal { get; set; } = string.Empty;
 
         public double Threshold { get; set; } = 0.55;
 
@@ -161,6 +163,7 @@ namespace QuickSearch
             previousSettings = JsonConvert.DeserializeObject<SearchSettings>(JsonConvert.SerializeObject(this));
             // Code executed when settings view is opened and user starts editing values.
             HotkeyText = $"{SearchShortcut.Modifiers} + {SearchShortcut.Key}";
+            HotkeyTextGlobal = $"{SearchShortcutGlobal.Modifiers} + {SearchShortcutGlobal.Key}";
         }
 
         public void CancelEdit()

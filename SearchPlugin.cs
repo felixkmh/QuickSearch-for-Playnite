@@ -52,7 +52,7 @@ namespace QuickSearch
             var handle = mainWindowHandle;
             source.AddHook(GlobalHotkeyCallback);
             globalHotkeyRegistered = true;
-            return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, settings.SearchShortcut.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key));
+            return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcutGlobal.Key));
         }
 
         internal bool UnregisterGlobalHotkey()
@@ -189,7 +189,7 @@ namespace QuickSearch
                         {
                             case HOTKEY_ID:
                                 uint vkey = ((uint)lParam >> 16) & 0xFFFF;
-                                if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcut.Key))
+                                if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcutGlobal.Key))
                                 {
                                     ToggleSearch();
                                     if (popup.IsOpen)

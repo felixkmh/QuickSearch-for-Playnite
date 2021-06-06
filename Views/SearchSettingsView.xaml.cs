@@ -25,8 +25,63 @@ namespace QuickSearch
 
         private void HotkeyTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            e.Handled = true;
+            if (DataContext is SearchSettings settings)
+            {
+                e.Handled = true;
+                SetHotkey(e, ShortcutText, SetHotkeyButton, settings.SearchShortcut);
+            }
+        }
 
+        private void SetHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShortcutText.Focusable = true;
+            ShortcutText.Focus();
+            SetHotkeyButton.Content = "Press Hotkey (+ modfiers) now";
+        }
+
+        private void MaxNumberResultsTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (int.TryParse(e.Text, out var val))
+            {
+                if (val >= 0)
+                {
+                    return;
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void MaxNumberResultsTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(MaxNumberResultsTextBox.Text, out var val))
+            {
+                if (val >= 0)
+                {
+                    return;
+                }
+            }
+            MaxNumberResultsTextBox.Text = "0";
+            MaxNumberResultsTextBox.SelectAll();
+        }
+
+        private void SetHotkeyButtonGlobal_Click(object sender, RoutedEventArgs e)
+        {
+            ShortcutTextGlobal.Focusable = true;
+            ShortcutTextGlobal.Focus();
+            SetHotkeyButtonGlobal.Content = "Press Hotkey (+ modfiers) now";
+        }
+
+        private void ShortcutTextGlobal_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (DataContext is SearchSettings settings)
+            {
+                e.Handled = true;
+                SetHotkey(e, ShortcutTextGlobal, SetHotkeyButtonGlobal, settings.SearchShortcutGlobal);
+            }
+        }
+
+        private void SetHotkey(KeyEventArgs e, TextBox shortcutText, Button setHotkeyButton, SearchSettings.Hotkey searchHotkey)
+        {
             // Get modifiers and key data
             var modifiers = Keyboard.Modifiers;
             var key = e.Key;
@@ -61,47 +116,13 @@ namespace QuickSearch
                 return;
             }
 
-            ShortcutText.Text =  $"{modifiers} + {key}";
+            shortcutText.Text = $"{modifiers} + {key}";
 
-            if (DataContext is SearchSettings settings)
-            {
-                settings.SearchShortcut = new SearchSettings.Hotkey(key, modifiers);
-            }
-            ShortcutText.Focusable = false;
-            SetHotkeyButton.Focus();
-            SetHotkeyButton.Content = "Set Hotkey";
-        }
-
-        private void SetHotkeyButton_Click(object sender, RoutedEventArgs e)
-        {
-            ShortcutText.Focusable = true;
-            ShortcutText.Focus();
-            SetHotkeyButton.Content = "Press Hotkey (+ modfiers) now";
-        }
-
-        private void MaxNumberResultsTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            if (int.TryParse(e.Text, out var val))
-            {
-                if (val >= 0)
-                {
-                    return;
-                }
-            }
-            e.Handled = true;
-        }
-
-        private void MaxNumberResultsTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (int.TryParse(MaxNumberResultsTextBox.Text, out var val))
-            {
-                if (val >= 0)
-                {
-                    return;
-                }
-            }
-            MaxNumberResultsTextBox.Text = "0";
-            MaxNumberResultsTextBox.SelectAll();
+            searchHotkey.Key = key;
+            searchHotkey.Modifiers = modifiers;
+            shortcutText.Focusable = false;
+            setHotkeyButton.Focus();
+            setHotkeyButton.Content = "Set Hotkey";
         }
     }
 }
