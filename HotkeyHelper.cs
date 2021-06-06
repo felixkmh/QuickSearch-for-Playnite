@@ -49,5 +49,10 @@ namespace QuickSearch
             }
             return vk;
         }
+
+        public static uint ToVK(this Key key)
+        {
+            return (uint)KeyInterop.VirtualKeyFromKey(key);
+        }
     }
 }
