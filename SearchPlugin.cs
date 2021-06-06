@@ -414,7 +414,7 @@ namespace QuickSearch
             }
             if (mainWindow.IsActive && mainWindow.WindowState != WindowState.Minimized)
             {
-                if (settings.EnableGlassEffect)
+                if (settings.EnableGlassEffect && !glassActive)
                 {
                     EnableGlassEffect();
                 }
@@ -425,7 +425,10 @@ namespace QuickSearch
                 popup.HorizontalOffset = 0;
             } else
             {
-                DisableGlassEffect();
+                if (glassActive)
+                {
+                    DisableGlassEffect();
+                }
                 double primScreenHeight = System.Windows.SystemParameters.FullPrimaryScreenHeight;
                 double primScreenWidth = System.Windows.SystemParameters.FullPrimaryScreenWidth;
                 dummyWindow.Top = (primScreenHeight - dummyWindow.Height) / 2;
@@ -466,6 +469,7 @@ namespace QuickSearch
             searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance };
             searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + radius;
             searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom + radius;
+            glassActive = true;
         }
 
         private void DisableGlassEffect()
@@ -483,6 +487,7 @@ namespace QuickSearch
             searchWindow.BackgroundBorder.Effect = null;
             searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right;
             searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom;
+            glassActive = false;
         }
 
         public override void OnApplicationStopped()
