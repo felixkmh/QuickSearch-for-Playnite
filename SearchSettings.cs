@@ -178,6 +178,8 @@ namespace QuickSearch
             // This method should save settings made to Option1 and Option2.
             bool changed = false;
             changed |= ValuePropertyChanged(this, previousSettings);
+            changed |= !SearchShortcut.Equals(previousSettings.SearchShortcut);
+            changed |= !SearchShortcutGlobal.Equals(previousSettings.SearchShortcutGlobal);
             changed |= EnabledAssemblies.Keys
                 .Concat(previousSettings.EnabledAssemblies.Keys)
                 .Aggregate(false, (v, key) => v || !(EnabledAssemblies

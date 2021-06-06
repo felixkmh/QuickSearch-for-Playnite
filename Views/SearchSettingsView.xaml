@@ -16,7 +16,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox  IsChecked="{Binding EnableGlobalHotkey}" Margin="5"/>
-                        <TextBlock Text="Enable hotkey globally" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                        <TextBlock Text="Enable global hotkey" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
                     <TextBlock Text="Gloabl hotkey to open the search popup:" Margin="2" Foreground="{StaticResource TextBrush}"/>
                     <StackPanel Orientation="Horizontal" Margin="2" IsEnabled="{Binding EnableGlobalHotkey}">
