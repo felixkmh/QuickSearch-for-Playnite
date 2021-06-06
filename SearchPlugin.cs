@@ -493,8 +493,7 @@ namespace QuickSearch
         public override void OnApplicationStopped()
         {
             // Add code to be executed when Playnite is shutting down.
-            var handle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-            HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
+            HotkeyHelper.UnregisterHotKey(mainWindowHandle, HOTKEY_ID);
         }
 
         public override void OnLibraryUpdated()
