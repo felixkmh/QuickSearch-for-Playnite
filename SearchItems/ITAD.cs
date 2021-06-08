@@ -125,7 +125,7 @@ namespace QuickSearch.SearchItems
                 }
                 bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.settings.ITADThreshold;
                 bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.settings.ITADOverride);
-                if (!isBelowThreshold && !overrideStringPresent)
+                if (!isBelowThreshold && !overrideStringPresent || string.IsNullOrWhiteSpace(query))
                 {
                     return null;
                 }
