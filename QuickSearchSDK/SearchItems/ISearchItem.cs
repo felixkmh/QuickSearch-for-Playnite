@@ -75,6 +75,17 @@ namespace QuickSearch.SearchItems
         string Name { get; }
     }
     /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface ISubItemsAction<TKey> : ISearchAction<TKey>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        ISearchSubItemSource<TKey> SubItemSource { get; }
+    }
+    /// <summary>
     /// Source that provides <see cref="ISearchItem{TKey}"/>.
     /// </summary>
     /// <typeparam name="TKey">Type used for comparison.</typeparam>
@@ -151,5 +162,23 @@ namespace QuickSearch.SearchItems
         /// using the "icofont.ttf" that is included with Playnite by default.
         /// </summary>
         char? IconChar { get; }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface ISearchSubItemSource<TKey> : ISearchItemSource<TKey>
+    {
+        /// <summary>
+        /// String displayed in front of sub search query.
+        /// </summary>
+        string Prefix { get; }
+        /// <summary>
+        /// If <see langword="true"/> is returned, all items of this source
+        /// will be shown if the sub search query is empty.
+        /// Otherwise items are displayed only if the sub query is not empty
+        /// and their score is above the threshold set by the user.
+        /// </summary>
+        bool DisplayAllIfQueryIsEmpty { get; }
     }
 }

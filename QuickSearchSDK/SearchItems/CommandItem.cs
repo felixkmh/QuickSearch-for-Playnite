@@ -172,6 +172,17 @@ namespace QuickSearch.SearchItems
         }
     }
 
+    public class SubItemsAction : CommandAction, ISubItemsAction<string>
+    {
+        public ISearchSubItemSource<string> SubItemSource { get; set; } = new SubItemsSource();
+    }
+
+    public class SubItemsSource : CommandItemSource, ISearchSubItemSource<string>
+    {
+        public string Prefix { get; set; }
+
+        public bool DisplayAllIfQueryIsEmpty => true;
+    }
 
     internal class ExternalCommandItemSource : ISearchItemSource<string>
     {

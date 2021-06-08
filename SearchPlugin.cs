@@ -4,6 +4,7 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
+using QuickSearch.SearchItems.Settings;
 using QuickSearch.Views;
 using System;
 using System.Collections.Concurrent;
@@ -341,7 +342,15 @@ namespace QuickSearch
                     key.Key = "> " + key.Key;
                 }
                 addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
-                var settingsCommand = new CommandItem("Open QuickSearch settings", () => OpenSettingsView(), "Open the QuickSearch settings view.", "Open") { IconChar = IconChars.Settings };
+                var settingsCommand = new CommandItem("Open QuickSearch settings", () => { }, "Open the QuickSearch settings view.", "Open") 
+                { 
+                    IconChar = IconChars.Settings 
+                };
+                var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch Settings", Settings = settings};
+                var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource };
+                settingsCommand.Actions = new ISearchAction<string>[] { subItemsAction };
+                subItemsAction.SubItemSource = subItemsSource;
+                
                 foreach (CommandItemKey key in settingsCommand.Keys)
                 {
                     key.Key = "> " + key.Key;
@@ -359,6 +368,12 @@ namespace QuickSearch
         Window dummyWindow;
         bool glassActive = false;
 
+        private string GetAssemblyName(string name)
+        {
+            var sep = name.IndexOf('_');
+            return name.Substring(0, sep);
+        }
+
         private void ToggleSearch()
         {
             //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
@@ -368,6 +383,7 @@ namespace QuickSearch
                 popup = new Popup();
                 popup.Opened += (s, a) =>
                 {
+                    searchWindow.SearchResults.Items.Refresh();
                     foreach (var assembly in QuickSearchSDK.registeredAssemblies)
                     {
                         if (!settings.EnabledAssemblies.ContainsKey(assembly))
@@ -380,7 +396,23 @@ namespace QuickSearch
                         searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right,
                         searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom
                         );
-                    searchWindow.QueueIndexUpdate();
+
+                    var sources = searchItemSources.Values.AsEnumerable();
+
+                    if (settings.EnableExternalItems)
+                    {
+                        sources = sources.Concat(QuickSearchSDK.searchItemSources
+                        .Where(e => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
+                        .Select(e => e.Value));
+                    }
+
+                    if (searchWindow.searchItemSources?.FirstOrDefault() is ISearchSubItemSource<string>)
+                    {
+                        searchWindow.QueueIndexUpdate();
+                    } else
+                    {
+                        searchWindow.QueueIndexUpdate(sources);
+                    }
                     searchWindow.SearchBox.SelectAll();
                     searchWindow.SearchBox.Focus();
                 };

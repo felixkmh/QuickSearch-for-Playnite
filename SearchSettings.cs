@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
+using QuickSearch.SearchItems.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -72,8 +73,9 @@ namespace QuickSearch
         public string HotkeyTextGlobal { get; set; } = string.Empty;
 
         public double Threshold { get; set; } = 0.55;
-
+        [GenericOption("Expand all items", Description = "If enabled, always show more detailed version of items.")]
         public bool ExpandAllItems { get; set; } = true;
+        [GenericOption("Show Seperator", Description = "If enabled, show line inbetween items.")]
         public bool ShowSeperator { get; set; } = false;
         public bool IncrementalUpdate { get; set; } = false;
         public int MaxNumberResults { get; set; } = 20;
@@ -84,10 +86,12 @@ namespace QuickSearch
         public float PrioritizationThreshold { get; set; } = 0.55f;
         public int MaxPrioritizedGames { get; set; } = 1;
         public bool InstallationStatusFirst { get; set; } = true;
+        [FloatOption("ITAD Threshold", Min = 0, Max = 1, Ticks = 0.01f)]
         public float ITADThreshold { get; set; } = 0.75f;
         public string ITADOverride { get; set; } = "+";
         public bool ITADEnabled { get; set; } = true;
         public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
+        [GenericOption("Glass Effect", Description = "If enabled, blur background under the search window.")]
         public bool EnableGlassEffect { get; set; } = true;
         public int OuterBorderThickness { get; set; } = 12;
         public bool EnableGlobalHotkey { get; set; } = false;

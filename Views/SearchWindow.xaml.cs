@@ -35,6 +35,10 @@ namespace QuickSearch
         Task backgroundTask = Task.CompletedTask;
         internal IList<ISearchItem<string>> searchItems = Array.Empty<ISearchItem<string>>();
 
+        internal Stack<IEnumerable<ISearchItemSource<string>>> navigationStack = new Stack<IEnumerable<ISearchItemSource<string>>>();
+
+        internal IEnumerable<ISearchItemSource<string>> searchItemSources = new List<ISearchItemSource<string>>();
+
         private double heightSelected = double.NaN;
         private double heightNotSelected = double.NaN;
 
@@ -97,7 +101,7 @@ namespace QuickSearch
             return name.Substring(0, sep);
         }
 
-        public void QueueIndexUpdate()
+        public void QueueIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null)
         {
             openedSearchTokeSource.Cancel();
             var oldSource = textChangedTokeSource;
@@ -106,17 +110,12 @@ namespace QuickSearch
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
                 t.Dispose();
-                var itemsEnumerable = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
-
-                if (SearchPlugin.Instance.settings.EnableExternalItems)
+                if (itemSources != null)
                 {
-                    var externalItems = QuickSearchSDK.searchItemSources
-                    .Where(e => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
-                    .Select(e => e.Value);
-                    itemsEnumerable = itemsEnumerable.Concat(externalItems);
+                    searchItemSources = itemSources;
                 }
 
-                searchItems = itemsEnumerable
+                searchItems = searchItemSources
                     .Where(source => !source.DependsOnQuery)
                     .Select(source => source.GetItems(null))
                     .Where(items => items != null)
@@ -138,7 +137,7 @@ namespace QuickSearch
             });
         }
 
-        float Clamp01(float f) => Math.Min(Math.Max(0f, f), 1f);
+        static float Clamp01(float f) => Math.Min(Math.Max(0f, f), 1f);
 
         internal float ComputeScore(ISearchItem<string> item, string input)
         {
@@ -187,158 +186,186 @@ namespace QuickSearch
                 string input = textBox.Text.ToLower().Trim();
                 if (lastInput != input)
                 {
-                    var startTime = DateTime.Now;
-                    lastInput = input;
-                    textChangedTokeSource.Cancel();
-                    var oldSource = textChangedTokeSource;
-                    textChangedTokeSource = new CancellationTokenSource();
-                    var cancellationToken = textChangedTokeSource.Token;
-                    backgroundTask = backgroundTask.ContinueWith(t => {
+                    textChangedTokeSource?.Cancel();
+                    backgroundTask = backgroundTask.ContinueWith(t =>
+                    {
                         t.Dispose();
-                        Dispatcher.Invoke(() => IsLoadingResults = true);
+                        lastInput = input;
+                        bool showAll = false;
+                        if ((searchItemSources?.Count() ?? 0) == 1)
+                        {
+                            if (searchItemSources.First() is ISearchSubItemSource<string> subSource)
+                            {
+                                if (input.StartsWith(subSource.Prefix, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    input = input.Substring(subSource.Prefix.Length);
+                                    showAll = subSource.DisplayAllIfQueryIsEmpty && string.IsNullOrWhiteSpace(input);
+                                }
+                                else
+                                {
+                                    var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
 
+                                    if (SearchPlugin.Instance.settings.EnableExternalItems)
+                                    {
+                                        sources = sources.Concat(QuickSearchSDK.searchItemSources
+                                        .Where(s => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(s.Key)].Items)
+                                        .Select(s => s.Value));
+                                    }
+                                    showAll = false;
+                                    QueueIndexUpdate(sources);
+                                }
+                            }
+                        }
+                        QueueSearch(input, showAll);
+                    });
+                }
+            }
+        }
+
+        private void QueueSearch(string input, bool showAll = false)
+        {
+            var startTime = DateTime.Now;
+            textChangedTokeSource.Cancel();
+            var oldSource = textChangedTokeSource;
+            textChangedTokeSource = new CancellationTokenSource();
+            var cancellationToken = textChangedTokeSource.Token;
+            backgroundTask = backgroundTask.ContinueWith(t =>
+            {
+                t.Dispose();
+                Dispatcher.Invoke(() => { IsLoadingResults = true; });
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                int maxResults = 0;
+                int addedItems = 0;
+                List<Candidate> addedCandidates = new List<Candidate>();
+                if (!string.IsNullOrEmpty(input) || showAll)
+                {
+                    var sources = searchItemSources;
+                    var queryDependantItems = sources
+                    .Where(source => source.DependsOnQuery)
+                    .Select(source => source.GetItems(input))
+                    .Where(items => items != null)
+                    .SelectMany(items => items);
+
+                    var canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                    .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold))
+                    .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+
+                    maxResults = canditates.Count();
+                    if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
+                    {
+                        maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
+                    }
+                    if (showAll)
+                    {
+                        maxResults = canditates.Count();
+                    }
+
+                    addedCandidates.Capacity = maxResults;
+
+                    while (addedItems < maxResults)
+                    {
                         if (cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
-                        int maxResults = 0;
-                        int addedItems = 0;
-                        List<Candidate> addedCandidates = new List<Candidate>();
-                        if (!string.IsNullOrEmpty(input))
+
+                        var maxIdx = FindMax(canditates, cancellationToken);
+
+                        if (maxIdx >= 0)
                         {
-                            var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
-                            if (SearchPlugin.Instance.settings.EnableExternalItems)
-                            {
-                                sources = sources
-                                .Concat(
-                                    QuickSearchSDK.searchItemSources
-                                    .Where(entry => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(entry.Key)].Items)
-                                    .Select(entry => entry.Value)
-                                );
-                            }
-                            var queryDependantItems = sources
-                            .Where(source => source.DependsOnQuery)
-                            .Select(source => source.GetItems(input))
-                            .Where(items => items != null)
-                            .SelectMany(items => items);
+                            canditates[maxIdx].Marked = true;
+                            addedCandidates.Add(canditates[maxIdx]);
 
-                            var canditates = searchItems.Concat(queryDependantItems).AsParallel()
-                            .Where(item => ComputePreliminaryScore(item, input) >= searchPlugin.settings.Threshold)
-                            .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
-                           
-                            maxResults = canditates.Count();
-                            if (SearchPlugin.Instance.settings.MaxNumberResults > 0)
-                            {
-                                maxResults = Math.Min(SearchPlugin.Instance.settings.MaxNumberResults, maxResults);
-                            }
 
-                            addedCandidates.Capacity = maxResults;
-
-                            while(addedItems < maxResults)
+                            Dispatcher.Invoke(() =>
                             {
-                                if (cancellationToken.IsCancellationRequested)
+
+                                if (ListDataContext.Count > addedItems)
                                 {
-                                    return;
+                                    ListDataContext[addedItems] = canditates[maxIdx].Item;
                                 }
-
-                                var maxIdx = FindMax(canditates, cancellationToken);
-
-                                if (maxIdx >= 0)
+                                else
                                 {
-                                    canditates[maxIdx].Marked = true;
-                                    addedCandidates.Add(canditates[maxIdx]);
-
-
-                                    Dispatcher.Invoke(() =>
-                                    {
-
-                                        if (ListDataContext.Count > addedItems)
-                                        {
-                                            ListDataContext[addedItems] = canditates[maxIdx].Item;
-                                        } else
-                                        {
-                                            ListDataContext.Add(canditates[maxIdx].Item);
-                                        }
-                                        //var keys = ListDataContext.First().Keys.Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k.Key });
-                                        //var max = keys.OrderByDescending(k => k.Score).First();
-                                        //var lcs = LongestCommonSubstringDP(input, max.Key);
-                                        //if (lcs.Index + input.Length < max.Key.Length)
-                                        //{
-                                        //    PlaceholderText.Text += max.Key.Substring(lcs.Index + input.Length);
-                                        //}
+                                    ListDataContext.Add(canditates[maxIdx].Item);
+                                }
 #if DEBUG
-                                        PlaceholderText.Text = SearchBox.Text;
-                                        PlaceholderText.Text += " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
-                                        PlaceholderText.Visibility = Visibility.Visible;
+                                PlaceholderText.Text = SearchBox.Text;
+                                PlaceholderText.Text += " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
+                                PlaceholderText.Visibility = Visibility.Visible;
 #endif
-                                        if (ListDataContext.Count > 0 && addedItems == 0)
-                                        {
-                                            SearchResults.SelectedIndex = 0;
-                                        }
-
-                                        if (addedItems == 2 || (addedItems > 2 && (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))))
-                                        {
-                                            UpdateListBox(maxResults);
-                                        }
-
-                                        
-                                    }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
-
-                                    addedItems += 1;
-                                } else
+                                if (ListDataContext.Count > 0 && addedItems == 0)
                                 {
-                                    break;
+                                    SearchResults.SelectedIndex = 0;
                                 }
 
-                            }
-                        
+                                if (addedItems == 2 || (addedItems > 2 && (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))))
+                                {
+                                    UpdateListBox(maxResults);
+                                }
+
+
+                            }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
+
+                            addedItems += 1;
+                        }
+                        else
+                        {
+                            break;
                         }
 
-                        Dispatcher.Invoke(() =>
-                        {
-                            for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
-                            {
-                                ListDataContext.RemoveAt(i);
-                            }
-                            if (ListDataContext.Count > 0)
-                            {
-                                SearchResults.SelectedIndex = 0;
-                            }
-                            UpdateListBox(ListDataContext.Count);
+                    }
 
-                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Background);
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            UpdateListBox(ListDataContext.Count);
-                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
-
-                        var elapsedMs = (int)(DateTime.Now - startTime).TotalMilliseconds;
-
-                        var remainingWaitTime = Math.Max(SearchPlugin.Instance.settings.AsyncItemsDelay - elapsedMs, 0);
-                        if (SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested, remainingWaitTime))
-                        {
-                            return;
-                        }
-                        
-                        InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults);
-
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            UpdateListBox(ListDataContext.Count);
-                        }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
-
-                    }, textChangedTokeSource.Token);
-                    backgroundTask = backgroundTask.ContinueWith(t => {
-                        t.Dispose();
-                        Dispatcher.Invoke(() => { 
-                            IsLoadingResults = false;
-                            oldSource.Dispose();
-                        });
-                    });
                 }
-            }
+
+                Dispatcher.Invoke(() =>
+                {
+                    for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
+                    {
+                        ListDataContext.RemoveAt(i);
+                    }
+                    if (ListDataContext.Count > 0)
+                    {
+                        SearchResults.SelectedIndex = 0;
+                    }
+                    UpdateListBox(ListDataContext.Count);
+
+                }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Background);
+
+                Dispatcher.Invoke(() =>
+                {
+                    UpdateListBox(ListDataContext.Count);
+                }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
+
+                var elapsedMs = (int)(DateTime.Now - startTime).TotalMilliseconds;
+
+                var remainingWaitTime = Math.Max(SearchPlugin.Instance.settings.AsyncItemsDelay - elapsedMs, 0);
+                if (SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested, remainingWaitTime))
+                {
+                    return;
+                }
+
+                InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults);
+
+
+                Dispatcher.Invoke(() =>
+                {
+                    UpdateListBox(ListDataContext.Count);
+                }, searchPlugin.settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
+
+            }, textChangedTokeSource.Token);
+            backgroundTask = backgroundTask.ContinueWith(t =>
+            {
+                t.Dispose();
+                Dispatcher.Invoke(() =>
+                {
+                    IsLoadingResults = false;
+                    oldSource.Dispose();
+                });
+            });
         }
 
         private List<Task> allTasksList = new List<Task>();
@@ -349,17 +376,7 @@ namespace QuickSearch
 
             TaskFactory factory = new TaskFactory();
 
-            var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
-
-            if (SearchPlugin.Instance.settings.EnableExternalItems)
-            {
-                sources = sources
-                .Concat(
-                    QuickSearchSDK.searchItemSources
-                    .Where(entry => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(entry.Key)].Items)
-                    .Select(entry => entry.Value)
-                );
-            }
+            var sources = searchItemSources;
 
             var highestScore = 0.0f;
             if (addedCandidates.Count > 0)
@@ -469,6 +486,8 @@ namespace QuickSearch
 
                                 if (SearchResults.SelectedIndex == -1)
                                 {
+                                    SearchResults.SelectedIndex = 0;
+                                    SearchResults.SelectedIndex = -1;
                                     SearchResults.SelectedIndex = 0;
                                 } else
                                 {
@@ -711,11 +730,25 @@ namespace QuickSearch
                 SearchResults.SelectedIndex = idx;
                 if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
-                    searchPlugin.popup.IsOpen = false;
                     if (SearchResults.SelectedIndex != -1)
                     {
                         if (ActionsListBox.SelectedItem is ISearchAction<string> action)
                         {
+                            if (action is ISubItemsAction<string> subItemsAction)
+                            {
+                                var source = subItemsAction.SubItemSource;
+                                QueueIndexUpdate(new ISearchItemSource<string>[] { source });
+                                if (source != null)
+                                {
+                                    // QueueSearch(string.Empty, source.DisplayAllIfQueryIsEmpty);
+                                    SearchBox.Text = source.Prefix + " ";
+                                    SearchBox.CaretIndex = SearchBox.Text.Length;
+                                    PlaceholderText.Text = SearchBox.Text;
+                                }
+                            } else
+                            {
+                                // searchPlugin.popup.IsOpen = false;
+                            }
                             if (SearchResults.SelectedItem is ISearchItem<string> item)
                             {
                                 if (action.CanExecute(item))
@@ -723,6 +756,7 @@ namespace QuickSearch
                                     action.Execute(item);
                                 }
                             }
+                            SearchResults.Items.Refresh();
                         }
                     }
                 }
