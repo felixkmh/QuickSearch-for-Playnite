@@ -369,6 +369,11 @@ namespace QuickSearch
                 }
                 QuickSearchSDK.AddCommand(settingsCommand);
                 QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
+
+                var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
+                var itadCommand = new CommandItem("IsThereAnyDeal", new List<CommandAction>(), "Search on IsThereAnyDeal.com", @"https://d2uym1p5obf9p8.cloudfront.net/images/banners/150x150.gif");
+                itadCommand.Actions.Add(itadSubItemsAction);
+                QuickSearchSDK.AddCommand(itadCommand);
             }
             // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
 

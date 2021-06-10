@@ -15,9 +15,13 @@ using QuickSearch.Models.ITAD;
 
 namespace QuickSearch.SearchItems
 {
-    class ITADItemSource : ISearchItemSource<string>
+    class ITADItemSource : ISearchSubItemSource<string>
     {
         public bool DependsOnQuery => true;
+
+        public string Prefix => "Search on ITAD";
+
+        public bool DisplayAllIfQueryIsEmpty => false;
 
         public IEnumerable<ISearchItem<string>> GetItems(string query)
         {
