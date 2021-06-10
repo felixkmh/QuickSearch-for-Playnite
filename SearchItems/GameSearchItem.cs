@@ -50,6 +50,8 @@ namespace QuickSearch.SearchItems
     class ContextAction : ISearchAction<string>
     {
         public string Name { get; set; }
+
+        public bool CloseAfterExecute => true;
 #pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
 #pragma warning restore CS0067
@@ -76,6 +78,8 @@ namespace QuickSearch.SearchItems
         public Action<Game> Action { get; set; }
 
         public string Name { get; set; }
+
+        public bool CloseAfterExecute => true;
 #pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
 #pragma warning restore CS0067
@@ -100,6 +104,8 @@ namespace QuickSearch.SearchItems
     class RemoveAction : ISearchAction<string>
     {
         public string Name { get; set; } = "Edit";
+
+        public bool CloseAfterExecute => true;
 #pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
 #pragma warning restore CS0067

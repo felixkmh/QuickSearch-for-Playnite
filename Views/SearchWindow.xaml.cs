@@ -348,7 +348,7 @@ namespace QuickSearch
                     return;
                 }
 
-                InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults);
+                InsertDelayedDependentItems(cancellationToken, input, addedCandidates, (float)SearchPlugin.Instance.settings.Threshold, SearchPlugin.Instance.settings.MaxNumberResults, showAll);
 
 
                 Dispatcher.Invoke(() =>
@@ -370,7 +370,7 @@ namespace QuickSearch
 
         private List<Task> allTasksList = new List<Task>();
 
-        private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, IList<Candidate> addedCandidates, float threshold, int maxItems)
+        private void InsertDelayedDependentItems(CancellationToken cancellationToken, string input, IList<Candidate> addedCandidates, float threshold, int maxItems, bool showAll = false)
         {
             var queue = new ConcurrentQueue<ISearchItem<string>>();
 
@@ -447,7 +447,7 @@ namespace QuickSearch
                 while (queue.TryDequeue(out var item) && !cancellationToken.IsCancellationRequested)
                 {
                     var preliminaryScore = ComputePreliminaryScore(item, input); 
-                    if (preliminaryScore > threshold)
+                    if (preliminaryScore > threshold || showAll)
                     {
                         var score = ComputeScore(item, input);
                         int insertionIdx = addedCandidates.Count;
@@ -592,7 +592,12 @@ namespace QuickSearch
             var aIsGame = a is GameSearchItem;
             var bIsGame = b is GameSearchItem;
 
-            return bIsGame.CompareTo(aIsGame);
+            if (bIsGame.CompareTo(aIsGame) != 0)
+            {
+                return bIsGame.CompareTo(aIsGame);
+            }
+
+            return a.TopLeft.CompareTo(b.TopLeft);
         } 
 
         private void UpdateListBox(int items)
@@ -745,9 +750,9 @@ namespace QuickSearch
                                     SearchBox.CaretIndex = SearchBox.Text.Length;
                                     PlaceholderText.Text = SearchBox.Text;
                                 }
-                            } else
+                            } else if (action.CloseAfterExecute)
                             {
-                                // searchPlugin.popup.IsOpen = false;
+                                searchPlugin.popup.IsOpen = false;
                             }
                             if (SearchResults.SelectedItem is ISearchItem<string> item)
                             {

@@ -41,7 +41,7 @@ namespace QuickSearch.SearchItems
             }
             if (!string.IsNullOrWhiteSpace(descripton))
             {
-                Keys.Add(new CommandItemKey { Key = descripton, Weight = 0.9f });
+                Keys.Add(new CommandItemKey { Key = descripton, Weight = 1f });
             }
 
             if (action is Action)
@@ -144,7 +144,7 @@ namespace QuickSearch.SearchItems
         /// <inheritdoc cref="ISearchKey{TKey}.Key"/>
         public string Key { get; set; }
         /// <inheritdoc cref="ISearchKey{TKey}.Weight"/>
-        public float Weight { get; set; }
+        public float Weight { get; set; } = 1f;
     }
     /// <inheritdoc cref="ISearchAction{TKey}"/>
     public class CommandAction : ISearchAction<string>
@@ -155,6 +155,8 @@ namespace QuickSearch.SearchItems
         /// Action to be executed.
         /// </summary>
         public Action Action { get; set; }
+
+        public bool CloseAfterExecute { get; set; } = true;
 
 #pragma warning disable CS0067
         /// <inheritdoc cref="System.Windows.Input.ICommand.CanExecuteChanged"/>

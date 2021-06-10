@@ -11,13 +11,13 @@ namespace QuickSearch.SearchItems.Settings
     {
         internal TSettings Settings { get; set; }
 
-        public string Prefix { get; set; } = "Settings";
+        public virtual string Prefix { get; set; } = "Settings";
 
-        public bool DisplayAllIfQueryIsEmpty => true;
+        public virtual bool DisplayAllIfQueryIsEmpty => true;
 
-        public bool DependsOnQuery => true;
+        public virtual bool DependsOnQuery => true;
 
-        public IEnumerable<ISearchItem<string>> GetItems(string query)
+        public virtual IEnumerable<ISearchItem<string>> GetItems(string query)
         {
             var items = new List<ISearchItem<string>>();
             foreach(var prop in typeof(TSettings).GetProperties())
@@ -26,20 +26,29 @@ namespace QuickSearch.SearchItems.Settings
                 {
                     if (prop.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault() is GenericOptionAttribute attr)
                     {
-                        if (attr is FloatOptionAttribute)
+                        if (attr is NumberOptionAttribute)
                         {
-                            var value = float.NaN;
+                            var value = double.NaN;
                             var last = query.Split(' ').LastOrDefault()??string.Empty;
-                            if (float.TryParse(last, out value))
+                            if (double.TryParse(last, out value))
                             {
                                 items.Add(new FloatSettingsItem<TSettings>(prop, Settings) { NewValue = value });
                             } else
                             {
                                 items.Add(new FloatSettingsItem<TSettings>(prop, Settings));
                             }
+                        } else if (attr is SelectionOptionAttribute)
+                        {
+                            items.Add(new SelectionSettingsItem<TSettings>(prop, Settings));
                         } else
                         {
-                            items.Add(new BoolSettingsItem<TSettings>(prop, Settings));
+                            if (prop.PropertyType == typeof(bool))
+                            {
+                                items.Add(new BoolSettingsItem<TSettings>(prop, Settings));
+                            } else if (prop.PropertyType.IsEnum)
+                            {
+                                items.Add(new EnumSettingsItem<TSettings>(prop, Settings));
+                            }
                         }
                     }
                 }
@@ -47,7 +56,7 @@ namespace QuickSearch.SearchItems.Settings
             return items;
         }
 
-        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
+        public virtual Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
         {
             return null;
         }
@@ -57,6 +66,8 @@ namespace QuickSearch.SearchItems.Settings
     {
         public static BoolSettingsAction<TSettings> Instance { get; private set; } = new BoolSettingsAction<TSettings>();
         public string Name { get; set; } = "Toggle";
+
+        public bool CloseAfterExecute => false;
 
         public event EventHandler CanExecuteChanged;
 
@@ -74,6 +85,34 @@ namespace QuickSearch.SearchItems.Settings
         }
     }
 
+    public class ValueSetAction<TSettings> : ISearchAction<string>
+    {
+        public string Name { get; set; }
+
+        public object Value { get; set; }
+
+        public bool CloseAfterExecute => false;
+
+        public event EventHandler CanExecuteChanged;
+
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            if (parameter is EnumSettingsItem<TSettings> item)
+            {
+                item.Property.SetValue(item.Settings, Value);
+            }
+            if (parameter is SelectionSettingsItem<TSettings> item2)
+            {
+                item2.Property.SetValue(item2.Settings, Value);
+            }
+        }
+    }
+
     public class FloatSettingsAction<TSettings> : ISearchAction<string>
     {
         public static readonly FloatSettingsAction<TSettings> AddAction = new FloatSettingsAction<TSettings>() { floatAction = FloatAction.Add, Name = "+" };
@@ -84,11 +123,13 @@ namespace QuickSearch.SearchItems.Settings
             Add, Subtract, Set
         }
 
-        public float NewValue { get; set; }
+        public double NewValue { get; set; }
 
         internal FloatAction floatAction;
 
         public string Name { get; set; } = "Set";
+
+        public bool CloseAfterExecute => false;
 
         public event EventHandler CanExecuteChanged;
 
@@ -101,25 +142,27 @@ namespace QuickSearch.SearchItems.Settings
         {
             if (parameter is FloatSettingsItem<TSettings> item)
             {
-                if (item.Property.GetCustomAttributes(true).OfType<FloatOptionAttribute>().FirstOrDefault() is FloatOptionAttribute attr)
+                if (item.Property.GetCustomAttributes(true).OfType<NumberOptionAttribute>().FirstOrDefault() is NumberOptionAttribute attr)
                 {
-                    var oldValue = (float)item.Property.GetValue(item.Settings);
+                    var oldValue = Convert.ToDouble(item.Property.GetValue(item.Settings));
+                    
                     var newValue = oldValue;
                     switch (floatAction)
                     {
                         case FloatAction.Add:
-                            newValue = oldValue + attr.Ticks;
+                            newValue = oldValue + attr.Tick;
                             break;
                         case FloatAction.Subtract:
-                            newValue = oldValue - attr.Ticks;
+                            newValue = oldValue - attr.Tick;
                             break;
                         case FloatAction.Set:
                             newValue = NewValue;
                             break;
                     }
-                    var fullTicks = (int)Math.Round(newValue / attr.Ticks);
-                    newValue = attr.Ticks * fullTicks;
-                    item.Property.SetValue(item.Settings, Math.Min(attr.Max, Math.Max(attr.Min, newValue)));
+
+                    newValue = Math.Min(attr.Max, Math.Max(attr.Min, newValue));
+
+                    item.Property.SetValue(item.Settings, Convert.ChangeType(newValue, item.Property.PropertyType));
                 }
             }
         }
@@ -210,16 +253,14 @@ namespace QuickSearch.SearchItems.Settings
 
     }
 
-    public class FloatSettingsItem<TSettings> : ISearchItem<string>
+    public class EnumSettingsItem<TSettings> : ISearchItem<string>
     {
         internal PropertyInfo Property { get; set; }
         internal TSettings Settings { get; set; }
 
-        private FloatSettingsItem() { }
+        private EnumSettingsItem() { }
 
-        public float NewValue { get; set; } = float.NaN;
-
-        public FloatSettingsItem(PropertyInfo property, TSettings settings)
+        public EnumSettingsItem(PropertyInfo property, TSettings settings)
         {
             if (property == null || settings == null) throw new ArgumentNullException();
             Property = property;
@@ -231,8 +272,8 @@ namespace QuickSearch.SearchItems.Settings
             get
             {
                 var keys = new List<ISearchKey<string>>();
-                var attr = Property.GetCustomAttributes(true).OfType<FloatOptionAttribute>().FirstOrDefault();
-                if (attr is FloatOptionAttribute)
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
                 {
                     if (attr.Name is string) keys.Add(new SettingsKey { Key = attr.Name });
                     if (attr.Description is string) keys.Add(new SettingsKey { Key = attr.Description });
@@ -246,12 +287,205 @@ namespace QuickSearch.SearchItems.Settings
             {
                 var actions = new List<ISearchAction<string>>();
                 var type = Property.PropertyType;
-                var attr = Property.GetCustomAttributes(true).OfType<FloatOptionAttribute>().FirstOrDefault();
-                if (type == typeof(float))
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (type.IsEnum)
                 {
-                    if (attr is FloatOptionAttribute)
+                    if (attr is GenericOptionAttribute)
                     {
-                        if (float.IsNaN(NewValue)) 
+                        var values = type.GetEnumValues();
+                        foreach(var value in values)
+                        {
+                            actions.Add(new ValueSetAction<TSettings> { Name = type.GetEnumName(value), Value = value});
+                        }
+                    }
+                }
+                return actions;
+            }
+        }
+
+        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
+
+        public Uri Icon { get; set; } = null;
+
+        public string TopLeft
+        {
+            get
+            {
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
+                {
+                    if (attr.Name is string) return attr.Name;
+                }
+                return null;
+            }
+        }
+
+        public string TopRight => Property.GetValue(Settings).ToString();
+
+        public string BottomLeft
+        {
+            get
+            {
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
+                {
+                    if (attr.Name is string) return attr.Description;
+                }
+                return null;
+            }
+        }
+
+        public string BottomCenter => null;
+
+        public string BottomRight => null;
+
+        public char? IconChar { get; set; } = IconChars.Settings;
+
+    }
+
+    public class SelectionSettingsItem<TSettings> : ISearchItem<string>
+    {
+        internal PropertyInfo Property { get; set; }
+        internal TSettings Settings { get; set; }
+
+        private SelectionSettingsItem() { }
+
+        public SelectionSettingsItem(PropertyInfo property, TSettings settings)
+        {
+            if (property == null || settings == null) throw new ArgumentNullException();
+            Property = property;
+            Settings = settings;
+        }
+
+        public IList<ISearchKey<string>> Keys
+        {
+            get
+            {
+                var keys = new List<ISearchKey<string>>();
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
+                {
+                    if (attr.Name is string) keys.Add(new SettingsKey { Key = attr.Name });
+                    if (attr.Description is string) keys.Add(new SettingsKey { Key = attr.Description });
+                }
+                return keys;
+            }
+        }
+        public IList<ISearchAction<string>> Actions
+        {
+            get
+            {
+                var actions = new List<ISearchAction<string>>();
+                var type = Property.PropertyType;
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is SelectionOptionAttribute selectionAttr)
+                {
+                    if (selectionAttr.Options != null)
+                    {
+                        foreach (var value in selectionAttr.Options)
+                        {
+                            if (value.GetType() == Property.PropertyType)
+                            {
+                                actions.Add(new ValueSetAction<TSettings> { Name = value.ToString(), Value = value });
+                            }
+                        }
+                    }
+                }
+                return actions;
+            }
+        }
+
+        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
+
+        public Uri Icon { get; set; } = null;
+
+        public string TopLeft
+        {
+            get
+            {
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
+                {
+                    if (attr.Name is string) return attr.Name;
+                }
+                return null;
+            }
+        }
+
+        public string TopRight => Property.GetValue(Settings)?.ToString()??"Null";
+
+        public string BottomLeft
+        {
+            get
+            {
+                var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
+                if (attr is GenericOptionAttribute)
+                {
+                    if (attr.Name is string) return attr.Description;
+                }
+                return null;
+            }
+        }
+
+        public string BottomCenter => null;
+
+        public string BottomRight => null;
+
+        public char? IconChar { get; set; } = IconChars.Settings;
+
+    }
+
+    public class FloatSettingsItem<TSettings> : ISearchItem<string>
+    {
+        internal PropertyInfo Property { get; set; }
+        internal TSettings Settings { get; set; }
+
+        private FloatSettingsItem() { }
+
+        public double NewValue { get; set; } = float.NaN;
+
+        public FloatSettingsItem(PropertyInfo property, TSettings settings)
+        {
+            if (property == null || settings == null) throw new ArgumentNullException();
+            Property = property;
+            Settings = settings;
+        }
+
+        public IList<ISearchKey<string>> Keys
+        {
+            get
+            {
+                var keys = new List<ISearchKey<string>>();
+                var attr = Property.GetCustomAttributes(true).OfType<NumberOptionAttribute>().FirstOrDefault();
+                if (attr is NumberOptionAttribute)
+                {
+                    if (!string.IsNullOrWhiteSpace(attr.Name)) keys.Add(new SettingsKey { Key = attr.Name });
+                    if (!string.IsNullOrWhiteSpace(attr.Description)) keys.Add(new SettingsKey { Key = attr.Description });
+                }
+                if (!double.IsNaN(NewValue))
+                {
+                    var length = keys.Count;
+                    for (int i = 0; i < length; ++i)
+                    {
+                        keys.Add(new SettingsKey { Key = keys[i].Key + " " + NewValue.ToString() });
+                    }
+                    if (keys.Count > 0) keys.Add(new SettingsKey { Key = NewValue.ToString() });
+                }
+                return keys;
+            }
+        }
+        public IList<ISearchAction<string>> Actions
+        {
+            get
+            {
+                var actions = new List<ISearchAction<string>>();
+                var type = Property.PropertyType;
+                var attr = Property.GetCustomAttributes(true).OfType<NumberOptionAttribute>().FirstOrDefault();
+                if (type.IsNumberType())
+                {
+                    if (attr is NumberOptionAttribute)
+                    {
+                        if (double.IsNaN(NewValue)) 
                         {
                             actions.Add(FloatSettingsAction<TSettings>.AddAction);
                             actions.Add(FloatSettingsAction<TSettings>.SubtractAction);
@@ -282,7 +516,7 @@ namespace QuickSearch.SearchItems.Settings
             }
         }
 
-        public string TopRight => Property.GetValue(Settings).ToString();
+        public string TopRight => Convert.ToDouble(Property.GetValue(Settings)).ToString("0.####");
 
         public string BottomLeft
         {

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="IconChars.cs" />
     <Compile Include="QuickSearchSDK.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

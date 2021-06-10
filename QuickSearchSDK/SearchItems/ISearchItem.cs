@@ -73,6 +73,8 @@ namespace QuickSearch.SearchItems
         /// Display name of the action.
         /// </summary>
         string Name { get; }
+
+        bool CloseAfterExecute { get; }
     }
     /// <summary>
     /// 
