@@ -4,7 +4,7 @@ Author: felixkmh
 Version: 1.5.0
 Module: QuickSearch.dll
 Type: GenericPlugin
-Icon: icon.png
+Icon: QuickSearch.png
 Links:
   - Name: GitHub
     Url: https://github.com/felixkmh/QuickSearch-for-Playnite
