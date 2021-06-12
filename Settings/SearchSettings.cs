@@ -12,25 +12,9 @@ using System.Windows.Input;
 
 namespace QuickSearch
 {
-    public class SearchSettings : ISettings
+    public partial class SearchSettings : ISettings
     {
         private readonly SearchPlugin plugin;
-
-        public class Hotkey : IEquatable<Hotkey>
-        {
-            public Hotkey(Key key, ModifierKeys modifier)
-            {
-                this.Key = key;
-                this.Modifiers = modifier;
-            }
-            public Key Key { get; set; }
-            public ModifierKeys Modifiers { get; set; }
-
-            public bool Equals(Hotkey other)
-            {
-                return Key == other.Key && Modifiers == other.Modifiers;
-            }
-        }
 
         public static void CopyProperties(SearchSettings from, SearchSettings to)
         {
@@ -66,11 +50,6 @@ namespace QuickSearch
                 }
             }
             return false;
-        }
-
-        public void callback()
-        {
-
         }
 
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
@@ -116,44 +95,6 @@ namespace QuickSearch
         [GenericOption("Enable Global Hotkey")]
         public bool EnableGlobalHotkey { get => enableGlobalHotkey; set { enableGlobalHotkey = value; if (value) SearchPlugin.Instance?.RegisterGlobalHotkey(); else SearchPlugin.Instance?.UnregisterGlobalHotkey(); } }
         private bool enableGlobalHotkey = false;
-        public class AssemblyOptions : IEquatable<AssemblyOptions>
-        {
-            public bool Items { get; set; } = true;
-            public bool Actions { get; set; } = true;
-
-            public bool Equals(AssemblyOptions other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-                return Items == other.Items && Actions == other.Actions;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj is AssemblyOptions options)
-                {
-                    return Equals(options);
-                }
-                return false;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
-        }
-
-        public class ITADShopOption
-        {
-            public ITADShopOption(string name)
-            {
-                Name = name;
-            }
-            public string Name { get; set; }
-            public bool Enabled { get; set; } = true;
-        }
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
