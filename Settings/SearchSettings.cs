@@ -51,23 +51,22 @@ namespace QuickSearch
             }
             return false;
         }
-
+        [GenericOption("Search Hotkey")]
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
+        [GenericOption("Global Search Hotkey")]
         public Hotkey SearchShortcutGlobal { get; set; } = new Hotkey(Key.F, ModifierKeys.Control | ModifierKeys.Alt);
         public string HotkeyText { get; set; } = string.Empty;
         public string HotkeyTextGlobal { get; set; } = string.Empty;
 
-        [GenericOption("Modfier Enum Option")]
-        public Visibility TestOption { get; set; }
-        [SelectionOption("Selection Option", new object[] {"First", "Second", "Not Fourth"})]
-        public string SelectionOptions { get; set; }
         [NumberOption("Search Threshold", Min = 0, Max = 1, Tick = 0.01f)]
         public double Threshold { get; set; } = 0.55;
         [GenericOption("Expand all items", Description = "If enabled, always show more detailed version of items.")]
         public bool ExpandAllItems { get; set; } = true;
         [GenericOption("Show Seperator", Description = "If enabled, show line inbetween items.")]
         public bool ShowSeperator { get; set; } = false;
+        [GenericOption("Add Items With Lower Priority")]
         public bool IncrementalUpdate { get; set; } = false;
+        [NumberOption("Maximum number of results", Min=0, Tick = 1)]
         public int MaxNumberResults { get; set; } = 20;
         [GenericOption("Enable External GameActions")]
         public bool EnableExternalGameActions { get; set; } = true;
