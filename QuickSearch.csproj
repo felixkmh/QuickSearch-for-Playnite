@@ -124,11 +124,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="QuickSearchSDK\QuickSearchSDK.csproj">
       <Project>{0425a0c6-c410-48fc-8218-6f7b124eeca5}</Project>
       <Name>QuickSearchSDK</Name>
@@ -142,6 +137,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\noise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="QuickSearch.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
