@@ -19,6 +19,12 @@ namespace QuickSearch
             {
                 return Key == other.Key && Modifiers == other.Modifiers;
             }
+
+            public override string ToString()
+            {
+                return $"{Modifiers} + {Key}";
+            }
         }
+
     }
 }
