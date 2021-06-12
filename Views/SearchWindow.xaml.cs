@@ -295,7 +295,7 @@ namespace QuickSearch
                                 }
 #if DEBUG
                                 PlaceholderText.Text = SearchBox.Text;
-                                PlaceholderText.Text += " - " + (int)((DateTime.Now - startTime).TotalMilliseconds) + "ms";
+                                PlaceholderText.Text += " - " + (int)(DateTime.Now - startTime).TotalMilliseconds + "ms";
                                 PlaceholderText.Visibility = Visibility.Visible;
 #endif
                                 if (ListDataContext.Count > 0 && addedItems == 0)
