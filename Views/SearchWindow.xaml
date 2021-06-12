@@ -150,8 +150,8 @@
                        Margin="6" Padding="1"/>
             <Image x:Name="LoadIcon" Source="{StaticResource LoadingDrawingImage}" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
                        Stretch="Uniform"
-                       MaxWidth="{Binding ActualHeight, ElementName=SearchIcon}"
-                       MaxHeight="{Binding ActualHeight, ElementName=SearchIcon}"
+                       Width="{Binding ActualHeight, ElementName=SearchIcon}"
+                       Height="{Binding ActualHeight, ElementName=SearchIcon}"
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Center" 
                        Margin="6"
