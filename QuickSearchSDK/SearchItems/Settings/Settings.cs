@@ -63,7 +63,7 @@ namespace QuickSearch.SearchItems.Settings
                             if (prop.PropertyType == typeof(bool))
                             {
                                 items.Add(new BoolSettingsItem<TSettings>(prop, Settings));
-                            } else if (prop.PropertyType.IsEnum)
+                            } else
                             {
                                 items.Add(new EnumSettingsItem<TSettings>(prop, Settings));
                             }
