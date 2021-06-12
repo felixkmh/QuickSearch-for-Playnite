@@ -153,7 +153,7 @@ namespace QuickSearch
             }
         }
 
-        private static Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");
+        private static readonly Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");
 
         public static string RemoveSpecial(in string input)
         {

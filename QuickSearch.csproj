@@ -64,7 +64,10 @@
     <Compile Include="Controls\AnimatedScrollViewer.cs" />
     <Compile Include="Controls\AutoScrollViewer.cs" />
     <Compile Include="Converters\ElementToRelativeRectConverter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Settings\Hotkey.cs" />
     <Compile Include="HotkeyHelper.cs" />
+    <Compile Include="Settings\ITADShopOption.cs" />
     <Compile Include="Models\ITAD.cs" />
     <Compile Include="Models\SchemaHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -79,7 +82,8 @@
     <Compile Include="Matching.cs" />
     <Compile Include="SearchItems\GameSearchItem.cs" />
     <Compile Include="SearchPlugin.cs" />
-    <Compile Include="SearchSettings.cs" />
+    <Compile Include="Settings\AssemblyOptions.cs" />
+    <Compile Include="Settings\SearchSettings.cs" />
     <Compile Include="Views\PopupWindow.xaml.cs">
       <DependentUpon>PopupWindow.xaml</DependentUpon>
     </Compile>

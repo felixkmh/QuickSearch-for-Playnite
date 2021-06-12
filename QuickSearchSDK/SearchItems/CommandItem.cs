@@ -27,21 +27,21 @@ namespace QuickSearch.SearchItems
         /// </summary>
         /// <param name="name">Display name.</param>
         /// <param name="action">Action to execute.</param>
-        /// <param name="descripton">Item description.</param>
+        /// <param name="description">Item description.</param>
         /// <param name="actionName">Short display name of the action.</param>
         /// <param name="iconPath">Path to an icon.</param>
-        public CommandItem(string name, Action action, string descripton = null, string actionName = "Run", string iconPath = null)
+        public CommandItem(string name, Action action, string description = null, string actionName = "Run", string iconPath = null)
         {
             TopLeft = name;
-            BottomLeft = descripton;
+            BottomLeft = description;
 
             if (!string.IsNullOrWhiteSpace(name))
             {
                 Keys.Add(new CommandItemKey { Key = name, Weight = 1f });
             }
-            if (!string.IsNullOrWhiteSpace(descripton))
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                Keys.Add(new CommandItemKey { Key = descripton, Weight = 1f });
+                Keys.Add(new CommandItemKey { Key = description, Weight = 1f });
             }
 
             if (action is Action)
@@ -63,20 +63,20 @@ namespace QuickSearch.SearchItems
         /// </summary>
         /// <param name="name">Display name.</param>
         /// <param name="actions">Actions to execute.</param>
-        /// <param name="descripton">Item description.</param>
+        /// <param name="description">Item description.</param>
         /// <param name="iconPath">Path to icon.</param>
-        public CommandItem(string name, IList<CommandAction> actions, string descripton = null, string iconPath = null)
+        public CommandItem(string name, IList<CommandAction> actions, string description = null, string iconPath = null)
         {
             TopLeft = name;
-            BottomLeft = descripton;
+            BottomLeft = description;
 
             if (!string.IsNullOrWhiteSpace(name))
             {
                 Keys.Add(new CommandItemKey { Key = name, Weight = 1f });
             }
-            if (!string.IsNullOrWhiteSpace(descripton))
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                Keys.Add(new CommandItemKey { Key = descripton, Weight = 0.9f });
+                Keys.Add(new CommandItemKey { Key = description, Weight = 0.9f });
             }
 
             if (actions is IList<CommandAction>)
@@ -95,6 +95,41 @@ namespace QuickSearch.SearchItems
                 }
             }
         }
+        /// <summary>
+        /// Create a simple command item.
+        /// </summary>
+        /// <param name="name">Display name.</param>
+        /// <param name="action">Action to execute.</param>
+        /// <param name="description">Item description.</param>
+        /// <param name="iconPath">Path to icon.</param>
+        public CommandItem(string name, ISearchAction<string> action, string description = null, string iconPath = null)
+        {
+            TopLeft = name;
+            BottomLeft = description;
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                Keys.Add(new CommandItemKey { Key = name, Weight = 1f });
+            }
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                Keys.Add(new CommandItemKey { Key = description, Weight = 0.9f });
+            }
+
+            if (action is ISearchAction<string>)
+            {
+                Actions.Add(action);
+            }
+
+            if (!string.IsNullOrEmpty(iconPath))
+            {
+                if (Uri.TryCreate(iconPath, UriKind.RelativeOrAbsolute, out var uri))
+                {
+                    Icon = uri;
+                }
+            }
+        }
+
         /// <inheritdoc cref="ISearchItem{TKey}.Keys"/>
         public IList<ISearchKey<string>> Keys { get; set; } = new List<ISearchKey<string>>();
         /// <inheritdoc cref="ISearchItem{TKey}.Actions"/>
@@ -119,6 +154,11 @@ namespace QuickSearch.SearchItems
     /// <inheritdoc cref="ISearchItemSource{TKey}"/>
     public class CommandItemSource : ISearchItemSource<string>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public CommandItemSource() { }
+
         /// <summary>
         /// List holding the search items.
         /// </summary>
@@ -155,7 +195,7 @@ namespace QuickSearch.SearchItems
         /// Action to be executed.
         /// </summary>
         public Action Action { get; set; }
-
+        /// <inheritdoc cref="ISearchAction{TKey}"/>
         public bool CloseAfterExecute { get; set; } = true;
 
 #pragma warning disable CS0067
@@ -173,16 +213,18 @@ namespace QuickSearch.SearchItems
             Action?.Invoke();
         }
     }
-
+    /// <inheritdoc cref="ISubItemsAction{TKey}"/>
     public class SubItemsAction : CommandAction, ISubItemsAction<string>
     {
+        /// <inheritdoc cref="ISubItemsAction{TKey}.SubItemSource"/>
         public ISearchSubItemSource<string> SubItemSource { get; set; } = new SubItemsSource();
     }
-
+    /// <inheritdoc cref="ISearchItemSource{TKey}"/>
     public class SubItemsSource : CommandItemSource, ISearchSubItemSource<string>
     {
+        /// <inheritdoc cref="ISearchSubItemSource{TKey}.Prefix"/>
         public string Prefix { get; set; }
-
+        /// <inheritdoc cref="ISearchSubItemSource{TKey}.DisplayAllIfQueryIsEmpty"/>
         public bool DisplayAllIfQueryIsEmpty => true;
     }
 

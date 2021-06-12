@@ -12,7 +12,8 @@ using System.Windows.Input;
 namespace QuickSearch.SearchItems
 {
     /// <summary>
-    /// 
+    /// A candidate is a potential search result that might be 
+    /// displayed, depending on the <see cref="Score"/>.
     /// </summary>
     public class Candidate
     {
@@ -74,16 +75,23 @@ namespace QuickSearch.SearchItems
         /// </summary>
         string Name { get; }
 
+        /// <summary>
+        /// Indicate whether the search window should
+        /// close after executing this action.
+        /// </summary>
         bool CloseAfterExecute { get; }
     }
     /// <summary>
-    /// 
+    /// <see cref="ISearchAction{TKey}"/> with additional SubItemSource that
+    /// is loaded in when action is executed. While a SubItemSource is active,
+    /// all search requests are only directed towards this ItemSource.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     public interface ISubItemsAction<TKey> : ISearchAction<TKey>
     {
         /// <summary>
-        /// 
+        /// The ItemSource to be used as the only ItemSource
+        /// after this action was executed.
         /// </summary>
         ISearchSubItemSource<TKey> SubItemSource { get; }
     }
@@ -166,13 +174,14 @@ namespace QuickSearch.SearchItems
         char? IconChar { get; }
     }
     /// <summary>
-    /// 
+    /// A <see cref="ISearchItemSource{TKey}"/> that also supplies a 
+    /// prefix that is displayed in front of the search query if active.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     public interface ISearchSubItemSource<TKey> : ISearchItemSource<TKey>
     {
         /// <summary>
-        /// String displayed in front of sub search query.
+        /// String displayed in front of sub search query followed by a space.
         /// </summary>
         string Prefix { get; }
         /// <summary>

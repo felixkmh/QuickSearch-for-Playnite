@@ -142,14 +142,14 @@ namespace QuickSearch.SearchItems
         public IEnumerable<ISearchItem<string>> GetItems(string query)
         {
             GameActions.Clear();
-            if (SearchPlugin.Instance.settings.EnableExternalGameActions)
+            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
             {
                 foreach (var item in QuickSearchSDK.gameActions)
                 {
                     var extracted = GetAssemblyName(item.Key);
                     var assembly = extracted.Item1;
                     var name = extracted.Item2;
-                    if (SearchPlugin.Instance.settings.EnabledAssemblies[assembly].Actions)
+                    if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
                     {
                         GameActions.Add(new GameAction() { Name = name, Action = item.Value });
                     }
@@ -158,7 +158,7 @@ namespace QuickSearch.SearchItems
             return SearchPlugin.Instance.PlayniteApi.Database.Games.Select(g =>
             {
                 var item = new GameSearchItem(g);
-                if (SearchPlugin.Instance.settings.EnableExternalGameActions)
+                if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
                 {
                     foreach (var action in GameActions)
                     {
@@ -240,10 +240,12 @@ namespace QuickSearch.SearchItems
             {
                 if (actions == null)
                 {
-                    var action = new ContextAction();
-                    action.Name = game.IsInstalled ?
+                    var action = new ContextAction
+                    {
+                        Name = game.IsInstalled ?
                         Application.Current.FindResource("LOCPlayGame") as string :
-                        Application.Current.FindResource("LOCInstallGame") as string;
+                        Application.Current.FindResource("LOCInstallGame") as string
+                    };
                     actions = new List<ISearchAction<string>> { action };
                 }
                 return actions;
@@ -259,8 +261,8 @@ namespace QuickSearch.SearchItems
         {
             get
             {
-                if (!string.IsNullOrEmpty(game.Icon)) { 
-                    string path = null;
+                if (!string.IsNullOrEmpty(game.Icon)) {
+                    string path;
                     if (IsURL(game.Icon) || Path.IsPathRooted(game.Icon))
                     {
                         path = game.Icon;

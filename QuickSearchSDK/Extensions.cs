@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace QuickSearch
 {
+    /// <summary>
+    /// Some utility extensions.
+    /// </summary>
     public static class Extensions
     {
         internal static readonly HashSet<Type> NumberTypes = new HashSet<Type>
@@ -23,6 +26,11 @@ namespace QuickSearch
             typeof(float)
         };
 
+        /// <summary>
+        /// Checks whether a type is primitve number type.
+        /// </summary>
+        /// <param name="type">Type to check.</param>
+        /// <returns><see langword="true"/>, if <paramref name="type"/> is a primitive number type. <see langword="false"/> otherwise.</returns>
         public static bool IsNumberType(this Type type)
         {
             return NumberTypes.Contains(type);

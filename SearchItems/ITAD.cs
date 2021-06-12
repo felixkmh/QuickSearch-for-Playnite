@@ -28,18 +28,18 @@ namespace QuickSearch.SearchItems
             return null;
         }
 
-        string baseUrl = @"https://api.isthereanydeal.com/";
+        readonly string baseUrl = @"https://api.isthereanydeal.com/";
 
-        string makeSearchQuery(string name)
+        string MakeSearchQuery(string name)
         {
             return baseUrl + $"v02/search/search/?key={Properties.Resources.ITAD}&q={Uri.EscapeDataString(name)}&limit=20";
         }
 
-        string makePriceQuery(string plain)
+        string MakePriceQuery(string plain)
         {
             var c = string.IsNullOrEmpty(country) ? string.Empty : $"&country={Uri.EscapeDataString(country)}";
             var r = string.IsNullOrEmpty(region) ? string.Empty : $"&region={Uri.EscapeDataString(region)}";
-            var shops = SearchPlugin.Instance.settings.EnabledITADShops.Where(s => s.Value.Enabled).Select(s => s.Key);
+            var shops = SearchPlugin.Instance.Settings.EnabledITADShops.Where(s => s.Value.Enabled).Select(s => s.Key);
             return baseUrl + $"v01/game/prices/?key={Properties.Resources.ITAD}&plains={Uri.EscapeDataString(plain)}{r}{c}&shops={Uri.EscapeDataString(string.Join(",", shops))}";
         }
 
@@ -84,15 +84,15 @@ namespace QuickSearch.SearchItems
                                 var stores = JsonConvert.DeserializeObject<RegionStoresResponse>(storesResponse);
                                 foreach(var store in stores.Data)
                                 {
-                                    if (!SearchPlugin.Instance.settings.EnabledITADShops.ContainsKey(store.ID))
+                                    if (!SearchPlugin.Instance.Settings.EnabledITADShops.ContainsKey(store.ID))
                                     {
-                                        SearchPlugin.Instance.settings.EnabledITADShops.Add(store.ID, new SearchSettings.ITADShopOption(store.Title) { Enabled = defaultStores.Contains(store.ID)});
+                                        SearchPlugin.Instance.Settings.EnabledITADShops.Add(store.ID, new SearchSettings.ITADShopOption(store.Title) { Enabled = defaultStores.Contains(store.ID)});
                                     }
                                 }
-                                var toRemove = SearchPlugin.Instance.settings.EnabledITADShops.Keys.ToArray().Where(key => !stores.Data.Any(s => s.ID == key)).ToArray();
+                                var toRemove = SearchPlugin.Instance.Settings.EnabledITADShops.Keys.ToArray().Where(key => !stores.Data.Any(s => s.ID == key)).ToArray();
                                 foreach (var key in toRemove)
                                 {
-                                    SearchPlugin.Instance.settings.EnabledITADShops.Remove(key);
+                                    SearchPlugin.Instance.Settings.EnabledITADShops.Remove(key);
                                 }
                             }
 
@@ -113,11 +113,11 @@ namespace QuickSearch.SearchItems
         string region = null;
         string country = null;
         string currencySign = null;
-        List<string> defaultStores = new List<string>() { "steam", "battlenet", "gog", "microsoft", "origin", "squenix", "uplay", "epic"};
+        readonly List<string> defaultStores = new List<string>() { "steam", "battlenet", "gog", "microsoft", "origin", "squenix", "uplay", "epic"};
 
         public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
         {
-            if (!SearchPlugin.Instance.settings.ITADEnabled)
+            if (!SearchPlugin.Instance.Settings.ITADEnabled)
             {
                 return null;
             }
@@ -127,8 +127,8 @@ namespace QuickSearch.SearchItems
                 {
                     GetRegion();
                 }
-                bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.settings.ITADThreshold;
-                bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.settings.ITADOverride);
+                bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.Settings.ITADThreshold;
+                bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.Settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.Settings.ITADOverride);
                 if (!isBelowThreshold && !overrideStringPresent || string.IsNullOrWhiteSpace(query))
                 {
                     return null;
@@ -137,14 +137,14 @@ namespace QuickSearch.SearchItems
                 var deals = new List<ISearchItem<string>>();
                 if (!isBelowThreshold && overrideStringPresent)
                 {
-                    input = query.Substring(0, query.Length - SearchPlugin.Instance.settings.ITADOverride.Length);
+                    input = query.Substring(0, query.Length - SearchPlugin.Instance.Settings.ITADOverride.Length);
                 }
 
                 using (var client = new HttpClient())
                 {
                     try
                     {
-                        var response = client.GetStringAsync(makeSearchQuery(input)).Result;
+                        var response = client.GetStringAsync(MakeSearchQuery(input)).Result;
                         var json = JObject.Parse(response);
                         if (json.IsValid(SearchResponse.Schema))
                         {
@@ -157,7 +157,7 @@ namespace QuickSearch.SearchItems
 
                                 if (games.Count() > 0)
                                 {
-                                    var prices = client.GetStringAsync(makePriceQuery(plains)).Result;
+                                    var prices = client.GetStringAsync(MakePriceQuery(plains)).Result;
                                     var pricesJson = JObject.Parse(prices);
                                     if (pricesJson.IsValid(PricesResponse.Schema))
                                     {
@@ -198,7 +198,7 @@ namespace QuickSearch.SearchItems
                             }
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception e) { SearchPlugin.logger.Debug(e, "Failed request to ITAD"); }
                 }
                 return deals.AsEnumerable();
             });

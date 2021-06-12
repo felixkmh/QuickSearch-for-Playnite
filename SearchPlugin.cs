@@ -34,7 +34,7 @@ namespace QuickSearch
         public static SearchPlugin Instance { get => instance; }
         private static SearchPlugin instance;
 
-        public SearchSettings settings { get; set; }
+        public SearchSettings Settings { get; set; }
 
         private InputBinding HotkeyBinding { get; set; }
 
@@ -45,7 +45,7 @@ namespace QuickSearch
 
         public SearchPlugin(IPlayniteAPI api) : base(api)
         {
-            settings = new SearchSettings(this);
+            Settings = new SearchSettings(this);
             instance = this;
         }
 
@@ -57,7 +57,7 @@ namespace QuickSearch
                 var handle = mainWindowHandle;
                 source.AddHook(GlobalHotkeyCallback);
                 globalHotkeyRegistered = true;
-                return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcutGlobal.Key));
+                return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
             }
             return true;
         }
@@ -141,7 +141,7 @@ namespace QuickSearch
 #pragma warning disable CS0067
             public event EventHandler CanExecuteChanged;
 #pragma warning restore CS0067
-            private Action action;
+            private readonly Action action;
 
             public bool CanExecute(object parameter)
             {
@@ -192,7 +192,7 @@ namespace QuickSearch
 
         private IntPtr GlobalHotkeyCallback(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (settings.EnableGlobalHotkey)
+            if (Settings.EnableGlobalHotkey)
             {
                 const int WM_HOTKEY = 0x0312;
                 switch (msg)
@@ -202,7 +202,7 @@ namespace QuickSearch
                         {
                             case HOTKEY_ID:
                                 uint vkey = ((uint)lParam >> 16) & 0xFFFF;
-                                if (vkey == (uint)KeyInterop.VirtualKeyFromKey(settings.SearchShortcutGlobal.Key))
+                                if (vkey == (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key))
                                 {
                                     ToggleSearch();
                                     if (popup.IsOpen)
@@ -236,21 +236,23 @@ namespace QuickSearch
             // Add code to be executed when Playnite is initialized.
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
-                settings.SettingsChanged += OnSettingsChanged;
+                Settings.SettingsChanged += OnSettingsChanged;
                 mainWindow = Application.Current.MainWindow;
                 windowInterop = new WindowInteropHelper(mainWindow);
                 mainWindowHandle = windowInterop.Handle;
                 source = HwndSource.FromHwnd(mainWindowHandle);
-                if (settings.EnableGlobalHotkey)
+                if (Settings.EnableGlobalHotkey)
                 {
                     RegisterGlobalHotkey();
                 }
 
-                HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(settings.SearchShortcut.Key, settings.SearchShortcut.Modifiers));
+                HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(Settings.SearchShortcut.Key, Settings.SearchShortcut.Modifiers));
                 mainWindow.InputBindings.Add(HotkeyBinding);
-                CommandItem addGameCommand = new CommandItem((string)Application.Current.FindResource("LOCAddGames"), new List<CommandAction>(), "Add Games");
-                addGameCommand.IconChar = IconChars.GameConsole;
-                foreach(InputBinding binding in mainWindow.InputBindings)
+                CommandItem addGameCommand = new CommandItem((string)Application.Current.FindResource("LOCAddGames"), new List<CommandAction>(), "Add Games")
+                {
+                    IconChar = IconChars.GameConsole
+                };
+                foreach (InputBinding binding in mainWindow.InputBindings)
                 {
                     if (binding.Gesture is KeyGesture keyGesture)
                     {
@@ -358,7 +360,7 @@ namespace QuickSearch
                 { 
                     IconChar = IconChars.Settings 
                 };
-                var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch Settings", Settings = settings};
+                var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch Settings", Settings = Settings};
                 var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
                 settingsCommand.Actions = new ISearchAction<string>[] { subItemsAction };
                 subItemsAction.SubItemSource = subItemsSource;
@@ -403,20 +405,20 @@ namespace QuickSearch
                     searchWindow.SearchResults.Items.Refresh();
                     foreach (var assembly in QuickSearchSDK.registeredAssemblies)
                     {
-                        if (!settings.EnabledAssemblies.ContainsKey(assembly))
+                        if (!Settings.EnabledAssemblies.ContainsKey(assembly))
                         {
-                            settings.EnabledAssemblies.Add(assembly, new SearchSettings.AssemblyOptions());
+                            Settings.EnabledAssemblies.Add(assembly, new AssemblyOptions());
                         }
                     }
 
-                    UpdateBorder(settings.OuterBorderThickness);
+                    UpdateBorder(Settings.OuterBorderThickness);
 
                     var sources = searchItemSources.Values.AsEnumerable();
 
-                    if (settings.EnableExternalItems)
+                    if (Settings.EnableExternalItems)
                     {
                         sources = sources.Concat(QuickSearchSDK.searchItemSources
-                        .Where(e => SearchPlugin.Instance.settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
+                        .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
                         .Select(e => e.Value));
                     }
 
@@ -445,7 +447,7 @@ namespace QuickSearch
                 searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
                 popup.InputBindings.Add(HotkeyBinding);
-                if (settings.EnableGlassEffect)
+                if (Settings.EnableGlassEffect)
                 {
                     EnableGlassEffect();
                 } else
@@ -461,7 +463,7 @@ namespace QuickSearch
             }
             if (mainWindow.IsActive && mainWindow.WindowState != WindowState.Minimized)
             {
-                if (settings.EnableGlassEffect && !glassActive)
+                if (Settings.EnableGlassEffect && !glassActive)
                 {
                     EnableGlassEffect();
                 }
@@ -509,11 +511,11 @@ namespace QuickSearch
         {
             if (searchWindow != null)
             {
-                searchWindow.WindowGrid.Margin = new Thickness(settings.OuterBorderThickness);
+                searchWindow.WindowGrid.Margin = new Thickness(Settings.OuterBorderThickness);
                 searchWindow.GlassTint.Visibility = Visibility.Visible;
                 searchWindow.Noise.Visibility = Visibility.Visible;
                 var margin = searchWindow.SearchResults.Margin;
-                margin.Top = settings.OuterBorderThickness + 8;
+                margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
                 var visual = (FrameworkElement)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
                 visual = (FrameworkElement)VisualTreeHelper.GetChild(visual, 0);
@@ -542,11 +544,11 @@ namespace QuickSearch
         {
             if (searchWindow != null)
             {
-                searchWindow.WindowGrid.Margin = new Thickness(settings.OuterBorderThickness);
+                searchWindow.WindowGrid.Margin = new Thickness(Settings.OuterBorderThickness);
                 searchWindow.GlassTint.Visibility = Visibility.Hidden;
                 searchWindow.Noise.Visibility = Visibility.Hidden;
                 var margin = searchWindow.SearchResults.Margin;
-                margin.Top = settings.OuterBorderThickness + 8;
+                margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
                 searchWindow.BackgroundBorder.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
                 searchWindow.HeaderBorder.Background = new SolidColorBrush { Color = Colors.Black, Opacity = 0.25 };
@@ -563,7 +565,7 @@ namespace QuickSearch
         {
             // Add code to be executed when Playnite is shutting down.
             HotkeyHelper.UnregisterHotKey(mainWindowHandle, HOTKEY_ID);
-            SavePluginSettings(settings);
+            SavePluginSettings(Settings);
         }
 
         public override void OnLibraryUpdated()
@@ -573,7 +575,7 @@ namespace QuickSearch
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return settings;
+            return Settings;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)
