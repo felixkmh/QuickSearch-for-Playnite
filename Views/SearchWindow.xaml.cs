@@ -236,6 +236,7 @@ namespace QuickSearch
 
                 if (cancellationToken.IsCancellationRequested)
                 {
+                    searchSw.Stop();
                     return;
                 }
                 int maxResults = 0;
@@ -284,6 +285,8 @@ namespace QuickSearch
                         ++passes;
                         if (cancellationToken.IsCancellationRequested)
                         {
+                            searchSw.Stop();
+                            sw.Stop();
                             return;
                         }
 
@@ -333,7 +336,8 @@ namespace QuickSearch
                                     break;
                                 }
                                 sw.Stop();
-                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < 16);
+                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < 15);
+                            sw.Stop();
                             maxC = Math.Max(maxC, c);
                         }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     }
@@ -342,6 +346,7 @@ namespace QuickSearch
 
                 if (cancellationToken.IsCancellationRequested)
                 {
+                    searchSw.Stop();
                     return;
                 }
 
@@ -357,7 +362,7 @@ namespace QuickSearch
                     }
                     UpdateListBox(ListDataContext.Count);
 
-                }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Background);
+                }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
 
                 Dispatcher.Invoke(() =>
                 {
