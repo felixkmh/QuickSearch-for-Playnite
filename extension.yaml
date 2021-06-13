@@ -1,7 +1,13 @@
 ﻿Id: felixkmh_Search_Extension
 Name: QuickSearch
 Author: felixkmh
-Version: 1.4.1
+Version: 1.5.0
 Module: QuickSearch.dll
 Type: GenericPlugin
-Icon: icon.png
+Icon: QuickSearch.png
+Links:
+  - Name: GitHub
+    Url: https://github.com/felixkmh/QuickSearch-for-Playnite
+UpdaterConfig:
+  GitHubUser: felixkmh
+  GitHubRepo: QuickSearch-for-Playnite

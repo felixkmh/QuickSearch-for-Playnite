@@ -1,34 +1,21 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
+using QuickSearch.Attributes;
+using QuickSearch.SearchItems.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace QuickSearch
 {
-    public class SearchSettings : ISettings
+    public partial class SearchSettings : ISettings
     {
         private readonly SearchPlugin plugin;
-
-        public class Hotkey : IEquatable<Hotkey>
-        {
-            public Hotkey(Key key, ModifierKeys modifier)
-            {
-                this.Key = key;
-                this.Modifiers = modifier;
-            }
-            public Key Key { get; set; }
-            public ModifierKeys Modifiers { get; set; }
-
-            public bool Equals(Hotkey other)
-            {
-                return Key == other.Key && Modifiers == other.Modifiers;
-            }
-        }
 
         public static void CopyProperties(SearchSettings from, SearchSettings to)
         {
@@ -37,7 +24,7 @@ namespace QuickSearch
                 return;
             }
             var type = typeof(SearchSettings);
-            foreach(var property in type.GetProperties())
+            foreach (var property in type.GetProperties())
             {
                 if (property.CanRead && property.CanWrite && !Attribute.IsDefined(property, typeof(JsonIgnoreAttribute)))
                 {
@@ -65,72 +52,58 @@ namespace QuickSearch
             }
             return false;
         }
-
+        [GenericOption("Search Hotkey")]
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);
+        [GenericOption("Global Search Hotkey")]
         public Hotkey SearchShortcutGlobal { get; set; } = new Hotkey(Key.F, ModifierKeys.Control | ModifierKeys.Alt);
         public string HotkeyText { get; set; } = string.Empty;
         public string HotkeyTextGlobal { get; set; } = string.Empty;
 
+        [NumberOption("Search Threshold", Min = 0, Max = 1, Tick = 0.01f)]
         public double Threshold { get; set; } = 0.55;
-
-        public bool ExpandAllItems { get; set; } = true;
+        [GenericOption("Expand all items", Description = "If enabled, always show more detailed version of items.")]
+        public bool ExpandAllItems 
+        {
+            get => expandAllItems;
+            set { expandAllItems = value; plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
+        }
+        [GenericOption("Show Seperator", Description = "If enabled, show line inbetween items.")]
         public bool ShowSeperator { get; set; } = false;
+        [GenericOption("Add Items With Lower Priority")]
         public bool IncrementalUpdate { get; set; } = false;
+        [NumberOption("Maximum number of results", Min = 0, Tick = 1)]
         public int MaxNumberResults { get; set; } = 20;
+        [GenericOption("Enable External GameActions")]
         public bool EnableExternalGameActions { get; set; } = true;
+        [GenericOption("Enable External SearchItems")]
         public bool EnableExternalItems { get; set; } = true;
+        [NumberOption("Delay until requesting async items", Min = 10, Max = 1000, Tick = 10f)]
         public int AsyncItemsDelay { get; set; } = 500;
         public SortedDictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new SortedDictionary<string, AssemblyOptions>();
         public float PrioritizationThreshold { get; set; } = 0.55f;
         public int MaxPrioritizedGames { get; set; } = 1;
+        [GenericOption("Prioritize Installation Status for Sorting")]
         public bool InstallationStatusFirst { get; set; } = true;
+        [NumberOption("ITAD Threshold", Min = 0, Max = 1, Tick = 0.01f)]
         public float ITADThreshold { get; set; } = 0.75f;
         public string ITADOverride { get; set; } = "+";
+        [GenericOption("Enable ITAD Search")]
         public bool ITADEnabled { get; set; } = true;
         public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
-        public bool EnableGlassEffect { get; set; } = true;
-        public int OuterBorderThickness { get; set; } = 12;
-        public bool EnableGlobalHotkey { get; set; } = false;
-        
-
-        public class AssemblyOptions : IEquatable<AssemblyOptions>
+        [GenericOption("Glass Effect", Description = "If enabled, blur background under the search window.")]
+        public bool EnableGlassEffect { get => enableGlassEffect; set { enableGlassEffect = value; if (value) SearchPlugin.Instance?.EnableGlassEffect(); else SearchPlugin.Instance?.DisableGlassEffect(); } }
+        private bool enableGlassEffect = true;
+        [NumberOption("Border Thickness", Min = 0, Max = 30, Tick = 1)]
+        public int OuterBorderThickness
         {
-            public bool Items { get; set; } = true;
-            public bool Actions { get; set; } = true;
-
-            public bool Equals(AssemblyOptions other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-                return Items == other.Items && Actions == other.Actions;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj is AssemblyOptions options)
-                {
-                    return Equals(options);
-                }
-                return false;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
+            get => outerBorderThickness;
+            set { outerBorderThickness = value; plugin?.UpdateBorder(value); plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
         }
-
-        public class ITADShopOption
-        {
-            public ITADShopOption(string name)
-            {
-                Name = name;
-            }
-            public string Name { get; set; }
-            public bool Enabled { get; set; } = true;
-        }
+        [GenericOption("Enable Filter-SubItemSources")]
+        public bool EnableFilterSubSources { get; set; } = true;
+        [GenericOption("Enable Global Hotkey")]
+        public bool EnableGlobalHotkey { get => enableGlobalHotkey; set { enableGlobalHotkey = value; if (value) SearchPlugin.Instance?.RegisterGlobalHotkey(); else SearchPlugin.Instance?.UnregisterGlobalHotkey(); } }
+        private bool enableGlobalHotkey = false;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
@@ -138,7 +111,7 @@ namespace QuickSearch
         // Parameterless constructor must exist if you want to use LoadPluginSettings method.
         public SearchSettings()
         {
-            
+
         }
 
         public SearchSettings(SearchPlugin plugin)
@@ -156,7 +129,9 @@ namespace QuickSearch
             }
         }
 
-        private SearchSettings previousSettings = null; 
+        private SearchSettings previousSettings = null;
+        private int outerBorderThickness = 12;
+        private bool expandAllItems = true;
 
         public void BeginEdit()
         {
@@ -183,8 +158,8 @@ namespace QuickSearch
             changed |= EnabledAssemblies.Keys
                 .Concat(previousSettings.EnabledAssemblies.Keys)
                 .Aggregate(false, (v, key) => v || !(EnabledAssemblies
-                    .Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault()?.Equals( 
-                    previousSettings.EnabledAssemblies.Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault())??true));
+                    .Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault()?.Equals(
+                    previousSettings.EnabledAssemblies.Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault()) ?? true));
             if (changed)
                 SettingsChanged?.Invoke(this, previousSettings);
             previousSettings = null;

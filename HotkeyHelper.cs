@@ -18,6 +18,7 @@ namespace QuickSearch
 
         public static uint WM_HOTKEY = 0x0312;
 
+        [Flags]
         public enum Mod : uint
         {
             NONE = 0x0000,

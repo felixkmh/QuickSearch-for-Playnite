@@ -64,7 +64,11 @@
     <Compile Include="Controls\AnimatedScrollViewer.cs" />
     <Compile Include="Controls\AutoScrollViewer.cs" />
     <Compile Include="Converters\ElementToRelativeRectConverter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="MultiFilter.cs" />
+    <Compile Include="Settings\Hotkey.cs" />
     <Compile Include="HotkeyHelper.cs" />
+    <Compile Include="Settings\ITADShopOption.cs" />
     <Compile Include="Models\ITAD.cs" />
     <Compile Include="Models\SchemaHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -79,7 +83,8 @@
     <Compile Include="Matching.cs" />
     <Compile Include="SearchItems\GameSearchItem.cs" />
     <Compile Include="SearchPlugin.cs" />
-    <Compile Include="SearchSettings.cs" />
+    <Compile Include="Settings\AssemblyOptions.cs" />
+    <Compile Include="Settings\SearchSettings.cs" />
     <Compile Include="Views\PopupWindow.xaml.cs">
       <DependentUpon>PopupWindow.xaml</DependentUpon>
     </Compile>
@@ -120,11 +125,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="QuickSearchSDK.Attributes\QuickSearchSDK.Attributes.csproj">
+      <Project>{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}</Project>
+      <Name>QuickSearchSDK.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="QuickSearchSDK\QuickSearchSDK.csproj">
       <Project>{0425a0c6-c410-48fc-8218-6f7b124eeca5}</Project>
       <Name>QuickSearchSDK</Name>
@@ -138,6 +142,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\noise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="QuickSearch.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

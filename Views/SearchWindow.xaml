@@ -20,6 +20,78 @@
         <TextBlock x:Key="LoadingTextIcon" Text="&#xeffa;" FontFamily="{DynamicResource FontIcoFont}" Style="{StaticResource {x:Type TextBlock}}" FontSize="50"/>
         <SolidColorBrush x:Key="PopupBackgroundBrush" Color="{DynamicResource PopupBackgroundColor}" Opacity="0.4"/>
         <ImageBrush x:Key="NoiseTextureBrush" ImageSource="pack://application:,,,/QuickSearch;component/Images/noise.png" Viewport="0,0,100,100" ViewportUnits="Absolute" TileMode="Tile" Opacity="0.4"/>
+        <DrawingImage x:Key="LoadingDrawingImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup ClipGeometry="M0,0 V256 H256 V0 H0 Z">
+                    <DrawingGroup Opacity="1" Transform="-1,0,0,1,256,0">
+                        <GeometryDrawing>
+                            <GeometryDrawing.Brush>
+                                <SolidColorBrush Color="{DynamicResource TextColor}" Opacity="0" />
+                            </GeometryDrawing.Brush>
+                            <GeometryDrawing.Geometry>
+                                <EllipseGeometry RadiusX="128" RadiusY="128" Center="128,128" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <DrawingGroup Opacity="1" Transform="2.0242,0,0,2.0242,-3.4533,-138.868">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="1.76394,0,0,1.76394,28.6097,-169.797">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="1.51394,0,0,1.51394,98.6924,-163.862">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="1.26394,0,0,1.26394,168.775,-103.878">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="1.01394,0,0,1.01394,200.639,-5.67553">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="0.751435,1.66852E-16,-1.66852E-16,0.751435,178.696,94.1751">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="0.526435,-1.20473E-17,1.20473E-17,0.526435,117.809,150.863">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                        <DrawingGroup Opacity="1" Transform="0.251435,0,0,0.251435,57.8895,160.094">
+                            <GeometryDrawing Brush="{DynamicResource TextBrush}">
+                                <GeometryDrawing.Geometry>
+                                    <EllipseGeometry RadiusX="13.351" RadiusY="13.351" Center="19.359,131.838" />
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                    </DrawingGroup>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
     </UserControl.Resources>
     <Grid x:Name="BackgroundGrid">
         <Border CornerRadius="15" x:Name="OutsideBorder" HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -56,7 +128,7 @@
                     Margin="{Binding Margin, ElementName=WindowGrid}"
                     />
         </Border>
-        <Grid Width="650"  Height="460" x:Name="WindowGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12">
+        <Grid Width="660"  Height="460" x:Name="WindowGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -76,20 +148,19 @@
                        VerticalAlignment="Center" 
                        FontSize="18"
                        Margin="6" Padding="1"/>
-            <TextBlock x:Name="LoadIcon" Text="&#xeffa;" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
-                       FontFamily="{DynamicResource FontIcoFont}" 
+            <Image x:Name="LoadIcon" Source="{StaticResource LoadingDrawingImage}" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Stretch="Uniform"
+                       Width="{Binding ActualHeight, ElementName=SearchIcon}"
+                       Height="{Binding ActualHeight, ElementName=SearchIcon}"
                        HorizontalAlignment="Left" 
-                       TextAlignment="Center" 
-                       Foreground="{DynamicResource TextBrush}" 
                        VerticalAlignment="Center" 
-                       FontSize="22"
-                       Margin="6" Padding="1"
-                       RenderTransformOrigin="0.477, 0.509772727"
-                       >
-                <TextBlock.RenderTransform>
+                       Margin="6"
+                       RenderTransformOrigin="0.5, 0.5"
+                       RenderOptions.BitmapScalingMode="Fant">
+                <Image.RenderTransform>
                     <RotateTransform x:Name="IconRotation"/>
-                </TextBlock.RenderTransform>
-                <TextBlock.Triggers>
+                </Image.RenderTransform>
+                <Image.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
                         <BeginStoryboard>
                             <Storyboard x:Name="Loading">
@@ -99,8 +170,8 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
-                </TextBlock.Triggers>
-            </TextBlock>
+                </Image.Triggers>
+            </Image>
             <ListBox x:Name="ActionsListBox" Height="{Binding ActualHeight, ElementName=SearchBox}" Grid.Row="0" HorizontalAlignment="Right"
                      ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Actions}" 
                      ScrollViewer.CanContentScroll="False"
@@ -111,7 +182,7 @@
                      Visibility="Hidden"
                      BorderBrush="Transparent"
                      BorderThickness="0"
-                     >
+                     Focusable="False">
                 <!--<ListBox.OpacityMask>
                     <VisualBrush Visual="{Binding ElementName=SearchBox}" AutoLayoutContent="True" Stretch="None" AlignmentX="Right" AlignmentY="Center">
                         <VisualBrush.Transform>
@@ -128,7 +199,7 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <controls:ActionButton Command="{Binding .}" ClipToBounds="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                        <controls:ActionButton Click="ActionButton_Click"  ClipToBounds="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                 Content="{Binding Name}"
                                 local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem}"
                                 MouseEnter="ActionButton_MouseEnter"
@@ -164,7 +235,8 @@
                      Visibility="Collapsed"
                      Background="Transparent"
                      BorderBrush="Transparent"
-                     BorderThickness="0">
+                     BorderThickness="0"
+                     >
                 <ListBox.Resources>
                     <SolidColorBrush x:Key="GlyphBrush" Color="{DynamicResource GlyphColor}" Opacity="0.5"/>
                     <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource HighlightGlyphColor}" Opacity="0.5"/>
@@ -177,9 +249,14 @@
                                             KeyboardNavigation.IsTabStop="False"
                                             MouseDown="ItemClicked"
                                             Padding="0,1"
-                                            />
+                                            Focusable="False"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
         </Grid>
     </Grid>

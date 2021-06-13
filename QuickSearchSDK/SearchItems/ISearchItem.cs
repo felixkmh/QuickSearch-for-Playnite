@@ -12,7 +12,8 @@ using System.Windows.Input;
 namespace QuickSearch.SearchItems
 {
     /// <summary>
-    /// 
+    /// A candidate is a potential search result that might be 
+    /// displayed, depending on the <see cref="Score"/>.
     /// </summary>
     public class Candidate
     {
@@ -73,6 +74,26 @@ namespace QuickSearch.SearchItems
         /// Display name of the action.
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Indicate whether the search window should
+        /// close after executing this action.
+        /// </summary>
+        bool CloseAfterExecute { get; }
+    }
+    /// <summary>
+    /// <see cref="ISearchAction{TKey}"/> with additional SubItemSource that
+    /// is loaded in when action is executed. While a SubItemSource is active,
+    /// all search requests are only directed towards this ItemSource.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface ISubItemsAction<TKey> : ISearchAction<TKey>
+    {
+        /// <summary>
+        /// The ItemSource to be used as the only ItemSource
+        /// after this action was executed.
+        /// </summary>
+        ISearchSubItemSource<TKey> SubItemSource { get; }
     }
     /// <summary>
     /// Source that provides <see cref="ISearchItem{TKey}"/>.
@@ -81,9 +102,15 @@ namespace QuickSearch.SearchItems
     public interface ISearchItemSource<TKey>
     {
         /// <summary>
-        /// Returns <see cref="ISearchItem{TKey}"/>s.
+        /// Returns query independent items.
         /// </summary>
-        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case. Only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
+        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
+        IEnumerable<ISearchItem<TKey>> GetItems();
+
+        /// <summary>
+        /// Returns query dependent items.
+        /// </summary>
+        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case.</param>
         /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
         IEnumerable<ISearchItem<TKey>> GetItems(string query);
 
@@ -96,12 +123,6 @@ namespace QuickSearch.SearchItems
         /// <param name="addedItems">List of already added search item candicates sorted by score.</param>
         /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
         Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems);
-
-        /// <summary>
-        /// Indicates whether this source supplies items depending on the current search query.
-        /// Returning true unnecessarily can slow down the search.
-        /// </summary>
-        bool DependsOnQuery { get; }
     }
     /// <summary>
     /// Item that holds data on how to search for it,
@@ -151,5 +172,24 @@ namespace QuickSearch.SearchItems
         /// using the "icofont.ttf" that is included with Playnite by default.
         /// </summary>
         char? IconChar { get; }
+    }
+    /// <summary>
+    /// A <see cref="ISearchItemSource{TKey}"/> that also supplies a 
+    /// prefix that is displayed in front of the search query if active.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface ISearchSubItemSource<TKey> : ISearchItemSource<TKey>
+    {
+        /// <summary>
+        /// String displayed in front of sub search query followed by a space.
+        /// </summary>
+        string Prefix { get; }
+        /// <summary>
+        /// If <see langword="true"/> is returned, all items of this source
+        /// will be shown if the sub search query is empty.
+        /// Otherwise items are displayed only if the sub query is not empty
+        /// and their score is above the threshold set by the user.
+        /// </summary>
+        bool DisplayAllIfQueryIsEmpty { get; }
     }
 }

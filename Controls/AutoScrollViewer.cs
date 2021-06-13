@@ -58,6 +58,7 @@ namespace QuickSearch.Controls
                 storyboard.Stop(this);
                 storyboard.Remove(this);
             }
+            storyboard = null;
 
             Opacity = 1;
             HorizontalOffset = 0;
@@ -92,7 +93,7 @@ namespace QuickSearch.Controls
                 BeginTime = delay,
             };
 
-            var scrollDuration = TimeSpan.FromSeconds(2 * delay.TotalSeconds + Math.Max(horitzontalDuration.TotalSeconds, verticalDuration.TotalSeconds));
+            var scrollDuration = TimeSpan.FromSeconds((2 * delay.TotalSeconds) + Math.Max(horitzontalDuration.TotalSeconds, verticalDuration.TotalSeconds));
 
             TimeSpan opacityAnimationDuration = TimeSpan.FromSeconds(0.334);
             var opacityOutAnimation = new DoubleAnimation()

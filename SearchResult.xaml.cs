@@ -64,13 +64,13 @@ namespace QuickSearch
 
         private void SearchResult_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            AlwaysExpand = SearchPlugin.Instance.settings.ExpandAllItems;
-            Seperator.Height = SearchPlugin.Instance.settings.ShowSeperator ? 5 : 0;
+            AlwaysExpand = SearchPlugin.Instance.Settings.ExpandAllItems;
+            Seperator.Height = SearchPlugin.Instance.Settings.ShowSeperator ? 5 : 0;
         }
 
         private void GameResult_Unselected(object sender, RoutedEventArgs e)
         {
-            if (SearchPlugin.Instance.settings.ExpandAllItems)
+            if (SearchPlugin.Instance.Settings.ExpandAllItems)
             {
                 Expand();
             } else

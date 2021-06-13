@@ -33,9 +33,9 @@ namespace QuickSearch
 
         public static float GetCombinedScore(in string str1, in string str2)
         {
-            return (10 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
-                 + LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score 
-                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 12f;
+            return (6 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
+                 + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score 
+                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
         }
 
         // http://www.catalysoft.com/articles/StrikeAMatch.html
@@ -153,7 +153,7 @@ namespace QuickSearch
             }
         }
 
-        private static Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");
+        private static readonly Regex regex = new Regex("[" + Regex.Escape("&.,:;^°_`´~+!\"§$% &/()=?<>#|'’") + "\\-]");
 
         public static string RemoveSpecial(in string input)
         {

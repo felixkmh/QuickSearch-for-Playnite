@@ -1,4 +1,6 @@
-﻿using QuickSearch.SearchItems;
+﻿using QuickSearch.Attributes;
+using QuickSearch.SearchItems;
+using QuickSearch.SearchItems.Settings;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -130,18 +132,7 @@ namespace QuickSearch
                 registeredAssemblies.Add(assemblyName);
             }
 
-            var sourceName = "___UNNAMEDITEMSOURCE___";
-            var combined = $"{assemblyName}_{sourceName}";
-
-            ExternalCommandItemSource source;
-            if (searchItemSources.TryGetValue(combined, out var existing))
-            {
-                source = (ExternalCommandItemSource)existing;
-            } else
-            {
-                source = new ExternalCommandItemSource();
-                searchItemSources.TryAdd(combined, source);
-            }
+            var source = GetOrCreateSource(assemblyName);
 
             var item = new CommandItem(name, action, descripton, actionName, iconPath);
             if (!source.entries.ContainsKey(key))
@@ -172,19 +163,7 @@ namespace QuickSearch
             }
             var item = new CommandItem(name, actions, descripton, iconPath);
 
-            var sourceName = "___UNNAMEDITEMSOURCE___";
-            var combined = $"{assemblyName}_{sourceName}";
-
-            ExternalCommandItemSource source;
-            if (searchItemSources.TryGetValue(combined, out var existing))
-            {
-                source = (ExternalCommandItemSource)existing;
-            }
-            else
-            {
-                source = new ExternalCommandItemSource();
-                searchItemSources.TryAdd(combined, source);
-            }
+            var source = GetOrCreateSource(assemblyName);
 
             if (!source.entries.ContainsKey(key))
             {
@@ -209,19 +188,7 @@ namespace QuickSearch
             }
             var key = $"{assemblyName}_{item.TopLeft}";
 
-            var sourceName = "___UNNAMEDITEMSOURCE___";
-            var combined = $"{assemblyName}_{sourceName}";
-
-            ExternalCommandItemSource source;
-            if (searchItemSources.TryGetValue(combined, out var existing))
-            {
-                source = (ExternalCommandItemSource)existing;
-            }
-            else
-            {
-                source = new ExternalCommandItemSource();
-                searchItemSources.TryAdd(combined, source);
-            }
+            var source = GetOrCreateSource(assemblyName);
 
             if (!source.entries.ContainsKey(key))
             {
@@ -260,6 +227,87 @@ namespace QuickSearch
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Delegate that should open the settings view of a plugin.
+        /// Every <see cref="Playnite.SDK.Plugins.Plugin"/> has the 
+        /// <see cref="Playnite.SDK.Plugins.Plugin.OpenSettingsView"/> method
+        /// that should be used.
+        /// </summary>
+        /// <returns>Whether settings were saved or not.</returns>
+        public delegate bool OpenSettingsViewDelegate();
+
+        /// <summary>
+        /// Add a command that opens the settings for a plugin or shows some options as a result using a <see cref="SubItemsSource"/>.
+        /// In order for options to be added to the search results, <typeparamref name="TSettings"/> needs to have at least one public property with a getter
+        /// and a setter with either a <see cref="GenericOptionAttribute"/>, <see cref="SelectionOptionAttribute"/> or <see cref="NumberOptionAttribute"/>
+        /// attached to it.
+        /// </summary>
+        /// <typeparam name="TSettings">Type of the settings object which has some properties 
+        /// with a <see cref="GenericOptionAttribute"/>/<see cref="SelectionOptionAttribute"/>/<see cref="NumberOptionAttribute"/>
+        /// atteched to it.
+        /// </typeparam>
+        /// <param name="pluginName">Name of the plugin.</param>
+        /// <param name="settings">The settings object used by the plugin or a proxy object for it.</param>
+        /// <param name="openSettingsViewAction">
+        /// Every <see cref="Playnite.SDK.Plugins.Plugin"/> has the 
+        /// <see cref="Playnite.SDK.Plugins.Plugin.OpenSettingsView"/> method
+        /// that should be used here.
+        /// </param>
+        /// <returns>The item that was added. Can be used to remove it.</returns>
+        public static SettingsItem<TSettings> AddPluginSettings<TSettings>(string pluginName, TSettings settings, OpenSettingsViewDelegate openSettingsViewAction)
+        {
+            var assembly = Assembly.GetCallingAssembly();
+            string assemblyName = assembly?.GetName()?.Name ?? "Null";
+            assemblyName = assemblyName.Replace("_", " "); ;
+            var key = $"{assemblyName}_{pluginName}_SETTINGS";
+            if (!registeredAssemblies.Contains(assemblyName))
+            {
+                registeredAssemblies.Add(assemblyName);
+            }
+
+            var settingsCommand = new CommandItem(pluginName + " " + Application.Current.FindResource("LOCSettingsLabel"), () => { openSettingsViewAction?.Invoke(); }, "Open the " + pluginName + " settings.", "Open")
+            {
+                IconChar = IconChars.Settings
+            };
+            if (settings?.GetType().GetProperties().Any(prop => prop.GetCustomAttribute<GenericOptionAttribute>(true) != null) ?? false)
+            {
+                var subItemsSource = new SettingsItemSource<TSettings>() { Prefix = pluginName + " " + Application.Current.FindResource("LOCSettingsLabel") as string, Settings = settings };
+                var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
+                subItemsAction.SubItemSource = subItemsSource;
+                settingsCommand.Actions.Add(subItemsAction);
+            }
+            foreach (CommandItemKey k in settingsCommand.Keys.ToArray())
+            {
+                settingsCommand.Keys.Add(new CommandItemKey() { Key = "> " + k.Key, Weight = 1 });
+            }
+            var source = GetOrCreateSource(assemblyName);
+
+            if (!source.entries.ContainsKey(key))
+            {
+                source.entries.Add(key, settingsCommand);
+            }
+            return source.entries[key] as SearchItems.Settings.SettingsItem<TSettings>;
+        }
+
+        private static ExternalCommandItemSource GetOrCreateSource(string assemblyName)
+        {
+            var sourceName = "___UNNAMEDITEMSOURCE___";
+            var combined = $"{assemblyName}_{sourceName}";
+
+            ExternalCommandItemSource source;
+            if (searchItemSources.TryGetValue(combined, out var existing))
+            {
+                source = (ExternalCommandItemSource)existing;
+            }
+            else
+            {
+                source = new ExternalCommandItemSource();
+                searchItemSources.TryAdd(combined, source);
+            }
+
+            return source;
         }
     }
 }
