@@ -359,21 +359,7 @@ namespace QuickSearch
                     addGameCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                 }
                 addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
-                //var settingsCommand = new CommandItem("QuickSearch " + Application.Current.FindResource("LOCSettingsLabel") as string, () => { OpenSettingsView(); }, "Open the QuickSearch settings.", "Open") 
-                //{ 
-                //    IconChar = IconChars.Settings 
-                //};
-                //var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch " + Application.Current.FindResource("LOCSettingsLabel") as string, Settings = Settings};
-                //var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
-                //settingsCommand.Actions.Add(subItemsAction);
-                //subItemsAction.SubItemSource = subItemsSource;
-
-                //foreach (CommandItemKey key in settingsCommand.Keys.ToArray())
-                //{
-                //    settingsCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                //}
-                //QuickSearchSDK.AddCommand(settingsCommand);
-                QuickSearchSDK.AddPluginSettings<SearchSettings>("QuickSearch", Settings, OpenSettingsView);
+                QuickSearchSDK.AddPluginSettings("QuickSearch", Settings, OpenSettingsView);
                 QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
 
                 var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
@@ -381,7 +367,6 @@ namespace QuickSearch
                 itadCommand.Actions.Add(itadSubItemsAction);
                 QuickSearchSDK.AddCommand(itadCommand);
             }
-            // QuickSearchSDK.AddGameAction("Show", g => PlayniteApi.Dialogs.ShowMessage(g.Name));
 
         }
 
