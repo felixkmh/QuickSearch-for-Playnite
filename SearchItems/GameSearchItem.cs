@@ -279,8 +279,6 @@ namespace QuickSearch.SearchItems
                 keys.Add(new CleanNameKey { game = game });
             if (!string.IsNullOrEmpty(game.GameImagePath))
                 keys.Add(new RomKey { game = game });
-            //if (!string.IsNullOrEmpty(game.Source?.Name))
-            //    keys.Add(new SourceKey { game = game });
         }
 
         public Game game;
@@ -288,20 +286,27 @@ namespace QuickSearch.SearchItems
         private readonly IList<ISearchKey<string>> keys;
         public IList<ISearchKey<string>> Keys => keys;
 
-        private IList<ISearchAction<string>> actions;
         public IList<ISearchAction<string>> Actions
         {
             get
             {
-                if (actions == null)
+
+                var launchAciton = new ContextAction
                 {
-                    var action = new ContextAction
-                    {
-                        Name = game.IsInstalled ?
-                        Application.Current.FindResource("LOCPlayGame") as string :
-                        Application.Current.FindResource("LOCInstallGame") as string
-                    };
-                    actions = new List<ISearchAction<string>> { action };
+                    Name = game.IsInstalled ?
+                    Application.Current.FindResource("LOCPlayGame") as string :
+                    Application.Current.FindResource("LOCInstallGame") as string
+                };
+
+                var actions = new List<ISearchAction<string>> { launchAciton };
+
+                if (game.IsInstalled)
+                {
+                    //var uninstallAction = new GameAction() 
+                    //{ 
+                    //    Name = Application.Current.FindResource("LOCUninstallGame") as string,
+                    //    Action = g => 
+                    //}
                 }
                 return actions;
             }

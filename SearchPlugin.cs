@@ -347,10 +347,6 @@ namespace QuickSearch
                                 item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                             }
                         }
-                        if (keyGesture.Key == Key.F3 && keyGesture.Modifiers == ModifierKeys.None)
-                        {
-                            QuickSearchSDK.AddGameAction("Edit", g => binding.Command.Execute(g));
-                        }
                     }
                 }
                 QuickSearchSDK.AddCommand(addGameCommand);
