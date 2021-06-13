@@ -39,8 +39,8 @@ namespace QuickSearch
 
         internal IEnumerable<ISearchItemSource<string>> searchItemSources = new List<ISearchItemSource<string>>();
 
-        private double heightSelected = double.NaN;
-        private double heightNotSelected = double.NaN;
+        internal double heightSelected = double.NaN;
+        internal double heightNotSelected = double.NaN;
 
         public Boolean IsLoadingResults { 
             get => (Boolean)GetValue(IsLoadingResultsProperty); 
@@ -623,8 +623,13 @@ namespace QuickSearch
             return a.TopLeft.CompareTo(b.TopLeft);
         } 
 
-        private void UpdateListBox(int items)
+        internal void UpdateListBox(int items, bool refresh = false)
         {
+            if (refresh)
+            {
+                heightSelected = double.NaN;
+                heightNotSelected = double.NaN;
+            }
             if (SearchResults.Items.Count > 1)
             {
                 if (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))

@@ -61,12 +61,16 @@ namespace QuickSearch
         [NumberOption("Search Threshold", Min = 0, Max = 1, Tick = 0.01f)]
         public double Threshold { get; set; } = 0.55;
         [GenericOption("Expand all items", Description = "If enabled, always show more detailed version of items.")]
-        public bool ExpandAllItems { get; set; } = true;
+        public bool ExpandAllItems 
+        {
+            get => expandAllItems;
+            set { expandAllItems = value; plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
+        }
         [GenericOption("Show Seperator", Description = "If enabled, show line inbetween items.")]
         public bool ShowSeperator { get; set; } = false;
         [GenericOption("Add Items With Lower Priority")]
         public bool IncrementalUpdate { get; set; } = false;
-        [NumberOption("Maximum number of results", Min=0, Tick = 1)]
+        [NumberOption("Maximum number of results", Min = 0, Tick = 1)]
         public int MaxNumberResults { get; set; } = 20;
         [GenericOption("Enable External GameActions")]
         public bool EnableExternalGameActions { get; set; } = true;
@@ -89,7 +93,11 @@ namespace QuickSearch
         public bool EnableGlassEffect { get => enableGlassEffect; set { enableGlassEffect = value; if (value) SearchPlugin.Instance?.EnableGlassEffect(); else SearchPlugin.Instance?.DisableGlassEffect(); } }
         private bool enableGlassEffect = true;
         [NumberOption("Border Thickness", Min = 0, Max = 30, Tick = 1)]
-        public int OuterBorderThickness { get => outerBorderThickness; set { outerBorderThickness = value; plugin?.UpdateBorder(value); } }
+        public int OuterBorderThickness
+        {
+            get => outerBorderThickness;
+            set { outerBorderThickness = value; plugin?.UpdateBorder(value); plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
+        }
         [GenericOption("Enable Filter-SubItemSources")]
         public bool EnableFilterSubSources { get; set; } = true;
         [GenericOption("Enable Global Hotkey")]
@@ -122,6 +130,7 @@ namespace QuickSearch
 
         private SearchSettings previousSettings = null;
         private int outerBorderThickness = 12;
+        private bool expandAllItems = true;
 
         public void BeginEdit()
         {
