@@ -266,7 +266,7 @@ namespace QuickSearch
                 registeredAssemblies.Add(assemblyName);
             }
 
-            var settingsCommand = new CommandItem(pluginName + " " + Application.Current.FindResource("LOCSettingsLabel"), () => { openSettingsViewAction?.Invoke(); }, "Open the QuickSearch settings.", "Open")
+            var settingsCommand = new CommandItem(pluginName + " " + Application.Current.FindResource("LOCSettingsLabel"), () => { openSettingsViewAction?.Invoke(); }, "Open the " + pluginName + " settings.", "Open")
             {
                 IconChar = IconChars.Settings
             };
