@@ -408,13 +408,13 @@ namespace QuickSearch
                         .Select(e => e.Value));
                     }
 
-                    if (searchWindow.searchItemSources?.FirstOrDefault() is ISearchSubItemSource<string>)
+                    if (searchWindow.navigationStack.Count <= 1)
                     {
-                        searchWindow.QueueIndexUpdate();
+                        searchWindow.QueueIndexUpdate(sources);
                     }
                     else
                     {
-                        searchWindow.QueueIndexUpdate(sources);
+                        searchWindow.QueueIndexUpdate();
                     }
                     searchWindow.SearchBox.SelectAll();
                     searchWindow.SearchBox.Focus();

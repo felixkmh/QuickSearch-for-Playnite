@@ -65,6 +65,7 @@
     <Compile Include="Controls\AutoScrollViewer.cs" />
     <Compile Include="Converters\ElementToRelativeRectConverter.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="MultiFilter.cs" />
     <Compile Include="Settings\Hotkey.cs" />
     <Compile Include="HotkeyHelper.cs" />
     <Compile Include="Settings\ITADShopOption.cs" />

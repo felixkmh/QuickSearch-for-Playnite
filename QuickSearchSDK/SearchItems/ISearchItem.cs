@@ -102,9 +102,15 @@ namespace QuickSearch.SearchItems
     public interface ISearchItemSource<TKey>
     {
         /// <summary>
-        /// Returns <see cref="ISearchItem{TKey}"/>s.
+        /// Returns query independent items.
         /// </summary>
-        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case. Only supplied if <see cref="DependsOnQuery"/> returns <see langword="true"/>, otherwise it is <see langword="null"/>.</param>
+        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
+        IEnumerable<ISearchItem<TKey>> GetItems();
+
+        /// <summary>
+        /// Returns query dependent items.
+        /// </summary>
+        /// <param name="query">The current search query, neither leading nor trailing spaces and in lower case.</param>
         /// <returns><see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/> or <see langword="null"/>.</returns>
         IEnumerable<ISearchItem<TKey>> GetItems(string query);
 
@@ -117,12 +123,6 @@ namespace QuickSearch.SearchItems
         /// <param name="addedItems">List of already added search item candicates sorted by score.</param>
         /// <returns><see cref="Task{TResult}"/> returning <see cref="IEnumerable{T}"/> of <see cref="ISearchItem{TKey}"/>, or <see langword="null"/></returns>
         Task<IEnumerable<ISearchItem<TKey>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems);
-
-        /// <summary>
-        /// Indicates whether this source supplies items depending on the current search query.
-        /// Returning true unnecessarily can slow down the search.
-        /// </summary>
-        bool DependsOnQuery { get; }
     }
     /// <summary>
     /// Item that holds data on how to search for it,

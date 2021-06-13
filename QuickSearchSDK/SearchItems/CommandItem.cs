@@ -164,14 +164,19 @@ namespace QuickSearch.SearchItems
         /// </summary>
         public List<ISearchItem<string>> Items { get; set; } = new List<ISearchItem<string>>();
 
-        /// <inheritdoc cref="ISearchItemSource{TKey}.DependsOnQuery"/>
-        public bool DependsOnQuery => false;
 
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems(string)"/>
         public IEnumerable<ISearchItem<string>> GetItems(string query)
         {
+            return null;
+        }
+
+        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems()"/>
+        public IEnumerable<ISearchItem<string>> GetItems()
+        {
             return Items;
         }
+
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string, IReadOnlyList{Candidate})"/>
         public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
         {
@@ -232,9 +237,12 @@ namespace QuickSearch.SearchItems
     {
         public Dictionary<string, ISearchItem<string>> entries = new Dictionary<string, ISearchItem<string>>();
 
-        public bool DependsOnQuery => false;
-
         public IEnumerable<ISearchItem<string>> GetItems(string query)
+        {
+            return null;
+        }
+
+        public IEnumerable<ISearchItem<string>> GetItems()
         {
             return entries.Values;
         }

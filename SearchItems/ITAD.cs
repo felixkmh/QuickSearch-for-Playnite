@@ -17,8 +17,6 @@ namespace QuickSearch.SearchItems
 {
     class ITADItemSource : ISearchSubItemSource<string>
     {
-        public bool DependsOnQuery => true;
-
         public string Prefix => "Search on ITAD";
 
         public bool DisplayAllIfQueryIsEmpty => false;
@@ -202,6 +200,11 @@ namespace QuickSearch.SearchItems
                 }
                 return deals.AsEnumerable();
             });
+        }
+
+        public IEnumerable<ISearchItem<string>> GetItems()
+        {
+            return null;
         }
     }
 

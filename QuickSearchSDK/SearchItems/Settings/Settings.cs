@@ -33,8 +33,6 @@ namespace QuickSearch.SearchItems.Settings
         public virtual string Prefix { get; set; } = "Settings";
         /// <inheritdoc cref="ISearchSubItemSource{TKey}.DisplayAllIfQueryIsEmpty"/>
         public virtual bool DisplayAllIfQueryIsEmpty => true;
-        /// <inheritdoc cref="ISearchItemSource{TKey}.DependsOnQuery"/>
-        public virtual bool DependsOnQuery => true;
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems(string)"/>
         public virtual IEnumerable<ISearchItem<string>> GetItems(string query)
         {
@@ -75,6 +73,11 @@ namespace QuickSearch.SearchItems.Settings
         }
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string, IReadOnlyList{Candidate})"/>
         public virtual Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
+        {
+            return null;
+        }
+        /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems()"/>
+        public IEnumerable<ISearchItem<string>> GetItems()
         {
             return null;
         }
@@ -471,7 +474,7 @@ namespace QuickSearch.SearchItems.Settings
             Property = property;
             Settings = settings;
         }
-
+        /// <inheritdoc cref="ISearchItem{TKey}.TopRight"/>
         public override string TopRight => Convert.ToDouble(Property.GetValue(Settings)).ToString("0.###");
 
         /// <inheritdoc cref="ISearchItem{TKey}"/>

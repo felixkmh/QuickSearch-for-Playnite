@@ -102,7 +102,7 @@ namespace QuickSearch
             return name.Substring(0, sep);
         }
 
-        public void QueueIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null)
+        public void QueueIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
         {
             openedSearchTokeSource.Cancel();
             var oldSource = textChangedTokeSource;
@@ -111,14 +111,19 @@ namespace QuickSearch
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
                 t.Dispose();
+                
                 if (itemSources != null)
                 {
-                    searchItemSources = itemSources;
+                    if (navigationStack.Count == 1 && !isSubSource)
+                    {
+                        navigationStack.Clear();
+                    }
+                    navigationStack.Push(itemSources);
                 }
+                searchItemSources = navigationStack.Peek();
 
                 searchItems = searchItemSources
-                    .Where(source => !source.DependsOnQuery)
-                    .Select(source => source.GetItems(null))
+                    .Select(source => source.GetItems())
                     .Where(items => items != null)
                     .SelectMany(items => items)
                     .ToList();
@@ -193,28 +198,22 @@ namespace QuickSearch
                         t.Dispose();
                         lastInput = input;
                         bool showAll = false;
-                        if ((searchItemSources?.Count() ?? 0) == 1)
+                        if (navigationStack.Count > 1)
                         {
-                            if (searchItemSources.First() is ISearchSubItemSource<string> subSource)
+                            bool popped = false;
+                            while (navigationStack.Count > 1 && navigationStack.Peek().First() is ISearchSubItemSource<string> subSource && !input.StartsWith(subSource.Prefix, StringComparison.OrdinalIgnoreCase))
                             {
-                                if (input.StartsWith(subSource.Prefix, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    input = input.Substring(subSource.Prefix.Length);
-                                    showAll = subSource.DisplayAllIfQueryIsEmpty && string.IsNullOrWhiteSpace(input);
-                                }
-                                else
-                                {
-                                    var sources = SearchPlugin.Instance.searchItemSources.Values.AsEnumerable();
-
-                                    if (SearchPlugin.Instance.Settings.EnableExternalItems)
-                                    {
-                                        sources = sources.Concat(QuickSearchSDK.searchItemSources
-                                        .Where(s => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(s.Key)].Items)
-                                        .Select(s => s.Value));
-                                    }
-                                    showAll = false;
-                                    QueueIndexUpdate(sources);
-                                }
+                                navigationStack.Pop();
+                                popped = true;
+                            }
+                            if (navigationStack.Count > 1 && navigationStack.Peek().First() is ISearchSubItemSource<string> newSubSource) 
+                            { 
+                                input = input.Substring(newSubSource.Prefix.Length);
+                                showAll = newSubSource.DisplayAllIfQueryIsEmpty && string.IsNullOrWhiteSpace(input);
+                            } 
+                            if (popped)
+                            {
+                                QueueIndexUpdate();
                             }
                         }
                         QueueSearch(input, showAll);
@@ -246,7 +245,6 @@ namespace QuickSearch
                 {
                     var sources = searchItemSources;
                     var queryDependantItems = sources
-                    .Where(source => source.DependsOnQuery)
                     .Select(source => source.GetItems(input))
                     .Where(items => items != null)
                     .SelectMany(items => items);
@@ -731,12 +729,20 @@ namespace QuickSearch
                     if (SearchResults.SelectedIndex == -1)
                         SearchResults.SelectedIndex = 0;
                     idx++;
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        idx = count - 1;
+                    }
                 }
                 if (e.Key == Key.Up)
                 {
                     if (SearchResults.SelectedIndex == -1)
                         SearchResults.SelectedIndex = 0;
                     idx--;
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        idx = 0;
+                    }
                 }
                 if(e.IsRepeat)
                 {
@@ -764,13 +770,13 @@ namespace QuickSearch
             if (action is ISubItemsAction<string> subItemsAction)
             {
                 var source = subItemsAction.SubItemSource;
-                QueueIndexUpdate(new ISearchItemSource<string>[] { source });
+                QueueIndexUpdate(new ISearchItemSource<string>[] { source }, true);
                 if (source != null)
                 {
-                    // QueueSearch(string.Empty, source.DisplayAllIfQueryIsEmpty);
                     SearchBox.Text = source.Prefix + " ";
                     SearchBox.CaretIndex = SearchBox.Text.Length;
                     PlaceholderText.Text = SearchBox.Text;
+                    QueueSearch(source.Prefix + " ", source.DisplayAllIfQueryIsEmpty);
                 }
             }
             else if (action.CloseAfterExecute)
