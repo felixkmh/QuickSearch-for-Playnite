@@ -31,7 +31,8 @@
                        Stretch="Uniform" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="DefaultIcon"
-                       Effect="{StaticResource IconDropShadow}"/>
+                       Effect="{StaticResource IconDropShadow}"
+                       MaxHeight="22"/>
                 <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="22" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontFamily="{DynamicResource FontIcoFont}"
                            />
@@ -86,7 +87,8 @@
                 <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Stretch="Uniform" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="SelectedImage"
-                       Effect="{StaticResource IconDropShadow}"/>
+                       Effect="{StaticResource IconDropShadow}"
+                       MaxHeight="40"/>
                 <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="40" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontFamily="{DynamicResource FontIcoFont}"
                            />

@@ -90,7 +90,8 @@ namespace QuickSearch
         private bool enableGlassEffect = true;
         [NumberOption("Border Thickness", Min = 0, Max = 30, Tick = 1)]
         public int OuterBorderThickness { get => outerBorderThickness; set { outerBorderThickness = value; plugin?.UpdateBorder(value); } }
-
+        [GenericOption("Enable Filter-SubItemSources")]
+        public bool EnableFilterSubSources { get; set; } = true;
         [GenericOption("Enable Global Hotkey")]
         public bool EnableGlobalHotkey { get => enableGlobalHotkey; set { enableGlobalHotkey = value; if (value) SearchPlugin.Instance?.RegisterGlobalHotkey(); else SearchPlugin.Instance?.UnregisterGlobalHotkey(); } }
         private bool enableGlobalHotkey = false;

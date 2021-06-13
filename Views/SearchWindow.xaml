@@ -128,7 +128,7 @@
                     Margin="{Binding Margin, ElementName=WindowGrid}"
                     />
         </Border>
-        <Grid Width="650"  Height="460" x:Name="WindowGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12">
+        <Grid Width="660"  Height="460" x:Name="WindowGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>

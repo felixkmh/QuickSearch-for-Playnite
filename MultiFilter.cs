@@ -11,10 +11,30 @@ namespace QuickSearch
         private readonly List<Func<T, bool>> any = new List<Func<T, bool>>();
         private readonly List<Func<T, bool>> all = new List<Func<T, bool>>();
 
+        public MultiFilter() { }
+
         private MultiFilter(MultiFilter<T> old)
         {
-            any.AddRange(old.any);
-            all.AddRange(old.all);
+            if (old != null)
+            {
+                any.AddRange(old.any);
+                all.AddRange(old.all);
+            }
+        }
+
+        public MultiFilter(Func<T, bool> filter, MultiFilter<T> old = null, Mode mode = Mode.Or) : this(old)
+        {
+            switch (mode)
+            {
+                case Mode.Or:
+                    any.Add(filter);
+                    break;
+                case Mode.And:
+                    all.Add(filter);
+                    break;
+                default:
+                    break;
+            }
         }
 
         public enum Mode
@@ -24,12 +44,7 @@ namespace QuickSearch
             And
         }
 
-        public MultiFilter(Func<T, bool> filter)
-        {
-            any.Add(filter);
-        }
-
-        public List<Func<T, bool>> One => any;
+        public List<Func<T, bool>> Any => any;
         public List<Func<T, bool>> All => all;
 
         public MultiFilter<T> And(Func<T, bool> filter)
@@ -61,5 +76,7 @@ namespace QuickSearch
         {
             return any.Any(f => f(item)) && all.All(f => f(item));
         }
+
+        public bool IsEmpty => any.Count == 0 && all.Count == 0;
     }
 }

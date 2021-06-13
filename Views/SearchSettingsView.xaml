@@ -77,6 +77,10 @@
                         <CheckBox  IsChecked="{Binding InstallationStatusFirst}" Margin="5"/>
                         <TextBlock Text="Sort by installation status before name if score is equal" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableFilterSubSources}" Margin="5"/>
+                        <TextBlock Text="Enable Filter-SubItemSources" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

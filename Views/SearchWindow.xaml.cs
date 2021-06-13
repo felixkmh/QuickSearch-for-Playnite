@@ -733,6 +733,7 @@ namespace QuickSearch
                     {
                         idx = count - 1;
                     }
+                    e.Handled = true;
                 }
                 if (e.Key == Key.Up)
                 {
@@ -743,6 +744,7 @@ namespace QuickSearch
                     {
                         idx = 0;
                     }
+                    e.Handled = true;
                 }
                 if(e.IsRepeat)
                 {
