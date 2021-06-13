@@ -72,7 +72,7 @@ namespace QuickSearch
         public bool EnableExternalGameActions { get; set; } = true;
         [GenericOption("Enable External SearchItems")]
         public bool EnableExternalItems { get; set; } = true;
-        [NumberOption("Delay until requesting async items", Min = 10, Max = 1000, Tick = 1f)]
+        [NumberOption("Delay until requesting async items", Min = 10, Max = 1000, Tick = 10f)]
         public int AsyncItemsDelay { get; set; } = 500;
         public SortedDictionary<string, AssemblyOptions> EnabledAssemblies { get; set; } = new SortedDictionary<string, AssemblyOptions>();
         public float PrioritizationThreshold { get; set; } = 0.55f;

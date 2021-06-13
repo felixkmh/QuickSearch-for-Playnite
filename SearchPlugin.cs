@@ -231,6 +231,9 @@ namespace QuickSearch
         {
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
+
+
+
             // searchItemSources.Add("Commands", simpleCommands);
             // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
             // Add code to be executed when Playnite is initialized.
@@ -356,20 +359,21 @@ namespace QuickSearch
                     addGameCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                 }
                 addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
-                var settingsCommand = new CommandItem("Open QuickSearch settings", () => { }, "Open the QuickSearch settings view.", "Open") 
-                { 
-                    IconChar = IconChars.Settings 
-                };
-                var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch Settings", Settings = Settings};
-                var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
-                settingsCommand.Actions = new ISearchAction<string>[] { subItemsAction };
-                subItemsAction.SubItemSource = subItemsSource;
+                //var settingsCommand = new CommandItem("QuickSearch " + Application.Current.FindResource("LOCSettingsLabel") as string, () => { OpenSettingsView(); }, "Open the QuickSearch settings.", "Open") 
+                //{ 
+                //    IconChar = IconChars.Settings 
+                //};
+                //var subItemsSource = new SettingsItemSource<SearchSettings>() { Prefix = "QuickSearch " + Application.Current.FindResource("LOCSettingsLabel") as string, Settings = Settings};
+                //var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
+                //settingsCommand.Actions.Add(subItemsAction);
+                //subItemsAction.SubItemSource = subItemsSource;
 
-                foreach (CommandItemKey key in settingsCommand.Keys.ToArray())
-                {
-                    settingsCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                }
-                QuickSearchSDK.AddCommand(settingsCommand);
+                //foreach (CommandItemKey key in settingsCommand.Keys.ToArray())
+                //{
+                //    settingsCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
+                //}
+                //QuickSearchSDK.AddCommand(settingsCommand);
+                QuickSearchSDK.AddPluginSettings<SearchSettings>("QuickSearch", Settings, OpenSettingsView);
                 QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
 
                 var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
