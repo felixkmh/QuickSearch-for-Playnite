@@ -71,7 +71,7 @@ namespace QuickSearch.SearchItems.Settings
                     }
                 }
             }
-            return items;
+            return items.OrderBy(item => item.TopLeft);
         }
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItemsTask(string, IReadOnlyList{Candidate})"/>
         public virtual Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
@@ -299,7 +299,7 @@ namespace QuickSearch.SearchItems.Settings
             }
         }
         /// <inheritdoc cref="ISearchItem{TKey}.TopRight"/> 
-        public string TopRight => Property.GetValue(Settings).ToString();
+        public virtual string TopRight => Property.GetValue(Settings).ToString();
         /// <inheritdoc cref="ISearchItem{TKey}.BottomLeft"/> 
         public string BottomLeft
         {
@@ -471,6 +471,9 @@ namespace QuickSearch.SearchItems.Settings
             Property = property;
             Settings = settings;
         }
+
+        public override string TopRight => Convert.ToDouble(Property.GetValue(Settings)).ToString("0.###");
+
         /// <inheritdoc cref="ISearchItem{TKey}"/>
         public override IList<ISearchKey<string>> Keys
         {

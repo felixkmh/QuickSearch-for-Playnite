@@ -251,9 +251,18 @@ namespace QuickSearch
                     .Where(items => items != null)
                     .SelectMany(items => items);
 
-                    var canditates = searchItems.Concat(queryDependantItems).AsParallel()
-                    .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold))
-                    .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                    Candidate[] canditates;
+                    if (showAll)
+                    {
+                        canditates = searchItems.Concat(queryDependantItems)
+                        .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold))
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                    } else
+                    {
+                        canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                        .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold))
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                    }
 
                     maxResults = canditates.Count();
                     if (SearchPlugin.Instance.Settings.MaxNumberResults > 0)
@@ -274,7 +283,7 @@ namespace QuickSearch
                             return;
                         }
 
-                        var maxIdx = FindMax(canditates, cancellationToken);
+                        var maxIdx = showAll ? addedItems : FindMax(canditates, cancellationToken);
 
                         if (maxIdx >= 0)
                         {
@@ -460,7 +469,7 @@ namespace QuickSearch
                                 break;
                             } else if (score == addedCandidates[i].Score)
                             {
-                                if (CompareSearchItems(item, addedCandidates[i].Item) < 0)
+                                if (!showAll && CompareSearchItems(item, addedCandidates[i].Item) < 0)
                                 {
                                     insertionIdx = i;
                                     break;
