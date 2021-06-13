@@ -340,6 +340,11 @@ namespace QuickSearch
                     sw.Reset();
                 }
 
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 Dispatcher.Invoke(() =>
                 {
                     for (int i = ListDataContext.Count - 1; i >= addedItems; --i)
@@ -368,7 +373,6 @@ namespace QuickSearch
                 }
 
                 InsertDelayedDependentItems(input, addedCandidates, (float)SearchPlugin.Instance.Settings.Threshold, SearchPlugin.Instance.Settings.MaxNumberResults, cancellationToken, showAll);
-
 
                 Dispatcher.Invoke(() =>
                 {
