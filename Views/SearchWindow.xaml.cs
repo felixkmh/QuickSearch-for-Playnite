@@ -224,13 +224,13 @@ namespace QuickSearch
 
         private void QueueSearch(string input, bool showAll = false)
         {
-            var startTime = DateTime.Now;
             textChangedTokeSource.Cancel();
             var oldSource = textChangedTokeSource;
             textChangedTokeSource = new CancellationTokenSource();
             var cancellationToken = textChangedTokeSource.Token;
             backgroundTask = backgroundTask.ContinueWith(t =>
             {
+                var searchSw = Stopwatch.StartNew();
                 t.Dispose();
                 Dispatcher.Invoke(() => { IsLoadingResults = true; });
 
@@ -240,6 +240,7 @@ namespace QuickSearch
                 }
                 int maxResults = 0;
                 int addedItems = 0;
+                var maxC = 0;
                 List<Candidate> addedCandidates = new List<Candidate>();
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
@@ -273,60 +274,70 @@ namespace QuickSearch
                     }
 
                     addedCandidates.Capacity = maxResults;
-
-                    while (addedItems < maxResults)
+                    
+                    var sw = new Stopwatch();
+                    bool done = false;
+                    var passes = 0;
+                    
+                    while (addedItems < maxResults && !done)
                     {
+                        ++passes;
                         if (cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
 
-                        var maxIdx = showAll ? addedItems : FindMax(canditates, cancellationToken);
-
-                        if (maxIdx >= 0)
+                        Dispatcher.Invoke(() =>
                         {
-                            canditates[maxIdx].Marked = true;
-                            addedCandidates.Add(canditates[maxIdx]);
-
-
-                            Dispatcher.Invoke(() =>
+                            sw.Restart();
+                            int c = 0;
+                            do
                             {
+                                sw.Start();
+                                var maxIdx = showAll ? addedItems : FindMax(canditates, cancellationToken);
 
-                                if (ListDataContext.Count > addedItems)
+                                if (maxIdx >= 0)
                                 {
-                                    ListDataContext[addedItems] = canditates[maxIdx].Item;
+                                    canditates[maxIdx].Marked = true;
+                                    addedCandidates.Add(canditates[maxIdx]);
+
+                                    if (ListDataContext.Count > addedItems)
+                                    {
+                                        ListDataContext[addedItems] = canditates[maxIdx].Item;
+                                    }
+                                    else
+                                    {
+                                        ListDataContext.Add(canditates[maxIdx].Item);
+                                    }
+#if DEBUG
+                                    PlaceholderText.Text = SearchBox.Text;
+                                    PlaceholderText.Text += " - " + searchSw.ElapsedMilliseconds + "ms (" + passes + " passes)";
+                                    PlaceholderText.Visibility = Visibility.Visible;
+#endif
+                                    if (ListDataContext.Count > 0 && addedItems == 0)
+                                    {
+                                        SearchResults.SelectedIndex = 0;
+                                    }
+
+                                    if (addedItems == 2 || (addedItems > 2 && (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))))
+                                    {
+                                        UpdateListBox(maxResults);
+                                    }
+
+                                    addedItems += 1;
+                                    ++c;
                                 }
                                 else
                                 {
-                                    ListDataContext.Add(canditates[maxIdx].Item);
+                                    done = true;
+                                    break;
                                 }
-#if DEBUG
-                                PlaceholderText.Text = SearchBox.Text;
-                                PlaceholderText.Text += " - " + (int)(DateTime.Now - startTime).TotalMilliseconds + "ms";
-                                PlaceholderText.Visibility = Visibility.Visible;
-#endif
-                                if (ListDataContext.Count > 0 && addedItems == 0)
-                                {
-                                    SearchResults.SelectedIndex = 0;
-                                }
-
-                                if (addedItems == 2 || (addedItems > 2 && (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))))
-                                {
-                                    UpdateListBox(maxResults);
-                                }
-
-
-                            }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
-
-                            addedItems += 1;
-                        }
-                        else
-                        {
-                            break;
-                        }
-
+                                sw.Stop();
+                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < 16);
+                            maxC = Math.Max(maxC, c);
+                        }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     }
-
+                    sw.Reset();
                 }
 
                 Dispatcher.Invoke(() =>
@@ -347,8 +358,8 @@ namespace QuickSearch
                 {
                     UpdateListBox(ListDataContext.Count);
                 }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Render);
-
-                var elapsedMs = (int)(DateTime.Now - startTime).TotalMilliseconds;
+                searchSw.Stop();
+                var elapsedMs = (int)searchSw.ElapsedMilliseconds;
 
                 var remainingWaitTime = Math.Max(SearchPlugin.Instance.Settings.AsyncItemsDelay - elapsedMs, 0);
                 if (SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested, remainingWaitTime))
