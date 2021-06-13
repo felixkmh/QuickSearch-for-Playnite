@@ -241,7 +241,6 @@ namespace QuickSearch
                 }
                 int maxResults = 0;
                 int addedItems = 0;
-                var maxC = 0;
                 List<Candidate> addedCandidates = new List<Candidate>();
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
@@ -293,7 +292,6 @@ namespace QuickSearch
                         Dispatcher.Invoke(() =>
                         {
                             sw.Restart();
-                            int c = 0;
                             do
                             {
                                 sw.Start();
@@ -326,9 +324,7 @@ namespace QuickSearch
                                     {
                                         UpdateListBox(maxResults);
                                     }
-
-                                    addedItems += 1;
-                                    ++c;
+                                    ++addedItems;
                                 }
                                 else
                                 {
@@ -338,7 +334,6 @@ namespace QuickSearch
                                 sw.Stop();
                             } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < 15);
                             sw.Stop();
-                            maxC = Math.Max(maxC, c);
                         }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     }
                     sw.Reset();
