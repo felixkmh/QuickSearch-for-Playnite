@@ -261,7 +261,7 @@ namespace QuickSearch
             var assembly = Assembly.GetCallingAssembly();
             string assemblyName = assembly?.GetName()?.Name ?? "Null";
             assemblyName = assemblyName.Replace("_", " "); ;
-            var key = $"{assemblyName}_{pluginName}";
+            var key = $"{assemblyName}_{pluginName}_SETTINGS";
             if (!registeredAssemblies.Contains(assemblyName))
             {
                 registeredAssemblies.Add(assemblyName);
