@@ -557,7 +557,7 @@ namespace QuickSearch
             return maxIdx;
         }
 
-        private int CompareSearchItems(in ISearchItem<string> a, in ISearchItem<string> b)
+        private int CompareSearchItems(ISearchItem<string> a, ISearchItem<string> b)
         {
             if (a is GameSearchItem gameItem)
             {
@@ -569,31 +569,31 @@ namespace QuickSearch
 
                     if (SearchPlugin.Instance.Settings.InstallationStatusFirst)
                     {
-                        if (installed > 0)
+                        if (installed != 0)
                         {
-                            return -1;
+                            return -1 * installed;
                         }
-                        else if (installed == 0 && name < 0)
+                        else if (name != 0)
                         {
-                            return -1;
+                            return name;
                         }
-                        else if (name == 0 && installed == 0 && lastPlayed > 0)
+                        else if (lastPlayed != 0)
                         {
-                            return -1;
+                            return -1 * lastPlayed;
                         }
                     } else
                     {
-                        if (name < 0)
+                        if (name != 0)
                         {
                             return -1;
                         }
-                        else if (name == 0 && lastPlayed > 0)
+                        else if (lastPlayed != 0)
                         {
-                            return -1;
+                            return -1 * lastPlayed;
                         }
-                        else if (name == 0 && lastPlayed == 0 && installed > 0)
+                        else if (installed != 0)
                         {
-                            return -1;
+                            return -1 * installed;
                         }
                     }                   
                 }

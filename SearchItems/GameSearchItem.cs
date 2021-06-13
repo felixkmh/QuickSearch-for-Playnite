@@ -169,7 +169,10 @@ namespace QuickSearch.SearchItems
             }).Concat(new ISearchItem<string>[] { 
                 new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
                     new SubItemsAction() { CloseAfterExecute = false, Name = "Show", SubItemSource = new FavoritesSource()},
-                    "Favorites") {IconChar = QuickSearch.IconChars.Star } });
+                    "Favorites") {IconChar = QuickSearch.IconChars.Star },
+                new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
+                        new SubItemsAction() { CloseAfterExecute = false, Name = "Show", SubItemSource = new RecentlyPlayedSource()},
+                        "Recently Played") {IconChar = '\uEEDC' }});
         }
 
         string quote = null;
@@ -248,6 +251,61 @@ namespace QuickSearch.SearchItems
                 }
             }
             return SearchPlugin.Instance.PlayniteApi.Database.Games.Where(g => g.Favorite).Select(g =>
+            {
+                var item = new GameSearchItem(g);
+                if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                {
+                    foreach (var action in GameActions)
+                    {
+                        item.Actions.Add(action);
+                    }
+                }
+                return item;
+            });
+        }
+
+        public Task<IEnumerable<ISearchItem<string>>> GetItemsTask(string query, IReadOnlyList<Candidate> addedItems)
+        {
+            return null;
+        }
+    }
+
+    public class RecentlyPlayedSource : ISearchSubItemSource<string>
+    {
+        private static Tuple<string, string> GetAssemblyName(string name)
+        {
+            var sep = name.IndexOf('_');
+            return new Tuple<string, string>(name.Substring(0, sep), name.Substring(sep + 1));
+        }
+
+        public IList<GameAction> GameActions { get; set; } = new List<GameAction>();
+
+        public bool DependsOnQuery => false;
+
+        public string Prefix => Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string;
+
+        public bool DisplayAllIfQueryIsEmpty => true;
+
+        public IEnumerable<ISearchItem<string>> GetItems(string query)
+        {
+            GameActions.Clear();
+            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+            {
+                foreach (var item in QuickSearchSDK.gameActions)
+                {
+                    var extracted = GetAssemblyName(item.Key);
+                    var assembly = extracted.Item1;
+                    var name = extracted.Item2;
+                    if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
+                    {
+                        GameActions.Add(new GameAction() { Name = name, Action = item.Value });
+                    }
+                }
+            }
+            return SearchPlugin.Instance.PlayniteApi.Database.Games
+                .Where(g => (g.LastActivity??DateTime.MinValue).AddDays(7) >= DateTime.Now)
+                .OrderByDescending(g => g.LastActivity??DateTime.MinValue)
+                .Select(g =>
             {
                 var item = new GameSearchItem(g);
                 if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
