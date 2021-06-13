@@ -1,4 +1,5 @@
-﻿using QuickSearch.SearchItems;
+﻿using QuickSearch.Attributes;
+using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
 using System;
 using System.Collections.Concurrent;

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
+using QuickSearch.Attributes;
 using QuickSearch.SearchItems.Settings;
 using System;
 using System.Collections.Generic;

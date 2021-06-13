@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QuickSearch.SearchItems.Settings
+namespace QuickSearch.Attributes
 {
     /// <summary>
     /// Marks a property as an option with a name and a description.
@@ -76,3 +72,4 @@ namespace QuickSearch.SearchItems.Settings
         public double Tick { get; set; } = 1;
     }
 }
+

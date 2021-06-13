@@ -125,6 +125,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="QuickSearchSDK.Attributes\QuickSearchSDK.Attributes.csproj">
+      <Project>{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}</Project>
+      <Name>QuickSearchSDK.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="QuickSearchSDK\QuickSearchSDK.csproj">
       <Project>{0425a0c6-c410-48fc-8218-6f7b124eeca5}</Project>
       <Name>QuickSearchSDK</Name>
