@@ -74,7 +74,7 @@ namespace QuickSearch
 
         public bool Eval(T item)
         {
-            return any.Any(f => f(item)) && all.All(f => f(item));
+            return IsEmpty || (any.Any(f => f(item)) && all.All(f => f(item)));
         }
 
         public bool IsEmpty => any.Count == 0 && all.Count == 0;
