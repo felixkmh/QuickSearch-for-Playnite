@@ -171,7 +171,7 @@ namespace QuickSearch.SearchItems
                                                 priceRange += " - " + worstPrice.NewPrice.ToString("0.00") + currencySign;
                                             }
                                             var title = games.First(g => g.Plain == game.Key).Title;
-                                            var item = new CommandItem(title, () => Process.Start(bestPrice.URL), bestPrice.Shop.Name, bestPrice.Shop.Name)
+                                            var item = new CommandItem(title, () => Process.Start(bestPrice.URL).Dispose() , bestPrice.Shop.Name, bestPrice.Shop.Name)
                                             {
                                                 IconChar = IconChars.ShoppingCart,
                                                 BottomLeft = priceRange,
