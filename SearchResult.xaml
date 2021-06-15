@@ -28,7 +28,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}}" 
-                       Stretch="Uniform" Margin="0"
+                       Stretch="UniformToFill" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="DefaultIcon"
                        Effect="{StaticResource IconDropShadow}"
@@ -84,7 +84,7 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Stretch="Uniform" Margin="0"
+                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" Stretch="UniformToFill" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="SelectedImage"
                        Effect="{StaticResource IconDropShadow}"
