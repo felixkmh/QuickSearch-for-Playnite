@@ -363,6 +363,11 @@ namespace QuickSearch
                 itadCommand.Keys.Add(new CommandItemKey() { Key = "itad", Weight = 1 });
                 itadCommand.Actions.Add(itadSubItemsAction);
                 QuickSearchSDK.AddCommand(itadCommand);
+
+                var cheapSharkSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new CheapSharkItemSource() };
+                var cheapSharkCommand = new CommandItem("CheapShark", new List<CommandAction>(), "Search on CheapShark.com", "https://www.cheapshark.com/img/logo_image.png?v=1.0");
+                cheapSharkCommand.Actions.Add(cheapSharkSubItemsAction);
+                QuickSearchSDK.AddCommand(cheapSharkCommand);
             }
 
         }
