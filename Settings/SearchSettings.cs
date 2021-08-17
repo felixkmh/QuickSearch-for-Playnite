@@ -104,6 +104,8 @@ namespace QuickSearch
         [GenericOption("Enable Global Hotkey")]
         public bool EnableGlobalHotkey { get => enableGlobalHotkey; set { enableGlobalHotkey = value; if (value) SearchPlugin.Instance?.RegisterGlobalHotkey(); else SearchPlugin.Instance?.UnregisterGlobalHotkey(); } }
         private bool enableGlobalHotkey = false;
+        [GenericOption("Prefer cover art", Description = "If available, use the cover art instead of the game icon as the icon.")]
+        public bool PreferCoverArt { get; set; } = false;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;

@@ -594,25 +594,40 @@ namespace QuickSearch.SearchItems
         {
             get
             {
-                if (!string.IsNullOrEmpty(game.Icon)) {
-                    string path;
-                    if (IsURL(game.Icon) || Path.IsPathRooted(game.Icon))
-                    {
-                        path = game.Icon;
-                    } else
-                    {
-                        path = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(game.Icon);
-                    }
-                    if (File.Exists(path))
-                    {
-                        if (Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out var uri)) 
-                        {
-                            return uri;
-                        }
-                    }
+                Uri icon = null;
+                Uri cover = null;
+                CheckImagePath(game.Icon, ref icon);
+                CheckImagePath(game.CoverImage, ref cover);
+
+                if (cover is Uri && (SearchPlugin.Instance.Settings.PreferCoverArt || icon == null))
+                {
+                    return cover;
                 }
+
+                if (icon is Uri)
+                {
+                    return icon;
+                }
+
                 return (Application.Current.FindResource("TrayIcon") as BitmapImage).UriSource;
             }
+        }
+
+        private bool CheckImagePath(string path, ref Uri uri)
+        {
+            string fullPath = path;
+            if (!string.IsNullOrEmpty(fullPath))
+            {
+                if (!IsURL(fullPath) && !Path.IsPathRooted(fullPath))
+                {
+                    fullPath = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(path);
+                }
+                if (File.Exists(fullPath))
+                {
+                    return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
+                }
+            }
+            return false;
         }
 
         public string TopLeft => game.Name;

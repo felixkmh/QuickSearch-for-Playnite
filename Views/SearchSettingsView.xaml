@@ -81,6 +81,10 @@
                         <CheckBox  IsChecked="{Binding EnableFilterSubSources}" Margin="5"/>
                         <TextBlock Text="Enable Filter-SubItemSources" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" ToolTip="If available, use the game cover art instead of the game icon as the icon for game results.">
+                        <CheckBox  IsChecked="{Binding PreferCoverArt}" Margin="5"/>
+                        <TextBlock Text="Prefer cover art over game icon" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
