@@ -622,10 +622,9 @@ namespace QuickSearch.SearchItems
                 {
                     fullPath = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(path);
                 }
-                if (File.Exists(fullPath))
-                {
-                    return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
-                }
+
+                return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
+
             }
             return false;
         }
