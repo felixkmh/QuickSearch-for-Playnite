@@ -41,7 +41,8 @@
       <HintPath>packages\Newtonsoft.Json.Schema.3.0.5\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
     </Reference>
     <Reference Include="Playnite.SDK, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\PlayniteSDK.5.5.0\lib\net462\Playnite.SDK.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Playnite9\build\Debug\Playnite.SDK.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

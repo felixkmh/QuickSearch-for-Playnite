@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Playnite.SDK;
+using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
@@ -27,7 +28,7 @@ using System.Windows.Media.Imaging;
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
 {
-    public class SearchPlugin : Plugin
+    public class SearchPlugin : GenericPlugin
     {
         internal static readonly ILogger logger = LogManager.GetLogger();
 
@@ -47,6 +48,7 @@ namespace QuickSearch
         {
             Settings = new SearchSettings(this);
             instance = this;
+            Properties = new GenericPluginProperties { HasSettings = true };
         }
 
         internal bool RegisterGlobalHotkey()
@@ -105,31 +107,6 @@ namespace QuickSearch
                 popup?.InputBindings.Add(HotkeyBinding);
                 searchWindow?.Reset();
             });
-        }
-
-        public override void OnGameInstalled(Game game)
-        {
-            // Add code to be executed when game is finished installing.
-        }
-
-        public override void OnGameStarted(Game game)
-        {
-            // Add code to be executed when game is started running.
-        }
-
-        public override void OnGameStarting(Game game)
-        {
-            // Add code to be executed when game is preparing to be started.
-        }
-
-        public override void OnGameStopped(Game game, long elapsedSeconds)
-        {
-            // Add code to be executed when game is preparing to be started.
-        }
-
-        public override void OnGameUninstalled(Game game)
-        {
-            // Add code to be executed when game is uninstalled.
         }
 
         private class ActionCommand : ICommand
@@ -227,7 +204,7 @@ namespace QuickSearch
         WindowInteropHelper windowInterop;
         bool globalHotkeyRegistered = false;
 
-        public override void OnApplicationStarted()
+        public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
@@ -431,7 +408,7 @@ namespace QuickSearch
                     dummyWindow.Hide();
                 };
 
-                popup.PlacementTarget = Application.Current.MainWindow;
+                popup.PlacementTarget = (UIElement)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
                 searchWindow = new SearchWindow(this);
@@ -508,8 +485,10 @@ namespace QuickSearch
                 var margin = searchWindow.SearchResults.Margin;
                 margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
-                var visual = (FrameworkElement)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
-                visual = (FrameworkElement)VisualTreeHelper.GetChild(visual, 0);
+                var visual = (Visual)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
+                //visual = (Visual)VisualTreeHelper.GetChild(visual, 0);
+
+                //PlayniteApi.Notifications.Add("test", "testing blur shift", NotificationType.Info);
                 brush = new VisualBrush()
                 {
                     Stretch = Stretch.None,
@@ -517,7 +496,6 @@ namespace QuickSearch
                     AutoLayoutContent = false,
                     TileMode = TileMode.None
                 };
-                brush.AutoLayoutContent = false;
                 searchWindow.BackgroundBorder.Background = brush;
                 RenderOptions.SetCachingHint(brush, CachingHint.Cache);
                 RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
@@ -552,14 +530,14 @@ namespace QuickSearch
             }
         }
 
-        public override void OnApplicationStopped()
+        public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
             // Add code to be executed when Playnite is shutting down.
             HotkeyHelper.UnregisterHotKey(mainWindowHandle, HOTKEY_ID);
             SavePluginSettings(Settings);
         }
 
-        public override void OnLibraryUpdated()
+        public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
             // Add code to be executed when library is updated.
         }

@@ -36,9 +36,9 @@ namespace QuickSearch.SearchItems
     struct RomKey : ISearchKey<string>
     {
         public Game game;
-        public string Key => game.GameImagePath;
+        public string Key => game.Roms?.FirstOrDefault()?.Name;
 
-        public float Weight => string.IsNullOrEmpty(game.GameImagePath)? 0f : 1f;
+        public float Weight => string.IsNullOrEmpty(game.Roms?.FirstOrDefault()?.Name) ? 0f : 1f;
     }
 
     struct SourceKey : ISearchKey<string>
@@ -246,11 +246,11 @@ namespace QuickSearch.SearchItems
                     return item;
                 });
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Platforms
-                .Where(p => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Platform == p, mode).Eval))
+                .Where(p => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Platforms?.FirstOrDefault() == p, mode).Eval))
                 .Select(p =>
                 {
                     var platform = p;
-                    GameFilter filter = new GameFilter(g => g.Platform == platform, previousFilter, mode);
+                    GameFilter filter = new GameFilter(g => g.Platforms?.FirstOrDefault() == platform, previousFilter, mode);
                     var item = new FilterItem(p.Name, prefix, "Platform", filter, seperator);
                     return item;
                 }));
@@ -550,7 +550,7 @@ namespace QuickSearch.SearchItems
                 keys.Add(new NameKey { game = game });
             if (!string.IsNullOrEmpty(game.Name) && CleanNameKey.regex.IsMatch(game.Name))
                 keys.Add(new CleanNameKey { game = game });
-            if (!string.IsNullOrEmpty(game.GameImagePath))
+            if (game.Roms?.Count > 0)
                 keys.Add(new RomKey { game = game });
         }
 
@@ -635,10 +635,10 @@ namespace QuickSearch.SearchItems
             Application.Current.FindResource("LOCGameIsInstalledTitle") as string  : 
             Application.Current.FindResource("LOCGameIsUnInstalledTitle") as string);
 
-        public string BottomLeft => game.Platform?.ToString();
+        public string BottomLeft => game.Platforms?.FirstOrDefault()?.ToString();
 
         public string BottomCenter => Path.GetFileNameWithoutExtension(
-            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.GameImagePath??string.Empty));
+            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.Roms.FirstOrDefault()?.Name??string.Empty));
 
         public string BottomRight
         {
