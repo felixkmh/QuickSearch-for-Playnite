@@ -556,6 +556,8 @@ namespace QuickSearch.SearchItems
 
         public Game game;
 
+        internal static string[] ImageExtensions = new string[] { ".png", ".jpg", ".jpeg", ".ico", ".bmp", ".tiff", ".gif" };
+
         private readonly IList<ISearchKey<string>> keys;
         public IList<ISearchKey<string>> Keys => keys;
 
@@ -571,7 +573,13 @@ namespace QuickSearch.SearchItems
                     Application.Current.FindResource("LOCInstallGame") as string
                 };
 
-                var actions = new List<ISearchAction<string>> { launchAciton };
+                var showAction = new CommandAction
+                {
+                    Name = "Show",
+                    Action = () => SearchPlugin.Instance.PlayniteApi.MainView.SelectGame(game.Id)
+                };
+
+                var actions = new List<ISearchAction<string>> { launchAciton, showAction };
 
                 if (game.IsInstalled)
                 {
@@ -623,8 +631,10 @@ namespace QuickSearch.SearchItems
                     fullPath = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(path);
                 }
 
-                return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
-
+                if (ImageExtensions.Contains(Path.GetExtension(Path.GetFileName(fullPath)).ToLower()))
+                {
+                    return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
+                }
             }
             return false;
         }
@@ -638,7 +648,7 @@ namespace QuickSearch.SearchItems
         public string BottomLeft => game.Platforms?.FirstOrDefault()?.ToString();
 
         public string BottomCenter => Path.GetFileNameWithoutExtension(
-            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.Roms.FirstOrDefault()?.Name??string.Empty));
+            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.Roms?.FirstOrDefault()?.Name??string.Empty));
 
         public string BottomRight
         {
