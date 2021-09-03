@@ -486,7 +486,7 @@ namespace QuickSearch
                 margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
                 var visual = (Visual)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
-                visual = (Visual)VisualTreeHelper.GetChild(visual, 0);
+                // visual = (Visual)VisualTreeHelper.GetChild(visual, 0);
 
                 //PlayniteApi.Notifications.Add("test", "testing blur shift", NotificationType.Info);
                 brush = new VisualBrush()
