@@ -1,0 +1,9 @@
+AddonId: felixkmh_QuickSearch_Plugin
+Packages:
+  - Version: 2.0.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-03
+    PackageUrl: https://github.com/felixkmh/DuplicateHider/releases/download/v2.0.0/felixkmh_QuickSearch_Plugin_2_0_0.pext
+    Changelog:
+      - Playnite 9 Betasupport, not compatible with Playnite 8!
+      - Changed Id, so you need to uninstall before reinstalling!
