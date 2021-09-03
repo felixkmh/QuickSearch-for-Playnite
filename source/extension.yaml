@@ -8,6 +8,3 @@ Icon: QuickSearch.png
 Links:
   - Name: GitHub
     Url: https://github.com/felixkmh/QuickSearch-for-Playnite
-UpdaterConfig:
-  GitHubUser: felixkmh
-  GitHubRepo: QuickSearch-for-Playnite
