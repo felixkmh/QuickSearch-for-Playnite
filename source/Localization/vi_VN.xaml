@@ -24,19 +24,27 @@
 
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey"></sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkeyShort"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkey"></sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyShort"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle"></sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold"></sys:String>
+    <sys:String x:Key="LOC_QS_SearchThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelay"></sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelayShort"></sys:String>
     <sys:String x:Key="LOC_QS_MaxResults"></sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems"></sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator"></sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding"></sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort"></sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus"></sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort"></sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArt"></sys:String>
     <sys:String x:Key="LOC_QS_GlassEffect"></sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffectShort"></sys:String>
     <sys:String x:Key="LOC_QS_BorderWidth"></sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidthShort"></sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems"></sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings"></sys:String>
@@ -45,6 +53,7 @@
     <sys:String x:Key="LOC_QS_Actions"></sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD"></sys:String>
     <sys:String x:Key="LOC_QS_ITADThreshold"></sys:String>
+    <sys:String x:Key="LOC_QS_ITADThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffix"></sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops"></sys:String>
     <sys:String x:Key="LOC_QS_Shop"></sys:String>
