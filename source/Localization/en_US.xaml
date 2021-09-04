@@ -52,7 +52,7 @@
     <sys:String x:Key="LOC_QS_Settings">Settings</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">Open settings for {0}</sys:String>
     <sys:String x:Key="LOC_QS_Library">Library</sys:String>
-    <sys:String x:Key="LOC_QS_Platorm">Platorm</sys:String>
+    <sys:String x:Key="LOC_QS_Platorm">Platform</sys:String>
     <sys:String x:Key="LOC_QS_Genre">Genre</sys:String>
     <sys:String x:Key="LOC_QS_Category">Category</sys:String>
     <sys:String x:Key="LOC_QS_Company">Company</sys:String>
