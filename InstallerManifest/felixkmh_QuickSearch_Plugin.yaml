@@ -1,5 +1,13 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:
+  - Version: 2.1.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-04
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.1.0/felixkmh_QuickSearch_Plugin_2_1_0.pext
+    Changelog:
+      - localization support. See https://crowdin.com/project/shortcutsync-for-playnite to contribute
+      - added german translation
+      - updated to QuickSearchSDK 1.4
   - Version: 2.0.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-03
