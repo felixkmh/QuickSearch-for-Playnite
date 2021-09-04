@@ -1,4 +1,5 @@
-﻿using QuickSearch.Attributes;
+﻿using Playnite.SDK;
+using QuickSearch.Attributes;
 using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
 using System;
@@ -267,14 +268,14 @@ namespace QuickSearch
                 registeredAssemblies.Add(assemblyName);
             }
 
-            var settingsCommand = new CommandItem(pluginName + " " + Application.Current.FindResource("LOCSettingsLabel"), () => { openSettingsViewAction?.Invoke(); }, "Open the " + pluginName + " settings.", "Open")
+            var settingsCommand = new CommandItem(pluginName + " " + Application.Current.FindResource("LOCSettingsLabel"), () => { openSettingsViewAction?.Invoke(); }, string.Format(ResourceProvider.GetString("LOC_QS_OpenSettings"), pluginName), ResourceProvider.GetString("LOC_QS_OpenAction"))
             {
                 IconChar = IconChars.Settings
             };
             if (settings?.GetType().GetProperties().Any(prop => prop.GetCustomAttribute<GenericOptionAttribute>(true) != null) ?? false)
             {
                 var subItemsSource = new SettingsItemSource<TSettings>() { Prefix = pluginName + " " + Application.Current.FindResource("LOCSettingsLabel") as string, Settings = settings };
-                var subItemsAction = new SubItemsAction() { Action = () => { }, Name = "Show", SubItemSource = subItemsSource, CloseAfterExecute = false };
+                var subItemsAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = subItemsSource, CloseAfterExecute = false };
                 subItemsAction.SubItemSource = subItemsSource;
                 settingsCommand.Actions.Add(subItemsAction);
             }

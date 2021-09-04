@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Playnite.SDK;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,10 +31,11 @@ namespace QuickSearch.SearchItems
         /// <param name="description">Item description.</param>
         /// <param name="actionName">Short display name of the action.</param>
         /// <param name="iconPath">Path to an icon.</param>
-        public CommandItem(string name, Action action, string description = null, string actionName = "Run", string iconPath = null)
+        public CommandItem(string name, Action action, string description = null, string actionName = null, string iconPath = null)
         {
             TopLeft = name;
             BottomLeft = description;
+            if (actionName == null) actionName = ResourceProvider.GetString("LOC_QS_RunAction");
 
             if (!string.IsNullOrWhiteSpace(name))
             {

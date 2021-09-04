@@ -1,4 +1,5 @@
-﻿using QuickSearch.Attributes;
+﻿using Playnite.SDK;
+using QuickSearch.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace QuickSearch.SearchItems.Settings
         }
         internal TSettings Settings { get; set; }
         /// <inheritdoc cref="ISearchSubItemSource{TKey}.Prefix"/>
-        public virtual string Prefix { get; set; } = "Settings";
+        public virtual string Prefix { get; set; } = ResourceProvider.GetString("LOC_QS_Settings");
         /// <inheritdoc cref="ISearchSubItemSource{TKey}.DisplayAllIfQueryIsEmpty"/>
         public virtual bool DisplayAllIfQueryIsEmpty => true;
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems(string)"/>
@@ -97,7 +98,7 @@ namespace QuickSearch.SearchItems.Settings
         /// </summary>
         public static readonly BoolSettingsAction<TSettings> Instance = new BoolSettingsAction<TSettings>();
         /// <inheritdoc cref="ISearchAction{TKey}.Name"/>
-        public string Name { get; set; } = "Toggle";
+        public string Name { get; set; } = ResourceProvider.GetString("LOC_QS_ToggleAction");
         /// <inheritdoc cref="ISearchAction{TKey}.CloseAfterExecute"/>
         public bool CloseAfterExecute => false;
 
@@ -217,7 +218,7 @@ namespace QuickSearch.SearchItems.Settings
 
         internal FloatAction floatAction;
         /// <inheritdoc cref="ISearchAction{TKey}.Name"/>
-        public string Name { get; set; } = "Set";
+        public string Name { get; set; } = ResourceProvider.GetString("LOC_QS_SetAction");
         /// <inheritdoc cref="ISearchAction{TKey}.CloseAfterExecute"/>
         public bool CloseAfterExecute => false;
 
@@ -487,8 +488,8 @@ namespace QuickSearch.SearchItems.Settings
                 var attr = Property.GetCustomAttributes(true).OfType<NumberOptionAttribute>().FirstOrDefault();
                 if (attr is NumberOptionAttribute)
                 {
-                    if (!string.IsNullOrWhiteSpace(attr.Name)) keys.Add(new SettingsKey { Key = attr.Name });
-                    if (!string.IsNullOrWhiteSpace(attr.Description)) keys.Add(new SettingsKey { Key = attr.Description });
+                    if (!string.IsNullOrWhiteSpace(attr.Name)) keys.Add(new SettingsKey { Key = attr.Name.ExpandString() });
+                    if (!string.IsNullOrWhiteSpace(attr.Description)) keys.Add(new SettingsKey { Key = attr.Description.ExpandString() });
                 }
                 if (!double.IsNaN(NewValue))
                 {
@@ -521,7 +522,7 @@ namespace QuickSearch.SearchItems.Settings
                             actions.Add(FloatSettingsAction<TSettings>.DecrementAction);
                         } else
                         {
-                            actions.Add(new FloatSettingsAction<TSettings> { Name = $"Set to {NewValue}", NewValue = NewValue, floatAction = FloatSettingsAction<TSettings>.FloatAction.Set });
+                            actions.Add(new FloatSettingsAction<TSettings> { Name = string.Format(ResourceProvider.GetString("LOC_QS_SetToAction"), NewValue), NewValue = NewValue, floatAction = FloatSettingsAction<TSettings>.FloatAction.Set });
                         }
                     }
                 }

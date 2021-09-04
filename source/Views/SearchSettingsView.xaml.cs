@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Playnite.SDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace QuickSearch
         {
             ShortcutText.Focusable = true;
             ShortcutText.Focus();
-            SetHotkeyButton.Content = "Press Hotkey (+ modfiers) now";
+            SetHotkeyButton.Content = ResourceProvider.GetString("LOC_QS_SetHotkeyPromtpButton");
         }
 
         private void MaxNumberResultsTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -68,7 +69,7 @@ namespace QuickSearch
         {
             ShortcutTextGlobal.Focusable = true;
             ShortcutTextGlobal.Focus();
-            SetHotkeyButtonGlobal.Content = "Press Hotkey (+ modfiers) now";
+            SetHotkeyButtonGlobal.Content = ResourceProvider.GetString("LOC_QS_SetHotkeyPromtpButton");
         }
 
         private void ShortcutTextGlobal_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -122,7 +123,7 @@ namespace QuickSearch
             searchHotkey.Modifiers = modifiers;
             shortcutText.Focusable = false;
             setHotkeyButton.Focus();
-            setHotkeyButton.Content = "Set Hotkey";
+            setHotkeyButton.Content = ResourceProvider.GetString("LOC_QS_SetHotkeyButton");
         }
     }
 }

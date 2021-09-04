@@ -1,4 +1,5 @@
-﻿using Playnite.SDK.Models;
+﻿using Playnite.SDK;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -216,10 +217,10 @@ namespace QuickSearch.SearchItems
                 return item;
             }).Concat(new ISearchItem<string>[] {
                 new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
-                    new SubItemsAction() { CloseAfterExecute = false, Name = "Show", SubItemSource = new FavoritesSource()},
+                    new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
                     "Favorites") {IconChar = QuickSearch.IconChars.Star },
                 new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
-                        new SubItemsAction() { CloseAfterExecute = false, Name = "Show", SubItemSource = new RecentlyPlayedSource()},
+                        new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new RecentlyPlayedSource()},
                         "Recently Played") {IconChar = '\uEEDC' }});
             if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
             {
@@ -242,7 +243,7 @@ namespace QuickSearch.SearchItems
                 {
                     var source = s;
                     GameFilter filter = new GameFilter(g => g.Source == source, previousFilter, mode);
-                    var item = new FilterItem(s.Name, prefix, "Library", filter, seperator);
+                    var item = new FilterItem(s.Name, prefix, ResourceProvider.GetString("LOC_QS_Library"), filter, seperator);
                     return item;
                 });
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Platforms
@@ -251,7 +252,7 @@ namespace QuickSearch.SearchItems
                 {
                     var platform = p;
                     GameFilter filter = new GameFilter(g => g.Platforms?.FirstOrDefault() == platform, previousFilter, mode);
-                    var item = new FilterItem(p.Name, prefix, "Platform", filter, seperator);
+                    var item = new FilterItem(p.Name, prefix, ResourceProvider.GetString("LOC_QS_Platform"), filter, seperator);
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Genres
@@ -259,7 +260,7 @@ namespace QuickSearch.SearchItems
                 .Select(gr =>
                 {
                     GameFilter filter = new GameFilter(g => g.Genres?.Contains(gr) ?? false, previousFilter, mode);
-                    var item = new FilterItem(gr.Name, prefix, "Genre", filter, seperator);
+                    var item = new FilterItem(gr.Name, prefix, ResourceProvider.GetString("LOC_QS_Genre"), filter, seperator);
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Categories
@@ -267,7 +268,7 @@ namespace QuickSearch.SearchItems
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => g.Categories?.Contains(c) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, "Category", filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOC_QS_Category"), filter, seperator);
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Companies
@@ -275,16 +276,16 @@ namespace QuickSearch.SearchItems
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, "Company", filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOC_QS_Company"), filter, seperator);
                     return item;
                 }));
             items = items.Concat((new[] { true, false })
                 .Where(c => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.IsInstalled == c, mode).Eval))
                 .Select(c =>
                 {
-                    var name = c ? "Installed" : "Unistalled";
+                    var name = c ? ResourceProvider.GetString("LOC_QS_Installed") : ResourceProvider.GetString("LOC_QS_Uninstalled");
                     GameFilter filter = new GameFilter(g => g.IsInstalled == c, previousFilter, mode);
-                    var item = new FilterItem(name, prefix, "Installation Status", filter, seperator);
+                    var item = new FilterItem(name, prefix, ResourceProvider.GetString("LOC_QS_InstallationStatus"), filter, seperator);
                     return item;
                 }));
             return items;
@@ -521,7 +522,7 @@ namespace QuickSearch.SearchItems
         }
 
         public IList<ISearchAction<string>> Actions 
-            => new [] { new SubItemsAction() { CloseAfterExecute = false, Name = "Apply", SubItemSource = new FilteredGameSource(filter, $"{prefix}{name}") }};
+            => new [] { new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ApplyAction"), SubItemSource = new FilteredGameSource(filter, $"{prefix}{name}") }};
 
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
 
@@ -531,7 +532,7 @@ namespace QuickSearch.SearchItems
 
         public string TopRight => SearchPlugin.Instance.PlayniteApi.Database.Games.Count(filter.Eval).ToString();
 
-        public string BottomLeft => $"{kind} Filter";
+        public string BottomLeft => string.Format(ResourceProvider.GetString("LOC_QS_XFilter"), kind);
 
         public string BottomCenter => null;
 
@@ -569,13 +570,13 @@ namespace QuickSearch.SearchItems
                 var launchAciton = new ContextAction
                 {
                     Name = game.IsInstalled ?
-                    Application.Current.FindResource("LOCPlayGame") as string :
-                    Application.Current.FindResource("LOCInstallGame") as string
+                    ResourceProvider.GetString("LOC_QS_PlayAction") :
+                    ResourceProvider.GetString("LOC_QS_InstallAction")
                 };
 
                 var showAction = new CommandAction
                 {
-                    Name = "Show",
+                    Name = ResourceProvider.GetString("LOC_QS_ShowAction"),
                     Action = () => SearchPlugin.Instance.PlayniteApi.MainView.SelectGame(game.Id)
                 };
 
@@ -641,9 +642,9 @@ namespace QuickSearch.SearchItems
 
         public string TopLeft => game.Name;
 
-        public string TopRight => (game.Source != null ? (game.Source.Name + " - "):"") + (game.IsInstalled ? 
-            Application.Current.FindResource("LOCGameIsInstalledTitle") as string  : 
-            Application.Current.FindResource("LOCGameIsUnInstalledTitle") as string);
+        public string TopRight => (game.Source != null ? (game.Source.Name + " - "):"") + (game.IsInstalled ?
+            ResourceProvider.GetString("LOCGameIsInstalledTitle") :
+            ResourceProvider.GetString("LOCGameIsUnInstalledTitle"));
 
         public string BottomLeft => game.Platforms?.FirstOrDefault()?.ToString();
 
@@ -657,7 +658,7 @@ namespace QuickSearch.SearchItems
                 var time = TimeSpan.FromSeconds(game.Playtime);
                 int hours = (int)Math.Truncate(time.TotalHours);
                 int minutes = (int)((time.TotalHours - hours) * 60);
-                return Application.Current.FindResource("LOCTimePlayed") as string + ": " + $"{hours}h{minutes}min";
+                return ResourceProvider.GetString("LOCTimePlayed") + ": " + $"{hours}h{minutes}min";
             }
         }
 
