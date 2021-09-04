@@ -31,11 +31,11 @@
     <sys:String x:Key="LOC_QS_MaxResults">Max. Anzahl an Ergebnissen (0 = kein Limit):</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">Alle Items aufklappen</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">Trennlinie zeigen</sys:String>
-    <sys:String x:Key="LOC_QS_LowerPriorityAdding">Ergebnisse mit niedrigerer Priorität hinzufügen (falls es beim Tippen hackelt)</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAdding">Ergebnisse mit niedrigerer Priorität hinzufügen (falls es beim Tippen hakelt)</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">Bei gleichem Wert erst nach Installationsstatus sortieren, dann nach Namen</sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems">Aktiviere Filter</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArt">Ziehe Cover-Art dem Spiele-Icon vor</sys:String>
-    <sys:String x:Key="LOC_QS_GlassEffect">Aktiviere Milchglass-Effect auf dem Suchfenster</sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffect">Aktiviere Milchglass-Effekt auf dem Suchfenster</sys:String>
     <sys:String x:Key="LOC_QS_BorderWidth">Breite der Umrandung des Suchfensters:</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems">Erlaube anderen Erweiterungen Items hinzuzufügen.</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions">Erlaube anderen Erweiterungen Spiel-Aktionen hinzuzufügen.</sys:String>
@@ -44,7 +44,7 @@
     <sys:String x:Key="LOC_QS_Items">Items</sys:String>
     <sys:String x:Key="LOC_QS_Actions">Aktionen</sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD">Aktiviere Suche via IsThereAnyDeal.com API</sys:String>
-    <sys:String x:Key="LOC_QS_ITADThreshold">ITAD Grenzwert. Wenn das beste Ergebnis einen niedriegeren Wert hat, suche mit ITAD:</sys:String>
+    <sys:String x:Key="LOC_QS_ITADThreshold">ITAD Grenzwert. Wenn das beste Ergebnis einen kleineren Wert hat, suche mit ITAD:</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffix">Suffix zum manuellen Überschreiben:</sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops">Aktiviere verfügbare Shops zum Suchen:</sys:String>
     <sys:String x:Key="LOC_QS_Shop">Shop</sys:String>
@@ -52,19 +52,19 @@
     <sys:String x:Key="LOC_QS_Settings">Einstellungen</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">Öffne Einstellungen für {0}</sys:String>
     <sys:String x:Key="LOC_QS_Library">Bibliothek</sys:String>
-    <sys:String x:Key="LOC_QS_Platorm"></sys:String>
-    <sys:String x:Key="LOC_QS_Genre"></sys:String>
-    <sys:String x:Key="LOC_QS_Category"></sys:String>
-    <sys:String x:Key="LOC_QS_Company"></sys:String>
-    <sys:String x:Key="LOC_QS_InstallationStatus"></sys:String>
-    <sys:String x:Key="LOC_QS_Installed"></sys:String>
-    <sys:String x:Key="LOC_QS_Uninstalled"></sys:String>
-    <sys:String x:Key="LOC_QS_XFilter"></sys:String>
+    <sys:String x:Key="LOC_QS_Platorm">Platform</sys:String>
+    <sys:String x:Key="LOC_QS_Genre">Genre</sys:String>
+    <sys:String x:Key="LOC_QS_Category">Kategorie</sys:String>
+    <sys:String x:Key="LOC_QS_Company">Studio</sys:String>
+    <sys:String x:Key="LOC_QS_InstallationStatus">Installationsstatus</sys:String>
+    <sys:String x:Key="LOC_QS_Installed">Installiert</sys:String>
+    <sys:String x:Key="LOC_QS_Uninstalled">Deinstalliert</sys:String>
+    <sys:String x:Key="LOC_QS_XFilter">{0}-Filter</sys:String>
 
     <!--Tool Tips-->
-    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
-    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip"></sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Hänge diese Zeichenfolge ans Ende der Suchanfrage um mit ITAD zu suchen. Freilassen um das manuelle Überschreiben zu deaktivieren.</sys:String>
     <!--Buttons-->
-    <sys:String x:Key="LOC_QS_SetHotkeyButton"></sys:String>
-    <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton"></sys:String>
+    <sys:String x:Key="LOC_QS_SetHotkeyButton">Setze Hotkey</sys:String>
+    <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Jetzt Hotkey (+ Modifiers) drücken</sys:String>
 </ResourceDictionary>
