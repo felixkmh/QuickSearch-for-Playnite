@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Playnite.SDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,26 @@ namespace QuickSearch
         public static bool IsNumberType(this Type type)
         {
             return NumberTypes.Contains(type);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ExpandString(this string input)
+        {
+            if (input is string)
+            {
+                if (input.StartsWith("LOC", StringComparison.OrdinalIgnoreCase))
+                {
+                    var loc = ResourceProvider.GetString(input);
+                    if (!string.IsNullOrEmpty(loc))
+                    {
+                        return loc;
+                    }
+                }
+            }
+            return input;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿Id: felixkmh_QuickSearch_Plugin
 Name: QuickSearch
 Author: felixkmh
-Version: 2.0.0
+Version: 2.1.0
 Module: QuickSearch.dll
 Type: GenericPlugin
 Icon: QuickSearch.png

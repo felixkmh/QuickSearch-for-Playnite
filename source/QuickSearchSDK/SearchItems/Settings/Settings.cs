@@ -278,8 +278,8 @@ namespace QuickSearch.SearchItems.Settings
                 var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
                 if (attr is GenericOptionAttribute)
                 {
-                    if (attr.Name is string) keys.Add(new SettingsKey { Key = attr.Name });
-                    if (attr.Description is string) keys.Add(new SettingsKey { Key = attr.Description });
+                    if (attr.Name is string) keys.Add(new SettingsKey { Key = attr.Name.ExpandString() });
+                    if (attr.Description is string) keys.Add(new SettingsKey { Key = attr.Description.ExpandString() });
                 }
                 return keys;
             }
@@ -297,7 +297,7 @@ namespace QuickSearch.SearchItems.Settings
                 var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
                 if (attr is GenericOptionAttribute)
                 {
-                    if (attr.Name is string) return attr.Name;
+                    if (attr.Name is string) return attr.Name.ExpandString();
                 }
                 return null;
             }
@@ -312,7 +312,7 @@ namespace QuickSearch.SearchItems.Settings
                 var attr = Property.GetCustomAttributes(true).OfType<GenericOptionAttribute>().FirstOrDefault();
                 if (attr is GenericOptionAttribute)
                 {
-                    if (attr.Name is string) return attr.Description;
+                    if (attr.Name is string) return attr.Description.ExpandString();
                 }
                 return null;
             }
