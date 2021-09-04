@@ -24,19 +24,27 @@
 
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey">Hotkey zum Öffnen des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkeyShort"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkey">Globaler Hotkey zum Öffnen des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyShort"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Aktiviere globalen Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold">Grenzwert für unscharfe Suche (größerer Wert = strikter = schnellere Suche):</sys:String>
+    <sys:String x:Key="LOC_QS_SearchThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelay">Zeit in Millisekunden, um die die Anfrage asynchroner Items verzögert wird:</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelayShort"></sys:String>
     <sys:String x:Key="LOC_QS_MaxResults">Max. Anzahl an Ergebnissen (0 = kein Limit):</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">Alle Items aufklappen</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">Trennlinie zeigen</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding">Ergebnisse mit niedrigerer Priorität hinzufügen (falls es beim Tippen hakelt)</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort"></sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">Bei gleichem Wert erst nach Installationsstatus sortieren, dann nach Namen</sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort"></sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems">Aktiviere Filter</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArt">Ziehe Cover-Art dem Spiele-Icon vor</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffect">Aktiviere Milchglass-Effekt auf dem Suchfenster</sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffectShort"></sys:String>
     <sys:String x:Key="LOC_QS_BorderWidth">Breite der Umrandung des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidthShort"></sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems">Erlaube anderen Erweiterungen Items hinzuzufügen.</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions">Erlaube anderen Erweiterungen Spiel-Aktionen hinzuzufügen.</sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings">Aktiviere Items und Spiele-Aktionen pro Erweiterung:</sys:String>
@@ -45,6 +53,7 @@
     <sys:String x:Key="LOC_QS_Actions">Aktionen</sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD">Aktiviere Suche via IsThereAnyDeal.com API</sys:String>
     <sys:String x:Key="LOC_QS_ITADThreshold">ITAD Grenzwert. Wenn das beste Ergebnis einen kleineren Wert hat, suche mit ITAD:</sys:String>
+    <sys:String x:Key="LOC_QS_ITADThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffix">Suffix zum manuellen Überschreiben:</sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops">Aktiviere verfügbare Shops zum Suchen:</sys:String>
     <sys:String x:Key="LOC_QS_Shop">Shop</sys:String>
