@@ -24,19 +24,27 @@
 
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey">Hotkey to open the search popup:</sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkeyShort">Search Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkey">Gloabl hotkey to open the search popup:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyShort">Global Search Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Enable global hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold">Fuzzy search threshold (higher value = more strict = quicker search):</sys:String>
+    <sys:String x:Key="LOC_QS_SearchThresholdShort">Fuzzy search threshold</sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelay">Amount of time in milliseconds to wait before requesting async items:</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelayShort">Async Item Delay (ms)</sys:String>
     <sys:String x:Key="LOC_QS_MaxResults">Max number of results (0 = no limit):</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">Expand all items</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">Show seperator</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding">Lower priority of adding results (Enable if typing seems laggy)</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">Add Items With Lower Priority</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">Sort by installation status before name if score is equal</sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">Prioritize Installation Status for Sorting</sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems">Enable Filter-SubItemSources</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArt">Prefer cover art over game icon</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffect">Enable transparent glass effect on search window</sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffectShort">Glass effect</sys:String>
     <sys:String x:Key="LOC_QS_BorderWidth">Width of the outer border of the search window:</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidthShort">Outer border width</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems">Enable Items added by other extensions.</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions">Enable Game Actions added by other extensions.</sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings">Enable Items and Game Actions per extension:</sys:String>
@@ -45,6 +53,7 @@
     <sys:String x:Key="LOC_QS_Actions">Actions</sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD">Enable searching via IsThereAnyDeal.com API</sys:String>
     <sys:String x:Key="LOC_QS_ITADThreshold">ITAD threshold. If the score of the best result is less than this value, search on ITAD:</sys:String>
+    <sys:String x:Key="LOC_QS_ITADThresholdShort">ITAD threshold</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffix">Manual override suffix:</sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops">Enable available Shops to search in:</sys:String>
     <sys:String x:Key="LOC_QS_Shop">Shop</sys:String>
