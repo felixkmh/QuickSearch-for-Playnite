@@ -1,0 +1,70 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+	<!--Actions-->
+    <sys:String x:Key="LOC_QS_PlayAction">Spielen</sys:String>
+    <sys:String x:Key="LOC_QS_InstallAction">Installieren</sys:String>
+    <sys:String x:Key="LOC_QS_RunAction">Ausführen</sys:String>
+    <sys:String x:Key="LOC_QS_ApplyAction">Anwenden</sys:String>
+    <sys:String x:Key="LOC_QS_SearchAction">Suchen</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAction">Öffnen</sys:String>
+    <sys:String x:Key="LOC_QS_ShowAction">Anzeigen</sys:String>
+    <sys:String x:Key="LOC_QS_ToggleAction">Umschalten</sys:String>
+    <sys:String x:Key="LOC_QS_SetAction">Festlegen</sys:String>
+    <sys:String x:Key="LOC_QS_SetToAction">Auf {0} setzen</sys:String>
+    <sys:String x:Key="LOC_QS_UpdateAction">Aktualisieren</sys:String>
+    <sys:String x:Key="LOC_QS_UpdateAllLibraries">Alle Bibliotheken aktualisieren</sys:String>
+    <sys:String x:Key="LOC_QS_DownloadMetaData">Metadaten herunterladen</sys:String>
+
+    <!--Settings-->
+	<!--Tabs-->
+	<sys:String x:Key="LOC_QS_CommonTab">Allgemein</sys:String>
+	<sys:String x:Key="LOC_QS_AppearanceTab">Aussehen</sys:String>
+    <sys:String x:Key="LOC_QS_ExternalTab">Extern</sys:String>
+    <sys:String x:Key="LOC_QS_ITADTab">IsThereAnyDeal</sys:String>
+
+	<!--Labels-->
+    <sys:String x:Key="LOC_QS_LocalHotkey">Hotkey zum Öffnen des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey">Globaler Hotkey zum Öffnen des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Aktiviere globalen Hotkey</sys:String>
+    <sys:String x:Key="LOC_QS_SearchThreshold">Grenzwert für unscharfe Suche (größerer Wert = strikter = schnellere Suche):</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelay">Zeit in Millisekunden, um die die Anfrage asynchroner Items verzögert wird:</sys:String>
+    <sys:String x:Key="LOC_QS_MaxResults">Max. Anzahl an Ergebnissen (0 = kein Limit):</sys:String>
+    <sys:String x:Key="LOC_QS_ExpandAllItems">Alle Items aufklappen</sys:String>
+    <sys:String x:Key="LOC_QS_ShowSeparator">Trennlinie zeigen</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAdding">Ergebnisse mit niedrigerer Priorität hinzufügen (falls es beim Tippen hakelt)</sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">Bei gleichem Wert erst nach Installationsstatus sortieren, dann nach Namen</sys:String>
+    <sys:String x:Key="LOC_QS_FilterSubItems">Aktiviere Filter</sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArt">Ziehe Cover-Art dem Spiele-Icon vor</sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffect">Aktiviere Milchglass-Effekt auf dem Suchfenster</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidth">Breite der Umrandung des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_AllowExternalItems">Erlaube anderen Erweiterungen Items hinzuzufügen.</sys:String>
+    <sys:String x:Key="LOC_QS_AllowExternalGameActions">Erlaube anderen Erweiterungen Spiel-Aktionen hinzuzufügen.</sys:String>
+    <sys:String x:Key="LOC_QS_PerExtensionSettings">Aktiviere Items und Spiele-Aktionen pro Erweiterung:</sys:String>
+    <sys:String x:Key="LOC_QS_Extension">Erweiterung</sys:String>
+    <sys:String x:Key="LOC_QS_Items">Items</sys:String>
+    <sys:String x:Key="LOC_QS_Actions">Aktionen</sys:String>
+    <sys:String x:Key="LOC_QS_EnableITAD">Aktiviere Suche via IsThereAnyDeal.com API</sys:String>
+    <sys:String x:Key="LOC_QS_ITADThreshold">ITAD Grenzwert. Wenn das beste Ergebnis einen kleineren Wert hat, suche mit ITAD:</sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffix">Suffix zum manuellen Überschreiben:</sys:String>
+    <sys:String x:Key="LOC_QS_EnabledITADShops">Aktiviere verfügbare Shops zum Suchen:</sys:String>
+    <sys:String x:Key="LOC_QS_Shop">Shop</sys:String>
+    <sys:String x:Key="LOC_QS_Enabled">Aktiviert</sys:String>
+    <sys:String x:Key="LOC_QS_Settings">Einstellungen</sys:String>
+    <sys:String x:Key="LOC_QS_OpenSettings">Öffne Einstellungen für {0}</sys:String>
+    <sys:String x:Key="LOC_QS_Library">Bibliothek</sys:String>
+    <sys:String x:Key="LOC_QS_Platorm">Platform</sys:String>
+    <sys:String x:Key="LOC_QS_Genre">Genre</sys:String>
+    <sys:String x:Key="LOC_QS_Category">Kategorie</sys:String>
+    <sys:String x:Key="LOC_QS_Company">Studio</sys:String>
+    <sys:String x:Key="LOC_QS_InstallationStatus">Installationsstatus</sys:String>
+    <sys:String x:Key="LOC_QS_Installed">Installiert</sys:String>
+    <sys:String x:Key="LOC_QS_Uninstalled">Deinstalliert</sys:String>
+    <sys:String x:Key="LOC_QS_XFilter">{0}-Filter</sys:String>
+
+    <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Hänge diese Zeichenfolge ans Ende der Suchanfrage um mit ITAD zu suchen. Freilassen um das manuelle Überschreiben zu deaktivieren.</sys:String>
+    <!--Buttons-->
+    <sys:String x:Key="LOC_QS_SetHotkeyButton">Setze Hotkey</sys:String>
+    <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Jetzt Hotkey (+ Modifiers) drücken</sys:String>
+</ResourceDictionary>
