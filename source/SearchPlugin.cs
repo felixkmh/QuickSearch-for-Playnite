@@ -351,6 +351,7 @@ namespace QuickSearch
 
         public Popup popup;
         internal SearchWindow searchWindow;
+        private UIElement placementTarget;
         VisualBrush brush;
         Window dummyWindow;
         bool glassActive = false;
@@ -408,9 +409,11 @@ namespace QuickSearch
                     dummyWindow.Hide();
                 };
 
-                popup.PlacementTarget = (UIElement)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
+                placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.MainWindow, "PART_ContentView").FirstOrDefault();
+                var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
+                popup.PlacementTarget = placementTarget;
                 searchWindow = new SearchWindow(this);
                 searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
@@ -435,7 +438,7 @@ namespace QuickSearch
                 {
                     EnableGlassEffect();
                 }
-                popup.PlacementTarget = Application.Current.MainWindow;
+                popup.PlacementTarget = placementTarget;
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
                 popup.VerticalOffset = 0;
@@ -456,6 +459,7 @@ namespace QuickSearch
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
             }
+            PlayniteApi.Notifications.Add("tests", "test", NotificationType.Info);
             popup.IsOpen = !popup.IsOpen;
         }
 
@@ -485,14 +489,12 @@ namespace QuickSearch
                 var margin = searchWindow.SearchResults.Margin;
                 margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
-                var visual = (Visual)VisualTreeHelper.GetChild(Application.Current.MainWindow, 0);
-                // visual = (Visual)VisualTreeHelper.GetChild(visual, 0);
+                var visual = (Visual)placementTarget;
 
-                //PlayniteApi.Notifications.Add("test", "testing blur shift", NotificationType.Info);
                 brush = new VisualBrush()
                 {
                     Stretch = Stretch.None,
-                    Visual = visual,
+                    Visual = placementTarget,
                     AutoLayoutContent = false,
                     TileMode = TileMode.None
                 };
@@ -501,6 +503,7 @@ namespace QuickSearch
                 RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
                 ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
+
                 int radius = 80;
                 searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance };
                 searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + radius;
