@@ -459,7 +459,7 @@ namespace QuickSearch
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
             }
-            PlayniteApi.Notifications.Add("tests", "test", NotificationType.Info);
+            
             popup.IsOpen = !popup.IsOpen;
         }
 
