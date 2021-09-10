@@ -543,6 +543,11 @@ namespace QuickSearch.SearchItems
 
     public class GameSearchItem : ISearchItem<string>
     {
+        public GameSearchItem()
+        {
+
+        }
+
         public GameSearchItem(Game game)
         {
             this.game = game;
