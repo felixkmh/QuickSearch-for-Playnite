@@ -19,7 +19,11 @@
     <UserControl.Resources>
         <TextBlock x:Key="LoadingTextIcon" Text="&#xeffa;" FontFamily="{DynamicResource FontIcoFont}" Style="{StaticResource {x:Type TextBlock}}" FontSize="50"/>
         <SolidColorBrush x:Key="PopupBackgroundBrush" Color="{DynamicResource PopupBackgroundColor}" Opacity="0.4"/>
-        <ImageBrush x:Key="NoiseTextureBrush" ImageSource="pack://application:,,,/QuickSearch;component/Images/noise.png" Viewport="0,0,100,100" ViewportUnits="Absolute" TileMode="Tile" Opacity="0.4"/>
+        <ImageBrush x:Key="NoiseTextureBrush"  Viewport="0,0,100,100" ViewportUnits="Absolute" TileMode="Tile" Opacity="0.4">
+            <ImageBrush.ImageSource>
+                <BitmapImage UriSource="pack://application:,,,/QuickSearch;component/Images/noise.png" CreateOptions="IgnoreColorProfile"/>
+            </ImageBrush.ImageSource>
+        </ImageBrush>
         <DrawingImage x:Key="LoadingDrawingImage">
             <DrawingImage.Drawing>
                 <DrawingGroup ClipGeometry="M0,0 V256 H256 V0 H0 Z">
@@ -148,7 +152,7 @@
                        VerticalAlignment="Center" 
                        FontSize="18"
                        Margin="6" Padding="1"/>
-            <Image x:Name="LoadIcon" Source="{StaticResource LoadingDrawingImage}" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
+            <Image x:Name="LoadIcon" Source="{DynamicResource LoadingDrawingImage}" Visibility="{Binding IsLoadingResults, Converter={StaticResource BooleanToVisibilityConverter}}"
                        Stretch="Uniform"
                        Width="{Binding ActualHeight, ElementName=SearchIcon}"
                        Height="{Binding ActualHeight, ElementName=SearchIcon}"
