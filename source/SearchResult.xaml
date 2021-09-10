@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="QuickSearch.SearchResult"
-             d:DataContext="{d:DesignInstance items:GameSearchItem , IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance items:GameSearchItem, IsDesignTimeCreatable=True}"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -86,7 +86,7 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon, TargetNullValue={x:Null}}" 
+                <Image Source="{Binding Icon, TargetNullValue={x:Null}}"
                        Stretch="UniformToFill" 
                        Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
