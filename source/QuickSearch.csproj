@@ -88,6 +88,7 @@
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="Settings\AssemblyOptions.cs" />
     <Compile Include="Settings\SearchSettings.cs" />
+    <Compile Include="UiHelper.cs" />
     <Compile Include="Views\PopupWindow.xaml.cs">
       <DependentUpon>PopupWindow.xaml</DependentUpon>
     </Compile>
