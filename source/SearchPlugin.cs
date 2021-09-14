@@ -247,7 +247,7 @@ namespace QuickSearch
                     {
                         string name = (string)Application.Current.FindResource("LOC_QS_Addons");
                         var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), (string)Application.Current.FindResource("LOC_QS_OpenAddons"), ResourceProvider.GetString("LOC_QS_OpenAction"));
-                        item.IconChar = IconChars.Settings;
+                        item.IconChar = '\uEEA0';
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
