@@ -12,12 +12,13 @@ using System.Globalization;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json;
 using QuickSearch.Models.ITAD;
+using Playnite.SDK;
 
 namespace QuickSearch.SearchItems
 {
     class CheapSharkItemSource : ISearchSubItemSource<string>
     {
-        public string Prefix => "Search on CheapShark";
+        public string Prefix => string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction"), "CheapShark");
 
         public bool DisplayAllIfQueryIsEmpty => false;
 

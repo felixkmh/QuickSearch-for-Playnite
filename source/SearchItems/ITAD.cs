@@ -12,12 +12,13 @@ using System.Globalization;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json;
 using QuickSearch.Models.ITAD;
+using Playnite.SDK;
 
 namespace QuickSearch.SearchItems
 {
     class ITADItemSource : ISearchSubItemSource<string>
     {
-        public string Prefix => "Search on ITAD";
+        public string Prefix => string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction"), "ITAD");
 
         public bool DisplayAllIfQueryIsEmpty => false;
 
