@@ -66,7 +66,7 @@
     <sys:String x:Key="LOC_QS_Settings">Einstellungen</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">Öffne Einstellungen für {0}</sys:String>
     <sys:String x:Key="LOC_QS_Library">Bibliothek</sys:String>
-    <sys:String x:Key="LOC_QS_Platorm">Platform</sys:String>
+    <sys:String x:Key="LOC_QS_Platform"></sys:String>
     <sys:String x:Key="LOC_QS_Genre">Genre</sys:String>
     <sys:String x:Key="LOC_QS_Category">Kategorie</sys:String>
     <sys:String x:Key="LOC_QS_Company">Studio</sys:String>
