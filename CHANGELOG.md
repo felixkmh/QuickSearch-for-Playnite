@@ -1,3 +1,15 @@
+## v2.2.0 (2021-09-15)
+
+### Fix
+
+- resource name typo
+- wrong icon for addons action
+- itad and cheapshark subitemsources names didn't use localization
+
+### Feat
+
+- added action to open add-on menu
+
 ## v2.1.1 (2021-09-10)
 
 ### Fix
