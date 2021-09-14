@@ -228,125 +228,141 @@ namespace QuickSearch
 
                 HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(Settings.SearchShortcut.Key, Settings.SearchShortcut.Modifiers));
                 mainWindow.InputBindings.Add(HotkeyBinding);
-                CommandItem addGameCommand = new CommandItem((string)Application.Current.FindResource("LOCAddGames"), new List<CommandAction>(), "Add Games")
+                AddBuiltInCommands();
+            }
+
+        }
+
+        private void AddBuiltInCommands()
+        {
+            CommandItem addGameCommand = new CommandItem((string)Application.Current.FindResource("LOCAddGames"), new List<CommandAction>(), "Add Games")
+            {
+                IconChar = IconChars.GameConsole
+            };
+            foreach (InputBinding binding in mainWindow.InputBindings)
+            {
+                if (binding.Gesture is KeyGesture keyGesture)
                 {
-                    IconChar = IconChars.GameConsole
-                };
-                foreach (InputBinding binding in mainWindow.InputBindings)
-                {
-                    if (binding.Gesture is KeyGesture keyGesture)
+                    if (keyGesture.Key == Key.F9 && keyGesture.Modifiers == ModifierKeys.None)
                     {
-                        if (keyGesture.Key == Key.F4 && keyGesture.Modifiers == ModifierKeys.None)
+                        string name = (string)Application.Current.FindResource("LOC_QS_Addons");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), (string)Application.Current.FindResource("LOC_QS_OpenAddons"), ResourceProvider.GetString("LOC_QS_OpenAction"));
+                        item.IconChar = IconChars.Settings;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCSettingsWindowTitle");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Playnite Settings", "Open");
-                            item.IconChar = IconChars.Settings;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach(CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.F5 && keyGesture.Modifiers == ModifierKeys.None)
+                    }
+                    if (keyGesture.Key == Key.F4 && keyGesture.Modifiers == ModifierKeys.None)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCSettingsWindowTitle");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Playnite Settings", ResourceProvider.GetString("LOC_QS_OpenAction"));
+                        item.IconChar = IconChars.Settings;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCUpdateAll") + " " + (string)Application.Current.FindResource("LOCLibraries");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Update All Libraries", (string)Application.Current.FindResource("LOCUpdateAll"));
-                            item.IconChar = IconChars.Refresh;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Alt)
+                    }
+                    if (keyGesture.Key == Key.F5 && keyGesture.Modifiers == ModifierKeys.None)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCUpdateAll") + " " + (string)Application.Current.FindResource("LOCLibraries");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Update All Libraries", (string)Application.Current.FindResource("LOCUpdateAll"));
+                        item.IconChar = IconChars.Refresh;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCExitPlaynite");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Exit Playnite", (string)Application.Current.FindResource("LOCExitAppLabel"));
-                            item.IconChar = IconChars.Exit;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.F11 && keyGesture.Modifiers == ModifierKeys.None)
+                    }
+                    if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Alt)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCExitPlaynite");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Exit Playnite", (string)Application.Current.FindResource("LOCExitAppLabel"));
+                        item.IconChar = IconChars.Exit;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCMenuOpenFullscreen");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Switch to Fullscreen Mode", "Switch");
-                            item.IconChar = IconChars.Maximize;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.Insert && keyGesture.Modifiers == ModifierKeys.None)
+                    }
+                    if (keyGesture.Key == Key.F11 && keyGesture.Modifiers == ModifierKeys.None)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCMenuOpenFullscreen");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Switch to Fullscreen Mode", ResourceProvider.GetString("LOC_QS_SwitchAction"));
+                        item.IconChar = IconChars.Maximize;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameManual")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Control)
+                    }
+                    if (keyGesture.Key == Key.Insert && keyGesture.Modifiers == ModifierKeys.None)
+                    {
+                        addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameManual")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
+                    }
+                    if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Control)
+                    {
+                        addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameEmulated")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
+                    }
+                    if (keyGesture.Key == Key.W && keyGesture.Modifiers == ModifierKeys.Control)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCMenuLibraryManagerTitle");
+                        name = name.Replace("…", "");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Library Manager", ResourceProvider.GetString("LOC_QS_OpenAction"));
+                        item.IconChar = IconChars.Settings;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameEmulated")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.W && keyGesture.Modifiers == ModifierKeys.Control)
+                    }
+                    if (keyGesture.Key == Key.T && keyGesture.Modifiers == ModifierKeys.Control)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCEmulatorsWindowTitle");
+                        name = name.Replace("…", "");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Configure Emulators", ResourceProvider.GetString("LOC_QS_ConfigureAction"));
+                        item.IconChar = IconChars.Settings;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCMenuLibraryManagerTitle");
-                            name = name.Replace("…", "");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Library Manager", "Open");
-                            item.IconChar = IconChars.Settings;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
-                        if (keyGesture.Key == Key.T && keyGesture.Modifiers == ModifierKeys.Control)
+                    }
+                    if (keyGesture.Key == Key.D && keyGesture.Modifiers == ModifierKeys.Control)
+                    {
+                        string name = (string)Application.Current.FindResource("LOCMenuDownloadMetadata");
+                        name = name.Replace("…", "");
+                        var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Download Metadata", ResourceProvider.GetString("LOC_QS_OpenAction"));
+                        item.IconChar = IconChars.Copy;
+                        item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
                         {
-                            string name = (string)Application.Current.FindResource("LOCEmulatorsWindowTitle");
-                            name = name.Replace("…", "");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Configure Emulators", "Configure");
-                            item.IconChar = IconChars.Settings;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
-                        }
-                        if (keyGesture.Key == Key.D && keyGesture.Modifiers == ModifierKeys.Control)
-                        {
-                            string name = (string)Application.Current.FindResource("LOCMenuDownloadMetadata");
-                            name = name.Replace("…", "");
-                            var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Download Metadata", "Open");
-                            item.IconChar = IconChars.Copy;
-                            item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
-                            foreach (CommandItemKey key in item.Keys.ToArray())
-                            {
-                                item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                            }
+                            item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
                 }
-                QuickSearchSDK.AddCommand(addGameCommand);
-                foreach (CommandItemKey key in addGameCommand.Keys.ToArray())
-                {
-                    addGameCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
-                }
-                addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
-                QuickSearchSDK.AddPluginSettings("QuickSearch", Settings, OpenSettingsView);
-                QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
-
-                var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
-                var itadCommand = new CommandItem("IsThereAnyDeal", new List<CommandAction>(), "Search on IsThereAnyDeal.com", "https://d2uym1p5obf9p8.cloudfront.net/images/banners/150x150.gif");
-                itadCommand.Keys.Add(new CommandItemKey() { Key = "itad", Weight = 1 });
-                itadCommand.Actions.Add(itadSubItemsAction);
-                QuickSearchSDK.AddCommand(itadCommand);
-
-                var cheapSharkSubItemsAction = new SubItemsAction() { Action = () => { }, Name = "Open", CloseAfterExecute = false, SubItemSource = new CheapSharkItemSource() };
-                var cheapSharkCommand = new CommandItem("CheapShark", new List<CommandAction>(), "Search on CheapShark.com", "https://www.cheapshark.com/img/logo_image.png?v=1.0");
-                cheapSharkCommand.Actions.Add(cheapSharkSubItemsAction);
-                QuickSearchSDK.AddCommand(cheapSharkCommand);
             }
+            QuickSearchSDK.AddCommand(addGameCommand);
+            foreach (CommandItemKey key in addGameCommand.Keys.ToArray())
+            {
+                addGameCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
+            }
+            addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
+            QuickSearchSDK.AddPluginSettings("QuickSearch", Settings, OpenSettingsView);
+            QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
 
+            var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
+            var itadCommand = new CommandItem("IsThereAnyDeal", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction") , "IsThereAnyDeal.com"), "https://d2uym1p5obf9p8.cloudfront.net/images/banners/150x150.gif");
+            itadCommand.Keys.Add(new CommandItemKey() { Key = "itad", Weight = 1 });
+            itadCommand.Actions.Add(itadSubItemsAction);
+            QuickSearchSDK.AddCommand(itadCommand);
+
+            var cheapSharkSubItemsAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new CheapSharkItemSource() };
+            var cheapSharkCommand = new CommandItem("CheapShark", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction"), "CheapShark.com"), "https://www.cheapshark.com/img/logo_image.png?v=1.0");
+            cheapSharkCommand.Actions.Add(cheapSharkSubItemsAction);
+            QuickSearchSDK.AddCommand(cheapSharkCommand);
         }
 
         public Popup popup;
