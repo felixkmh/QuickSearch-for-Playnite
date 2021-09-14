@@ -14,6 +14,11 @@
     <sys:String x:Key="LOC_QS_UpdateAction"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateAllLibraries"></sys:String>
     <sys:String x:Key="LOC_QS_DownloadMetaData"></sys:String>
+    <sys:String x:Key="LOC_QS_Addons"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenAddons"></sys:String>
+    <sys:String x:Key="LOC_QS_SwitchAction"></sys:String>
+    <sys:String x:Key="LOC_QS_ConfigureAction"></sys:String>
+    <sys:String x:Key="LOC_QS_SearchOnAction"></sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
