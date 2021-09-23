@@ -74,7 +74,8 @@
     <sys:String x:Key="LOC_QS_Installed">Installiert</sys:String>
     <sys:String x:Key="LOC_QS_Uninstalled">Deinstalliert</sys:String>
     <sys:String x:Key="LOC_QS_XFilter">{0}-Filter</sys:String>
-
+    <sys:String x:Key="LOC_QS_EnableDetailsView"></sys:String>
+    
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Hänge diese Zeichenfolge ans Ende der Suchanfrage um mit ITAD zu suchen. Freilassen um das manuelle Überschreiben zu deaktivieren.</sys:String>
