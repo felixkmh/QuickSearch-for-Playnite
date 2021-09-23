@@ -13,6 +13,7 @@ using Newtonsoft.Json.Schema;
 using Newtonsoft.Json;
 using QuickSearch.Models.ITAD;
 using Playnite.SDK;
+using System.Windows;
 
 namespace QuickSearch.SearchItems
 {
@@ -172,11 +173,11 @@ namespace QuickSearch.SearchItems
                                                 priceRange += " - " + worstPrice.NewPrice.ToString("0.00") + currencySign;
                                             }
                                             var title = games.First(g => g.Plain == game.Key).Title;
-                                            var item = new CommandItem(title, () => Process.Start(bestPrice.URL).Dispose() , bestPrice.Shop.Name, bestPrice.Shop.Name)
+                                            var item = new CommandItem(title, () => Process.Start(bestPrice.URL).Dispose(), bestPrice.Shop.Name, bestPrice.Shop.Name)
                                             {
                                                 IconChar = IconChars.ShoppingCart,
                                                 BottomLeft = priceRange,
-                                                BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}{(country!=null?", ":string.Empty)}{country?.ToUpper()??string.Empty}"),
+                                                BottomRight = "IsThereAnyDeal.com API" + (string.IsNullOrEmpty(region) ? string.Empty : $" - {region.ToUpper()}{(country != null ? ", " : string.Empty)}{country?.ToUpper() ?? string.Empty}"),
                                                 // TopRight = "Available in " + game.Value.Prices.Count.ToString() + " Shop" + (game.Value.Prices.Count != 1 ? "s" : string.Empty),
                                                 Keys = new List<ISearchKey<string>>() { new CommandItemKey() { Key = title, Weight = 1 } }
                                             };

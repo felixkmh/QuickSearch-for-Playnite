@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace QuickSearch.SearchItems.Settings
 {
@@ -326,6 +327,8 @@ namespace QuickSearch.SearchItems.Settings
         public char? IconChar { get; set; } = IconChars.Settings;
         /// <inheritdoc cref="ISearchItem{TKey}.Actions"/>
         public virtual IList<ISearchAction<string>> Actions => throw new NotImplementedException();
+        /// <inheritdoc cref="ISearchItem{TKey}.DetailsView"/>
+        public FrameworkElement DetailsView => null;
     }
 
     /// <summary>

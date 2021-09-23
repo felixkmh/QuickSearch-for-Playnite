@@ -1,4 +1,5 @@
-﻿using Playnite.SDK;
+﻿using Microsoft.Web.WebView2.Wpf;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,11 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TheArtOfDev.HtmlRenderer.WPF;
 
 namespace QuickSearch.SearchItems
 {
@@ -539,6 +543,8 @@ namespace QuickSearch.SearchItems
         public string BottomRight => kind;
 
         public char? IconChar => '\uEF29';
+
+        public FrameworkElement DetailsView => null;
     }
 
     public class GameSearchItem : ISearchItem<string>
@@ -560,6 +566,26 @@ namespace QuickSearch.SearchItems
                 keys.Add(new RomKey { game = game });
         }
 
+        private const string template = @"
+<!DOCTYPE html><html><head><meta charset=""UTF-8"">
+    <style type=""text/css"">
+        HTML,BODY
+        {
+            margin: 0;
+            padding: 0;
+        }
+        img {
+            max-width: 100%;
+        }
+    </style>
+    <title>Game Description</title>
+</head>
+<body>
+<div>
+{text}
+</div>
+</body>
+</html>";
         public Game game;
 
         internal static string[] ImageExtensions = new string[] { ".png", ".jpg", ".jpeg", ".ico", ".bmp", ".tiff", ".gif" };
@@ -604,7 +630,7 @@ namespace QuickSearch.SearchItems
             return path.StartsWith("http", StringComparison.OrdinalIgnoreCase);
         }
 
-        public Uri Icon 
+        public Uri Icon
         {
             get
             {
@@ -647,14 +673,14 @@ namespace QuickSearch.SearchItems
 
         public string TopLeft => game.Name;
 
-        public string TopRight => (game.Source != null ? (game.Source.Name + " - "):"") + (game.IsInstalled ?
+        public string TopRight => (game.Source != null ? (game.Source.Name + " - ") : "") + (game.IsInstalled ?
             ResourceProvider.GetString("LOCGameIsInstalledTitle") :
             ResourceProvider.GetString("LOCGameIsUnInstalledTitle"));
 
         public string BottomLeft => game.Platforms?.FirstOrDefault()?.ToString();
 
         public string BottomCenter => Path.GetFileNameWithoutExtension(
-            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.Roms?.FirstOrDefault()?.Name??string.Empty));
+            SearchPlugin.Instance.PlayniteApi.ExpandGameVariables(game, game.Roms?.FirstOrDefault()?.Name ?? string.Empty));
 
         public string BottomRight
         {
@@ -670,5 +696,38 @@ namespace QuickSearch.SearchItems
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
 
         public char? IconChar => null;
+
+        public FrameworkElement DetailsView
+        {
+            get
+            {
+                //var stackPanel = new StackPanel();
+                //var api = SearchPlugin.Instance.PlayniteApi;
+                //var plugins = api.Addons.Plugins;
+                //var successStory = plugins.Where(p => p.GetType().Name == "DuplicateHiderPlugin").FirstOrDefault();
+                //if (successStory != null)
+                //{
+                //    var control = successStory.GetGameViewControl(new Playnite.SDK.Plugins.GetGameViewControlArgs() { Mode = ApplicationMode.Desktop, Name = "SourceSelector2" });
+                //    if (control is Playnite.SDK.Controls.PluginUserControl ctrl)
+                //    {
+                //        ctrl.GameContext = game;
+                //        ctrl.GameContextChanged(null, game);
+                //        ctrl.MaxHeight = 50;
+                //        ctrl.Margin = new Thickness(5);
+                //        stackPanel.Children.Add(ctrl);
+                //    }
+                //}
+                var panel = new HtmlPanel
+                {
+                    Text = template.Replace("{text}", game.Description),
+                    Background = Brushes.Transparent,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    Foreground = ResourceProvider.GetResource<Brush>("TextBrush")
+                };
+                ScrollViewer.SetVerticalScrollBarVisibility(panel, ScrollBarVisibility.Disabled);
+                ScrollViewer.SetHorizontalScrollBarVisibility(panel, ScrollBarVisibility.Disabled);
+                return panel;
+            } 
+        }
     }
 }

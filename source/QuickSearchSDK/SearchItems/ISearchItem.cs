@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 
@@ -172,6 +173,11 @@ namespace QuickSearch.SearchItems
         /// using the "icofont.ttf" that is included with Playnite by default.
         /// </summary>
         char? IconChar { get; }
+        /// <summary>
+        /// Optional details view that is shown on to the right of the search window
+        /// after a short delay if the item is selected.
+        /// </summary>
+        FrameworkElement DetailsView { get; }
     }
     /// <summary>
     /// A <see cref="ISearchItemSource{TKey}"/> that also supplies a 

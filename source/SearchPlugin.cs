@@ -384,6 +384,31 @@ namespace QuickSearch
 
             if (popup is null)
             {
+                var deserializer = new YamlDotNet.Serialization.Deserializer();
+                var plugins = PlayniteApi.Addons.Plugins
+                .OfType<GenericPlugin>()
+                .Where(pl => pl.Properties.HasSettings);
+
+                foreach (var plugin in plugins)
+                {
+                    var installDir = System.IO.Path.GetDirectoryName(plugin.GetType().Assembly.Location);
+                    var extensionYaml = System.IO.Path.Combine(installDir, "extension.yaml");
+                    if (System.IO.File.Exists(extensionYaml))
+                    {
+                        var text = System.IO.File.ReadAllText(extensionYaml);
+                        var config = deserializer.Deserialize<Dictionary<string, object>>(text);
+                        if (config != null)
+                        {
+                            string name = config["Name"] as string ?? plugin.GetType().Name;
+
+                            if (name is string)
+                            {
+                                QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                            }
+                        }
+                    }
+                }
+
                 popup = new Popup();
                 popup.Opened += (s, a) =>
                 {
@@ -492,6 +517,12 @@ namespace QuickSearch
                                         searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right,
                                         searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom
                                     );
+
+                searchWindow.DetailsBackground.Viewport = new Rect(
+                                        -searchWindow.SearchResultsBackground.Viewport.Width - searchWindow.DetailsBorder.Width, 0,
+                                        searchWindow.SearchResultsBackground.Viewport.Width + 2 * searchWindow.DetailsBorder.Width,
+                                        searchWindow.SearchResultsBackground.Viewport.Height
+                                    );
             }
         }
 
@@ -514,7 +545,10 @@ namespace QuickSearch
                     AutoLayoutContent = false,
                     TileMode = TileMode.None
                 };
+
                 searchWindow.BackgroundBorder.Background = brush;
+                searchWindow.DetailsBackgroundVisual.Background = brush;
+                searchWindow.DetailsBackgroundBorderFallback.Visibility = Visibility.Hidden;
                 RenderOptions.SetCachingHint(brush, CachingHint.Cache);
                 RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
                 ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
@@ -522,8 +556,8 @@ namespace QuickSearch
 
                 int radius = 80;
                 searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance };
-                searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + radius;
-                searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom + radius;
+                searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + (2 * radius) + (2 * searchWindow.DetailsBorder.Width);
+                searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom + (2 * radius);
                 glassActive = true;
             }
         }
@@ -539,12 +573,14 @@ namespace QuickSearch
                 margin.Top = Settings.OuterBorderThickness + 8;
                 searchWindow.SearchResults.Margin = margin;
                 searchWindow.BackgroundBorder.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
+                searchWindow.DetailsBackgroundVisual.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
                 searchWindow.HeaderBorder.Background = new SolidColorBrush { Color = Colors.Black, Opacity = 0.25 };
                 ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
                 searchWindow.BackgroundBorder.Effect = null;
                 searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right;
                 searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom;
+                searchWindow.DetailsBackgroundBorderFallback.Visibility = Visibility.Visible;
                 glassActive = false;
             }
         }

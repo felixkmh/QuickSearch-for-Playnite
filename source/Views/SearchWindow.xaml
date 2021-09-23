@@ -7,15 +7,12 @@
              xmlns:controls="clr-namespace:QuickSearch.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="40"
-             >
+             Effect="{DynamicResource DropShadow}">
     <UserControl.CacheMode>
         <BitmapCache EnableClearType="False" 
                      RenderAtScale="1" 
                      SnapsToDevicePixels="False" />
     </UserControl.CacheMode>
-    <UserControl.Effect>
-        <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1"/>
-    </UserControl.Effect>
     <UserControl.Resources>
         <TextBlock x:Key="LoadingTextIcon" Text="&#xeffa;" FontFamily="{DynamicResource FontIcoFont}" Style="{StaticResource {x:Type TextBlock}}" FontSize="50"/>
         <SolidColorBrush x:Key="PopupBackgroundBrush" Color="{DynamicResource PopupBackgroundColor}" Opacity="0.4"/>
@@ -96,8 +93,50 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
+        <DropShadowEffect x:Key="DropShadow" BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1"/>
     </UserControl.Resources>
     <Grid x:Name="BackgroundGrid">
+        <Popup StaysOpen="True" 
+               AllowsTransparency="True" 
+               Placement="Right" 
+               IsOpen="{Binding ElementName=BackgroundGrid, Path=IsVisible, Mode=OneWay}" 
+               x:Name="DetailsPopup"
+               PopupAnimation="Fade"
+               HorizontalOffset="10">
+            <Border Width="400" Height="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" x:Name="DetailsBorder"
+                    Effect="{DynamicResource DropShadow}"
+                    Margin="40"
+                    Visibility="Hidden">
+                <Grid MaxHeight="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" 
+                    MaxWidth="{Binding ElementName=DetailsBorder, Path=Width, Mode=OneWay}"
+                      HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Border x:Name="DetailsBackgroundBorderFallback" CornerRadius="15"
+                            Background="{Binding ElementName=BackgroundBorder, Path=Background, Mode=OneWay}">
+                    </Border>
+                    <Border Visibility="Visible" CornerRadius="15" x:Name="DetailsBackgroundBorder">
+                        <Border.Background>
+                            <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="DetailsBackground">
+                                <VisualBrush.Visual>
+                                    <Grid>
+                                        <Border RenderOptions.ClearTypeHint="Auto" RenderOptions.CachingHint="Cache" RenderOptions.BitmapScalingMode="Fant" x:Name="DetailsBackgroundVisual"
+                                                Width="{Binding ElementName=BackgroundBorder, Path=Width, Mode=OneWay}"
+                                                Height="{Binding ElementName=BackgroundBorder, Path=Height, Mode=OneWay}"
+                                                Effect="{Binding ElementName=BackgroundBorder, Path=Effect, Mode=OneWay}"
+                                                CacheMode="{Binding ElementName=BackgroundBorder, Path=CacheMode, Mode=OneWay}">
+                                        </Border>
+                                        <Border Background="{DynamicResource PopupBackgroundBrush}" Visibility="{Binding ElementName=GlassTint, Path=Visibility, Mode=OneWay}"/>
+                                        <Border Background="{DynamicResource NoiseTextureBrush}" Visibility="{Binding ElementName=Noise, Path=Visibility, Mode=OneWay}"/>
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.Background>
+                    </Border>
+                    <ScrollViewer x:Name="DetailsScrollViewer" Padding="15"
+                                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                                  Content="{Binding ElementName=SearchResults, Path=SelectedItem.DetailsView, Mode=OneWay, TargetNullValue={x:Null}, FallbackValue={x:Null}}"/>
+                </Grid>
+            </Border>
+        </Popup>
         <Border CornerRadius="15" x:Name="OutsideBorder" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Border.Background>
                 <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="SearchResultsBackground">
@@ -105,7 +144,7 @@
                         <Grid>
                             <Border x:Name="BackgroundBorder" RenderOptions.ClearTypeHint="Auto" RenderOptions.CachingHint="Cache" RenderOptions.BitmapScalingMode="Fant">
                                 <Border.CacheMode>
-                                    <BitmapCache EnableClearType="False" RenderAtScale="0.25" SnapsToDevicePixels="False"/>
+                                    <BitmapCache EnableClearType="False" RenderAtScale="0.25" SnapsToDevicePixels="False" x:Name="BlurBitmapCache"/>
                                 </Border.CacheMode>
                             </Border>
                             <Border Background="{DynamicResource PopupBackgroundBrush}" x:Name="GlassTint"/>
@@ -258,7 +297,7 @@
                 </ListBox.ItemTemplate>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                        
+
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>

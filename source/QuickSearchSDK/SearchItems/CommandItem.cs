@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
@@ -152,6 +154,8 @@ namespace QuickSearch.SearchItems
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
         /// <inheritdoc cref="ISearchItem{TKey}.IconChar"/>
         public char? IconChar { get; set; } = null;
+        /// <inheritdoc cref="ISearchItem{TKey}.DetailsView"/>
+        public FrameworkElement DetailsView { get; set; } = null;
     }
     /// <inheritdoc cref="ISearchItemSource{TKey}"/>
     public class CommandItemSource : ISearchItemSource<string>

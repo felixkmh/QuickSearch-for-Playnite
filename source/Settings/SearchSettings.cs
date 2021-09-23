@@ -91,7 +91,22 @@ namespace QuickSearch
         public bool ITADEnabled { get; set; } = true;
         public SortedDictionary<string, ITADShopOption> EnabledITADShops { get; set; } = new SortedDictionary<string, ITADShopOption>();
         [GenericOption("LOC_QS_GlassEffectShort", Description = "LOC_QS_GlassEffect")]
-        public bool EnableGlassEffect { get => enableGlassEffect; set { enableGlassEffect = value; if (value) SearchPlugin.Instance?.EnableGlassEffect(); else SearchPlugin.Instance?.DisableGlassEffect(); } }
+        public bool EnableGlassEffect
+        {
+            get => enableGlassEffect;
+            set
+            {
+                if (value)
+                {
+                    SearchPlugin.Instance?.EnableGlassEffect();
+                }
+                else
+                {
+                    SearchPlugin.Instance?.DisableGlassEffect();
+                }
+                enableGlassEffect = value;
+            }
+        }
         private bool enableGlassEffect = true;
         [NumberOption("LOC_QS_BorderWidthShort", Min = 0, Max = 30, Tick = 1)]
         public int OuterBorderThickness

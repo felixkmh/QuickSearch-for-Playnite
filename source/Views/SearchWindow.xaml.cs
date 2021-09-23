@@ -85,6 +85,7 @@ namespace QuickSearch
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+            DetailsBorder.Visibility = Visibility.Hidden;
             if (e.AddedItems.Count > 0)
             {
                 if (ActionsListBox.Items.Count > 0)
@@ -92,7 +93,14 @@ namespace QuickSearch
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
                 }
                 SearchResults.ScrollIntoView(e.AddedItems[0]);
+                if (e.AddedItems[0] is ISearchItem<string> item && item.DetailsView != null)
+                {
+                    DetailsBorder.Visibility = Visibility.Visible;
+                }
+            } else
+            {
             }
+            DetailsScrollViewer.ScrollToVerticalOffset(0);
             SearchBox.Focus();
         }
 
