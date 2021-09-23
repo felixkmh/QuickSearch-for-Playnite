@@ -85,6 +85,10 @@
                         <CheckBox  IsChecked="{Binding PreferCoverArt}" Margin="5"/>
                         <TextBlock Text="{DynamicResource LOC_QS_PreferCoverArt}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" ToolTip="{DynamicResource LOC_QS_EnableDetailsViewTooltip}">
+                        <CheckBox  IsChecked="{Binding EnableDetailsView}" Margin="5"/>
+                        <TextBlock Text="{DynamicResource LOC_QS_EnableDetailsView}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

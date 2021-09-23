@@ -79,6 +79,8 @@
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding.</sys:String>
+    <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">If enabled, show more details for the selected result after a short delay, if available.</sys:String>
+
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">Set Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Press Hotkey (+ modfiers) now</sys:String>
