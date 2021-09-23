@@ -7,7 +7,8 @@
              xmlns:controls="clr-namespace:QuickSearch.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="40"
-             Effect="{DynamicResource DropShadow}">
+             Effect="{DynamicResource DropShadow}"
+             IsVisibleChanged="UserControl_IsVisibleChanged">
     <UserControl.CacheMode>
         <BitmapCache EnableClearType="False" 
                      RenderAtScale="1" 
@@ -93,22 +94,23 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-        <DropShadowEffect x:Key="DropShadow" BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1"/>
+        <DropShadowEffect x:Key="DropShadow" BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1" RenderingBias="Performance"/>
     </UserControl.Resources>
     <Grid x:Name="BackgroundGrid">
         <Popup StaysOpen="True" 
                AllowsTransparency="True" 
                Placement="Right" 
-               IsOpen="{Binding ElementName=BackgroundGrid, Path=IsVisible, Mode=OneWay}" 
+               IsOpen="False" 
                x:Name="DetailsPopup"
                PopupAnimation="Fade"
-               HorizontalOffset="10">
+               HorizontalOffset="10"
+               PlacementTarget="{Binding ElementName=BackgroundGrid}">
             <Border Width="400" Height="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" x:Name="DetailsBorder"
                     Effect="{DynamicResource DropShadow}"
                     Margin="40"
                     Visibility="Hidden">
-                <Grid MaxHeight="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" 
-                    MaxWidth="{Binding ElementName=DetailsBorder, Path=Width, Mode=OneWay}"
+                <Grid MaxHeight="{Binding ElementName=BackgroundGrid, Path=ActualHeight, Mode=OneWay}" 
+                      MaxWidth="{Binding ElementName=DetailsBorder, Path=Width, Mode=OneWay}"
                       HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border x:Name="DetailsBackgroundBorderFallback" CornerRadius="15"
                             Background="{Binding ElementName=BackgroundBorder, Path=Background, Mode=OneWay}">
@@ -132,8 +134,7 @@
                         </Border.Background>
                     </Border>
                     <ScrollViewer x:Name="DetailsScrollViewer" Padding="15"
-                                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-                                  Content="{Binding ElementName=SearchResults, Path=SelectedItem.DetailsView, Mode=OneWay, TargetNullValue={x:Null}, FallbackValue={x:Null}}"/>
+                                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
                 </Grid>
             </Border>
         </Popup>

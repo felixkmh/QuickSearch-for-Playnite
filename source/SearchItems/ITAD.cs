@@ -14,6 +14,10 @@ using Newtonsoft.Json;
 using QuickSearch.Models.ITAD;
 using Playnite.SDK;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Data;
+using System.Windows.Controls.Primitives;
 
 namespace QuickSearch.SearchItems
 {
@@ -173,6 +177,7 @@ namespace QuickSearch.SearchItems
                                                 priceRange += " - " + worstPrice.NewPrice.ToString("0.00") + currencySign;
                                             }
                                             var title = games.First(g => g.Plain == game.Key).Title;
+
                                             var item = new CommandItem(title, () => Process.Start(bestPrice.URL).Dispose(), bestPrice.Shop.Name, bestPrice.Shop.Name)
                                             {
                                                 IconChar = IconChars.ShoppingCart,
@@ -188,6 +193,42 @@ namespace QuickSearch.SearchItems
                                                 PricesResponse.PricesItem pricesItem = game.Value.Prices[i];
                                                 item.Actions.Add(new CommandAction { Name = pricesItem.Shop.Name, Action = () => Process.Start(pricesItem.URL) });
                                             }
+
+                                            Application.Current.Dispatcher.Invoke(() => {
+                                                var stackPanel = new StackPanel();
+                                                var dataGrid = new DataGrid()
+                                                {
+                                                    ItemsSource = game.Value.Prices.Select(deal => new { Shop = deal.Shop.Name, Price = $"{deal.NewPrice:0.00}{currencySign}" }),
+                                                    AutoGenerateColumns = false,
+                                                    HeadersVisibility = DataGridHeadersVisibility.None,
+                                                    CanUserAddRows = false,
+                                                    CanUserDeleteRows = false,
+                                                    CanUserReorderColumns = false,
+                                                    CanUserResizeRows = false,
+                                                    CanUserResizeColumns = false,
+                                                    CanUserSortColumns = false,
+                                                    Background = null,
+                                                    SelectionMode = DataGridSelectionMode.Single,
+                                                    IsHitTestVisible = false,
+                                                    BorderBrush = null,
+                                                    HorizontalGridLinesBrush = null,
+                                                    VerticalGridLinesBrush = null
+                                                };
+
+                                                dataGrid.Columns.Add(new DataGridTextColumn { Binding = new Binding("Shop"), Header = "Shop", IsReadOnly = true });
+                                                dataGrid.Columns.Add(new DataGridTextColumn { Binding = new Binding("Price"), Header = "Price", IsReadOnly = true });
+                                                stackPanel.Children.Add(new TextBlock
+                                                {
+                                                    Text = $"{title} Deals:",
+                                                    Foreground = ResourceProvider.GetResource<Brush>("TextBrush") ?? Brushes.White,
+                                                    Margin = new Thickness { Bottom = 10, Left = 10, Right = 10},
+                                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                                    TextWrapping = TextWrapping.Wrap
+                                                });
+                                                stackPanel.Children.Add(dataGrid);
+                                                item.DetailsView = stackPanel;
+                                            });
+
 
                                             item.Actions.Add(new CommandAction { Name = "Go to ITAD", Action = () => Process.Start(game.Value.URLs["game"]) });
 

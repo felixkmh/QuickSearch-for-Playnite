@@ -74,7 +74,8 @@
     <sys:String x:Key="LOC_QS_Installed">Installed</sys:String>
     <sys:String x:Key="LOC_QS_Uninstalled">Uninstalled</sys:String>
     <sys:String x:Key="LOC_QS_XFilter">{0} filter</sys:String>
-
+    <sys:String x:Key="LOC_QS_EnableDetailsView">Enable Details View</sys:String>
+    
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding.</sys:String>

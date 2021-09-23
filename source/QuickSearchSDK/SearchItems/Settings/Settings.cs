@@ -39,8 +39,10 @@ namespace QuickSearch.SearchItems.Settings
         /// <inheritdoc cref="ISearchItemSource{TKey}.GetItems(string)"/>
         public virtual IEnumerable<ISearchItem<string>> GetItems(string query)
         {
+            if (Settings == null) return null;
             var items = new List<ISearchItem<string>>();
-            foreach(var prop in typeof(TSettings).GetProperties())
+            var type = Settings.GetType();
+            foreach(var prop in type.GetProperties())
             {
                 if (prop.CanRead && prop.CanWrite)
                 {

@@ -14,29 +14,29 @@ namespace QuickSearch.Models.ITAD
         public class RegionsResult
         {
             [JsonProperty("countries")]
-            public List<string> Countries = new List<string>();
+            public List<string> Countries { get; set; } = new List<string>();
             [JsonProperty("currency")]
-            public CurrencyItem Currency;
+            public CurrencyItem Currency { get; set; }
         }
 
         public class CurrencyItem
         {
             [JsonProperty("code")]
-            public string Code;
+            public string Code { get; set; }
             [JsonProperty("sign")]
-            public string Sign;
+            public string Sign { get; set; }
             [JsonProperty("delimiter")]
-            public string Delimiter;
+            public string Delimiter { get; set; }
             [JsonProperty("left")]
-            public bool Left;
+            public bool Left { get; set; }
             [JsonProperty("name")]
-            public string Name;
+            public string Name { get; set; }
             [JsonProperty("html")]
-            public string HTML;
+            public string HTML { get; set; }
         }
 
         [JsonProperty("data")]
-        public Dictionary<string, RegionsResult> Data;
+        public Dictionary<string, RegionsResult> Data { get; set; }
     }
 
     public class RegionStoresResponse : SchemaHelper<RegionStoresResponse>
@@ -44,26 +44,26 @@ namespace QuickSearch.Models.ITAD
         public class MetaData
         {
             [JsonProperty("region")]
-            public string Region;
+            public string Region { get; set; }
             [JsonProperty("country")]
-            public string Country;
+            public string Country { get; set; }
         }
 
         public class ShopItem
         {
             [JsonProperty("id")]
-            public string ID;
+            public string ID { get; set; }
             [JsonProperty("title")]
-            public string Title;
+            public string Title { get; set; }
             [JsonProperty("color")]
-            public string Color;
+            public string Color { get; set; }
         }
 
 
         [JsonProperty("data")]
-        public List<ShopItem> Data = new List<ShopItem>();
+        public List<ShopItem> Data { get; set; } = new List<ShopItem>();
         [JsonProperty(".meta")]
-        public MetaData Meta;
+        public MetaData Meta { get; set; }
     }
 
     public class SearchResponse : SchemaHelper<SearchResponse>
@@ -71,21 +71,21 @@ namespace QuickSearch.Models.ITAD
         public class SearchResults
         {
             [JsonProperty("results")]
-            public List<SearchResult> Data = new List<SearchResult>();
+            public List<SearchResult> Data { get; set; } = new List<SearchResult>();
         };
 
         public class SearchResult
         {
             [JsonProperty("id")]
-            public int ID;
+            public int ID { get; set; }
             [JsonProperty("plain")]
-            public string Plain;
+            public string Plain { get; set; }
             [JsonProperty("title")]
-            public string Title;
+            public string Title { get; set; }
         };
 
         [JsonProperty("data")]
-        public SearchResults Results;
+        public SearchResults Results { get; set; }
     }
 
     public class PricesResponse : SchemaHelper<PricesResponse>
@@ -93,45 +93,45 @@ namespace QuickSearch.Models.ITAD
         public class PricesResult
         {
             [JsonProperty("list")]
-            public List<PricesItem> Prices = new List<PricesItem>();
+            public List<PricesItem> Prices { get; set; } = new List<PricesItem>();
             [JsonProperty("urls")]
-            public Dictionary<string, string> URLs = new Dictionary<string, string>();
+            public Dictionary<string, string> URLs { get; set; } = new Dictionary<string, string>();
         };
 
         public class PricesItem
         {
             [JsonProperty("price_new")]
-            public decimal NewPrice;
+            public decimal NewPrice { get; set; }
             [JsonProperty("price_old")]
-            public decimal OldPrice;
+            public decimal OldPrice { get; set; }
             [JsonProperty("price_cut")]
-            public decimal PriceCut;
+            public decimal PriceCut { get; set; }
             [JsonProperty("url")]
-            public string URL;
+            public string URL { get; set; }
             [JsonProperty("shop")]
-            public ShopItem Shop;
+            public ShopItem Shop { get; set; }
             [JsonProperty("drm")]
-            public List<string> DRM = new List<string>();
+            public List<string> DRM { get; set; } = new List<string>();
 
             public class ShopItem
             {
                 [JsonProperty("id")]
-                public string ID;
+                public string ID { get; set; }
                 [JsonProperty("name")]
-                public string Name;
+                public string Name { get; set; }
             }
         }
 
         public class PricesMetaData
         {
             [JsonProperty("currency")]
-            public string Currency;
+            public string Currency { get; set; }
         }
 
         [JsonProperty(".meta")]
-        public PricesMetaData Meta;
+        public PricesMetaData Meta { get; set; }
         [JsonProperty("data")]
-        public Dictionary<string, PricesResult> Data = new Dictionary<string, PricesResult>();
+        public Dictionary<string, PricesResult> Data { get; set; } = new Dictionary<string, PricesResult>();
     }
 
 }

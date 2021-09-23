@@ -121,6 +121,8 @@ namespace QuickSearch
         private bool enableGlobalHotkey = false;
         [GenericOption("LOC_QS_PreferCoverArt")]
         public bool PreferCoverArt { get; set; } = false;
+        [GenericOption("LOC_QS_EnableDetailsView")]
+        public bool EnableDetailsView { get; set; } = true;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;

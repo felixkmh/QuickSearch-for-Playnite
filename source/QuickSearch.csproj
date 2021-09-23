@@ -86,7 +86,13 @@
     </Compile>
     <Compile Include="Controls\AnimatedScrollViewer.cs" />
     <Compile Include="Controls\AutoScrollViewer.cs" />
+    <Compile Include="Controls\HtmlPanelExt.xaml.cs">
+      <DependentUpon>HtmlPanelExt.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ElementToRelativeRectConverter.cs" />
+    <Compile Include="Converters\ListToStringConverter.cs" />
+    <Compile Include="Converters\RomsToStringConverter.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\CheapShark.cs" />
     <Compile Include="MultiFilter.cs" />
@@ -111,6 +117,9 @@
     <Compile Include="Settings\AssemblyOptions.cs" />
     <Compile Include="Settings\SearchSettings.cs" />
     <Compile Include="UiHelper.cs" />
+    <Compile Include="Views\GameDetailsView.xaml.cs">
+      <DependentUpon>GameDetailsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PopupWindow.xaml.cs">
       <DependentUpon>PopupWindow.xaml</DependentUpon>
     </Compile>
@@ -133,9 +142,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\HtmlPanelExt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SearchResult.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GameDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PopupWindow.xaml">
       <SubType>Designer</SubType>

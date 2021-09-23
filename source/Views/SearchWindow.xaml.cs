@@ -82,12 +82,24 @@ namespace QuickSearch
 
         }
 
+        DispatcherTimer timer = null;
+
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (timer == null)
+            {
+                timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+                timer.Interval = TimeSpan.FromSeconds(0.3333);
+                timer.Tick += Timer_Tick;
+            }
+            timer.Stop();
+            DetailsPopup.PopupAnimation = PopupAnimation.None;
+            DetailsScrollViewer.Content = null;
+            DetailsPopup.IsOpen = false;
             DetailsBorder.Visibility = Visibility.Hidden;
             if (e.AddedItems.Count > 0)
             {
+                timer.Start();
                 if (ActionsListBox.Items.Count > 0)
                 {
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
@@ -97,11 +109,27 @@ namespace QuickSearch
                 {
                     DetailsBorder.Visibility = Visibility.Visible;
                 }
-            } else
-            {
             }
-            DetailsScrollViewer.ScrollToVerticalOffset(0);
+            // DetailsScrollViewer.ScrollToVerticalOffset(0);
             SearchBox.Focus();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (SearchPlugin.Instance.Settings.EnableDetailsView)
+            {
+                timer.Stop();
+                if (SearchResults.SelectedItem is ISearchItem<string> item)
+                {
+                    if (IsVisible && item.DetailsView is FrameworkElement view)
+                    {
+                        DetailsScrollViewer.Content = view;
+                        DetailsScrollViewer.ScrollToVerticalOffset(0);
+                        DetailsPopup.PopupAnimation = PopupAnimation.Fade;
+                        DetailsPopup.IsOpen = true;
+                    }
+                }
+            }
         }
 
         private string GetAssemblyName(string name)
@@ -781,6 +809,11 @@ namespace QuickSearch
                 {
                     idx = (idx + count) % count;
                 }
+                if (SearchResults.SelectedIndex != idx)
+                {
+                    DetailsPopup.PopupAnimation = PopupAnimation.None;
+                    DetailsPopup.IsOpen = false;
+                }
                 SearchResults.SelectedIndex = idx;
                 if (e.Key == Key.Enter || e.Key == Key.Return)
                 {
@@ -867,6 +900,18 @@ namespace QuickSearch
                     SearchBox.Focus();
                 }
             }
+        }
+
+        private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is bool visbible && visbible)
+            {
+                if (timer != null)
+                {
+                    timer.Stop();
+                    timer.Start();
+                }
+            } 
         }
     }
 
