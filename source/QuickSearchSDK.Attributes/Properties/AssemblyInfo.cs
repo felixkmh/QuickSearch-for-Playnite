@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("QuickSearchSDK.Attributes")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Settings attributes for Playnite extensions settings such that the QuickSearch extension can show additional information about them.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("felixkmh")]
 [assembly: AssemblyProduct("QuickSearchSDK.Attributes")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
