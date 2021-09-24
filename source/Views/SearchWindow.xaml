@@ -120,6 +120,7 @@
                             <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="DetailsBackground">
                                 <VisualBrush.Visual>
                                     <Grid>
+                                        <Border Background="{DynamicResource WindowBackgourndBrush}" Visibility="{Binding ElementName=GlassTint, Path=Visibility, Mode=OneWay}"/>
                                         <Border RenderOptions.ClearTypeHint="Auto" RenderOptions.CachingHint="Cache" RenderOptions.BitmapScalingMode="Fant" x:Name="DetailsBackgroundVisual"
                                                 Width="{Binding ElementName=BackgroundBorder, Path=Width, Mode=OneWay}"
                                                 Height="{Binding ElementName=BackgroundBorder, Path=Height, Mode=OneWay}"
@@ -143,6 +144,7 @@
                 <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="SearchResultsBackground">
                     <VisualBrush.Visual>
                         <Grid>
+                            <Border Background="{DynamicResource WindowBackgourndBrush}" Visibility="{Binding ElementName=GlassTint, Path=Visibility, Mode=OneWay}"/>
                             <Border x:Name="BackgroundBorder" RenderOptions.ClearTypeHint="Auto" RenderOptions.CachingHint="Cache" RenderOptions.BitmapScalingMode="Fant">
                                 <Border.CacheMode>
                                     <BitmapCache EnableClearType="False" RenderAtScale="0.25" SnapsToDevicePixels="False" x:Name="BlurBitmapCache"/>
