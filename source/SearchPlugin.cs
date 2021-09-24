@@ -387,7 +387,7 @@ namespace QuickSearch
                 var deserializer = new YamlDotNet.Serialization.Deserializer();
                 var plugins = PlayniteApi.Addons.Plugins
                 .OfType<GenericPlugin>()
-                .Where(pl => pl.Properties.HasSettings);
+                .Where(pl => pl?.Properties?.HasSettings ?? false);
 
                 foreach (var plugin in plugins)
                 {
