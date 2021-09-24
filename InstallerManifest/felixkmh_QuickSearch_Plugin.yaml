@@ -11,7 +11,7 @@ Packages:
     ReleaseDate: 2021-09-24
     PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.3.0/felixkmh_QuickSearch_Plugin_2_3_0.pext
     Changelog:
-      - 'added optional details view for games and itad results. Enabled by default'
+      - 'added optional details view for games (supporting ExtraMetadata Logos) and itad results. Enabled by default'
   - Version: 2.2.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-04
