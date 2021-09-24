@@ -592,7 +592,11 @@ namespace QuickSearch.SearchItems
                 var showAction = new CommandAction
                 {
                     Name = ResourceProvider.GetString("LOC_QS_ShowAction"),
-                    Action = () => SearchPlugin.Instance.PlayniteApi.MainView.SelectGame(game.Id)
+                    Action = () => 
+                    {
+                        SearchPlugin.Instance.PlayniteApi.MainView.SwitchToLibraryView();
+                        SearchPlugin.Instance.PlayniteApi.MainView.SelectGame(game.Id);
+                    }
                 };
 
                 var actions = new List<ISearchAction<string>> { launchAciton, showAction };
