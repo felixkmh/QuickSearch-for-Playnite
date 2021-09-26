@@ -147,23 +147,28 @@ namespace QuickSearch
             backgroundTask = backgroundTask.ContinueWith((t) =>
             {
                 t.Dispose();
-                
-                if (itemSources != null)
-                {
-                    if (navigationStack.Count == 1 && !isSubSource)
-                    {
-                        navigationStack.Clear();
-                    }
-                    navigationStack.Push(itemSources);
-                }
-                searchItemSources = navigationStack.Peek();
 
-                searchItems = searchItemSources
-                    .Select(source => source.GetItems())
-                    .Where(items => items != null)
-                    .SelectMany(items => items)
-                    .ToList();
+                StartIndexUpdate(itemSources, isSubSource);
             });
+        }
+
+        public void StartIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
+        {
+            if (itemSources != null)
+            {
+                if (navigationStack.Count == 1 && !isSubSource)
+                {
+                    navigationStack.Clear();
+                }
+                navigationStack.Push(itemSources);
+            }
+            searchItemSources = navigationStack.Peek();
+
+            searchItems = searchItemSources
+                .Select(source => source.GetItems())
+                .Where(items => items != null)
+                .SelectMany(items => items)
+                .ToList();
         }
 
         public void QueueIndexClear()
@@ -242,14 +247,14 @@ namespace QuickSearch
                                 navigationStack.Pop();
                                 popped = true;
                             }
-                            if (navigationStack.Count > 1 && navigationStack.Peek().First() is ISearchSubItemSource<string> newSubSource) 
-                            { 
+                            if (navigationStack.Count > 1 && navigationStack.Peek().First() is ISearchSubItemSource<string> newSubSource)
+                            {
                                 input = input.Substring(newSubSource.Prefix.Length);
                                 showAll = newSubSource.DisplayAllIfQueryIsEmpty && string.IsNullOrWhiteSpace(input);
-                            } 
+                            }
                             if (popped)
                             {
-                                QueueIndexUpdate();
+                                StartIndexUpdate();
                             }
                         }
                         QueueSearch(input, showAll);
