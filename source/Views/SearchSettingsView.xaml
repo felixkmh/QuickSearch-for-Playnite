@@ -99,12 +99,26 @@
                         <CheckBox  IsChecked="{Binding EnableGlassEffect}" Margin="5"/>
                         <TextBlock Text="{DynamicResource LOC_QS_GlassEffect}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}" />
                     </StackPanel>
-                    <TextBlock Text="{DynamicResource LOC_QS_BorderWidth}" Margin="2" Foreground="{StaticResource TextBrush}" IsEnabled="{Binding ITADEnabled}"/>
-                    <StackPanel Orientation="Horizontal" Margin="2" IsEnabled="{Binding ITADEnabled}">
+                    <TextBlock Text="{DynamicResource LOC_QS_BorderWidth}" Margin="2" Foreground="{StaticResource TextBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
                         <Slider Value="{Binding OuterBorderThickness}" Minimum="0" Maximum="30" Width="230" 
                         HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
                         VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding OuterBorderThickness}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{DynamicResource LOC_QS_SearchWindowWidth}" Margin="2" Foreground="{StaticResource TextBrush}" IsEnabled="{Binding ITADEnabled}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Value="{Binding SearchWindowWidth}" Minimum="300" Maximum="800" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SearchWindowWidth}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{DynamicResource LOC_QS_DetailsMaxWidth}" Margin="2" Foreground="{StaticResource TextBrush}" IsEnabled="{Binding ITADEnabled}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Value="{Binding DetailsViewMaxWidth}" Minimum="200" Maximum="500" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding DetailsViewMaxWidth}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

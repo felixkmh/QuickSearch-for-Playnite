@@ -75,6 +75,8 @@
     <sys:String x:Key="LOC_QS_Uninstalled">Uninstalled</sys:String>
     <sys:String x:Key="LOC_QS_XFilter">{0} filter</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsView">Enable Details View</sys:String>
+    <sys:String x:Key="LOC_QS_SearchWindowWidth">Search Window Width</sys:String>
+    <sys:String x:Key="LOC_QS_DetailsMaxWidth">Details View Max Width</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>

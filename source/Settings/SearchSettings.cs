@@ -62,7 +62,7 @@ namespace QuickSearch
         [NumberOption("LOC_QS_SearchThresholdShort", Min = 0, Max = 1, Tick = 0.01f)]
         public double Threshold { get; set; } = 0.55;
         [GenericOption("LOC_QS_ExpandAllItems")]
-        public bool ExpandAllItems 
+        public bool ExpandAllItems
         {
             get => expandAllItems;
             set { expandAllItems = value; plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
@@ -123,6 +123,53 @@ namespace QuickSearch
         public bool PreferCoverArt { get; set; } = false;
         [GenericOption("LOC_QS_EnableDetailsView")]
         public bool EnableDetailsView { get; set; } = true;
+        [NumberOption("LOC_QS_SearchWindowWidth", Min = 300, Max = 800, Tick = 5)]
+        public int SearchWindowWidth { get => searchWindowWidth; 
+            set
+            {
+                if ((plugin?.searchWindow ?? null) != null)
+                {
+                    plugin.searchWindow.WindowGrid.Width = value;
+                    plugin.searchWindow.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true);
+                    plugin.UpdateBorder(OuterBorderThickness); 
+                    if (EnableGlassEffect)
+                    {
+                        plugin.DisableGlassEffect();
+                        plugin.EnableGlassEffect();
+                    } else
+                    {
+                        plugin.EnableGlassEffect();
+                        plugin.DisableGlassEffect();
+                    }
+                }
+                searchWindowWidth = value;
+            } 
+        }
+        private int searchWindowWidth = 660;
+        [NumberOption("LOC_QS_DetailsMaxWidth", Min = 200, Max = 500, Tick = 5)]
+        public int DetailsViewMaxWidth { get => detailsViewMaxWidth; 
+            set 
+            {
+                if ((plugin?.searchWindow ?? null) != null)
+                {
+                    plugin.searchWindow.DetailsBorder.Width = value;
+                    plugin.searchWindow.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true);
+                    plugin.UpdateBorder(OuterBorderThickness);
+                    if (EnableGlassEffect)
+                    {
+                        plugin.DisableGlassEffect();
+                        plugin.EnableGlassEffect();
+                    }
+                    else
+                    {
+                        plugin.EnableGlassEffect();
+                        plugin.DisableGlassEffect();
+                    }
+                }
+                detailsViewMaxWidth = value;
+            } 
+        }
+        private int detailsViewMaxWidth = 400;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;

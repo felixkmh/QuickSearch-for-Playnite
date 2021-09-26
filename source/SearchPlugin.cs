@@ -82,12 +82,22 @@ namespace QuickSearch
         {
             var window = mainWindow;
             window.Dispatcher.Invoke(() => {
+                if (searchWindow != null)
+                {
+                    searchWindow.WindowGrid.Width = newSettings.SearchWindowWidth;
+                    searchWindow.DetailsBorder.Width = newSettings.DetailsViewMaxWidth;
+                }
+
+                UpdateBorder(newSettings.OuterBorderThickness);
+
                 if (newSettings.EnableGlassEffect)
                 {
+                    DisableGlassEffect();
                     EnableGlassEffect();
                 }
                 else
                 {
+                    EnableGlassEffect();
                     DisableGlassEffect();
                 }
                 if (globalHotkeyRegistered)
@@ -412,6 +422,8 @@ namespace QuickSearch
                 popup = new Popup();
                 popup.Opened += (s, a) =>
                 {
+                    searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
+                    searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
                     searchWindow.SearchResults.Items.Refresh();
                     foreach (var assembly in QuickSearchSDK.registeredAssemblies)
                     {
@@ -500,7 +512,7 @@ namespace QuickSearch
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
             }
-            
+
             popup.IsOpen = !popup.IsOpen;
         }
 
