@@ -75,6 +75,8 @@
     <sys:String x:Key="LOC_QS_Uninstalled"></sys:String>
     <sys:String x:Key="LOC_QS_XFilter"></sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsView"></sys:String>
+    <sys:String x:Key="LOC_QS_SearchWindowWidth"></sys:String>
+    <sys:String x:Key="LOC_QS_DetailsMaxWidth"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
