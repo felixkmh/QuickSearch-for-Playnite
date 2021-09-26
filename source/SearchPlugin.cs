@@ -468,6 +468,8 @@ namespace QuickSearch
                 popup.StaysOpen = false;
                 popup.PlacementTarget = placementTarget;
                 searchWindow = new SearchWindow(this);
+                searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
+                searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
                 searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
                 popup.InputBindings.Add(HotkeyBinding);
