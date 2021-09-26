@@ -1,5 +1,12 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.4.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-26
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.4.0/felixkmh_QuickSearch_Plugin_2_4_0.pext
+    Changelog:
+      - added options to change search window width and details view max width
+      - fixed search results missing when returning from SubItemSource
   - Version: 2.3.3
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-24
