@@ -24,7 +24,7 @@ namespace QuickSearch.Converters
                 sep = parameter as string;
             }
 
-            return string.Join(sep, ((IEnumerable<object>)value).ToArray());
+            return string.Join(sep, (IEnumerable<object>)value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
