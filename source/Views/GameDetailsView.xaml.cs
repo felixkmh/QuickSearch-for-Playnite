@@ -43,7 +43,8 @@ namespace QuickSearch.Views
                         {
                             var bitmap = new BitmapImage();
                             bitmap.BeginInit();
-                            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile | BitmapCreateOptions.DelayCreation;
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
                             bitmap.UriSource = uri;
                             bitmap.EndInit();
                             LogoImage.Source = bitmap;
