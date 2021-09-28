@@ -396,8 +396,23 @@ namespace QuickSearch
             {
                 var deserializer = new YamlDotNet.Serialization.Deserializer();
                 var plugins = PlayniteApi.Addons.Plugins
-                .OfType<GenericPlugin>()
-                .Where(pl => pl?.Properties?.HasSettings ?? false);
+                    .OfType<GenericPlugin>()
+                    .Where(pl => pl?.Properties?.HasSettings ?? false)
+                    .Cast<Plugin>();
+
+                plugins = plugins
+                    .Concat(PlayniteApi.Addons.Plugins
+                        .OfType<LibraryPlugin>()
+                        .Where(pl => pl?.Properties?.HasSettings ?? false)
+                        .Cast<Plugin>()
+                );
+
+                plugins = plugins
+                    .Concat(PlayniteApi.Addons.Plugins
+                        .OfType<MetadataPlugin>()
+                        .Where(pl => pl?.Properties?.HasSettings ?? false)
+                        .Cast<Plugin>()
+                );
 
                 foreach (var plugin in plugins)
                 {
