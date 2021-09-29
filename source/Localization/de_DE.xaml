@@ -77,14 +77,14 @@
     <sys:String x:Key="LOC_QS_EnableDetailsView">Aktiviere Detail-Ansicht</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">Suchfenster Breite</sys:String>
     <sys:String x:Key="LOC_QS_DetailsMaxWidth">Detailansicht Maximalbreite</sys:String>
-    <sys:String x:Key="LOC_QS_AddonBrowserPrefix"></sys:String>
-    <sys:String x:Key="LOC_QS_AddonByDev"></sys:String>
-    <sys:String x:Key="LOC_QS_GenericExtension"></sys:String>
-    <sys:String x:Key="LOC_QS_LibraryIntegration"></sys:String>
-    <sys:String x:Key="LOC_QS_DesktopTheme"></sys:String>
-    <sys:String x:Key="LOC_QS_FullscreenTheme"></sys:String>
-    <sys:String x:Key="LOC_QS_MetadataProvider"></sys:String>
-    <sys:String x:Key="LOC_QS_Disabled"></sys:String>
+    <sys:String x:Key="LOC_QS_AddonBrowserPrefix">Durchsuche Add-ons</sys:String>
+    <sys:String x:Key="LOC_QS_AddonByDev">{0} von {1}</sys:String>
+    <sys:String x:Key="LOC_QS_GenericExtension">Erweiterung</sys:String>
+    <sys:String x:Key="LOC_QS_LibraryIntegration">Bibliothek</sys:String>
+    <sys:String x:Key="LOC_QS_DesktopTheme">Desktop-Design</sys:String>
+    <sys:String x:Key="LOC_QS_FullscreenTheme">Vollbild-Design</sys:String>
+    <sys:String x:Key="LOC_QS_MetadataProvider">Metadaten-Quelle</sys:String>
+    <sys:String x:Key="LOC_QS_Disabled">Deaktiviert</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
