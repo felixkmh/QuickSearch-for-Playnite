@@ -77,6 +77,14 @@
     <sys:String x:Key="LOC_QS_EnableDetailsView">Enable Details View</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">Search Window Width</sys:String>
     <sys:String x:Key="LOC_QS_DetailsMaxWidth">Details View Max Width</sys:String>
+    <sys:String x:Key="LOC_QS_AddonBrowserPrefix">Browse Add-ons</sys:String>
+    <sys:String x:Key="LOC_QS_AddonByDev">{0} by {1}</sys:String>
+    <sys:String x:Key="LOC_QS_GenericExtension">Extension</sys:String>
+    <sys:String x:Key="LOC_QS_LibraryIntegration">Library</sys:String>
+    <sys:String x:Key="LOC_QS_DesktopTheme">Desktop Theme</sys:String>
+    <sys:String x:Key="LOC_QS_FullscreenTheme">Fullscreen Theme</sys:String>
+    <sys:String x:Key="LOC_QS_MetadataProvider">Metadata Provider</sys:String>
+    <sys:String x:Key="LOC_QS_Disabled">Disabled</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>

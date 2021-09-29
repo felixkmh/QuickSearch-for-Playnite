@@ -10,6 +10,13 @@ namespace QuickSearch.Converters
 {
     public class ListToStringConverter : MarkupExtension, IValueConverter
     {
+        private const string defaultSeperator = ",";
+
+        public static string MakeString(IEnumerable<string> source)
+        {
+            return string.Join(",", source);
+        }
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value == null)
@@ -17,11 +24,11 @@ namespace QuickSearch.Converters
                 return string.Empty;
             }
 
-            string sep = ", ";
+            string sep = defaultSeperator;
 
-            if (parameter is string )
+            if (parameter is string customSep)
             {
-                sep = parameter as string;
+                sep = customSep;
             }
 
             return string.Join(sep, (IEnumerable<object>)value);
@@ -37,11 +44,11 @@ namespace QuickSearch.Converters
             }
             else
             {
-                string sep = ", ";
+                string sep = defaultSeperator;
 
-                if (parameter is string)
+                if (parameter is string customSep)
                 {
-                    sep = parameter as string;
+                    sep = customSep;
                 }
 
                 var converted = stringVal.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries);

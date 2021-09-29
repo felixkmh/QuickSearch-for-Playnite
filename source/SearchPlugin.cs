@@ -373,6 +373,11 @@ namespace QuickSearch
             var cheapSharkCommand = new CommandItem("CheapShark", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction"), "CheapShark.com"), "https://www.cheapshark.com/img/logo_image.png?v=1.0");
             cheapSharkCommand.Actions.Add(cheapSharkSubItemsAction);
             QuickSearchSDK.AddCommand(cheapSharkCommand);
+
+            var addonSubItemAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new AddonBrowser() };
+            var addonItem = new CommandItem("Add-on Browser", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_AddonBrowserPrefix"))) { IconChar = '\uEEA0' };
+            addonItem.Actions.Add(addonSubItemAction);
+            QuickSearchSDK.AddCommand(addonItem);
         }
 
         public Popup popup;
@@ -480,9 +485,12 @@ namespace QuickSearch
                 placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.MainWindow, "PART_ContentView").FirstOrDefault();
                 var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = false;
+                popup.StaysOpen = true;
                 popup.PlacementTarget = placementTarget;
                 searchWindow = new SearchWindow(this);
+
+                
+
                 searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
                 searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
                 searchWindow.DataContext = searchWindow;
@@ -510,7 +518,7 @@ namespace QuickSearch
                 }
                 popup.PlacementTarget = placementTarget;
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = false;
+                popup.StaysOpen = true;
                 popup.VerticalOffset = 0;
                 popup.HorizontalOffset = 0;
             } else
@@ -527,7 +535,7 @@ namespace QuickSearch
                 dummyWindow.Activate();
                 popup.PlacementTarget = dummyWindow;
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = false;
+                popup.StaysOpen = true;
             }
 
             popup.IsOpen = !popup.IsOpen;

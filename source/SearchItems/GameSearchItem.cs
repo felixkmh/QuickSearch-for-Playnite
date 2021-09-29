@@ -1,5 +1,4 @@
-﻿using Microsoft.Web.WebView2.Wpf;
-using Playnite.SDK;
+﻿using Playnite.SDK;
 using Playnite.SDK.Models;
 using QuickSearch.Controls;
 using QuickSearch.Views;

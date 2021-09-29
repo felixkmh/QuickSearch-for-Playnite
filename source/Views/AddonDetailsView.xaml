@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="QuickSearch.Views.AddonDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QuickSearch.Views" xmlns:searchitems="clr-namespace:QuickSearch.SearchItems"
+             xmlns:mdxam="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=searchitems:AddonManifestBase, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Grid.IsSharedSizeScope="True">
+        <StackPanel>
+            <TextBlock Text="{Binding Name}" FontSize="20" Margin="0,0,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="InstallationStatus">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                    <Setter Property="Text" Value="{DynamicResource LOCGameIsInstalledTitle}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsInstalled}" Value="False">
+                                    <Setter Property="Text" Value="{DynamicResource LOCGameIsUnInstalledTitle}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text=", " Visibility="{Binding ElementName=EnabledStatus, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                <TextBlock x:Name="EnabledStatus">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsInstalled}" Value="True"/>
+                                        <Condition Binding="{Binding IsEnabled}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Text" Value="{DynamicResource LOCEnabledTitle}"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsInstalled}" Value="True"/>
+                                        <Condition Binding="{Binding IsEnabled}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Text" Value="{DynamicResource LOC_QS_Disabled}"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" 
+                        Visibility="{Binding ElementName=AuthorText, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
+                <TextBlock Text="{DynamicResource LOCAuthorLabel}"/>
+                <TextBlock Text=": "/>
+                <TextBlock x:Name="AuthorText" Text="{Binding Author}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" 
+                        Visibility="{Binding ElementName=DescriptionText, Path=Markdown, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
+                <TextBlock Text="{DynamicResource LOCGameDescriptionTitle}"/>
+                <TextBlock Text=":"/>
+            </StackPanel>
+            <mdxam:MarkdownScrollViewer x:Name="DescriptionText" Markdown="{Binding Description}" 
+                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                        Foreground="{DynamicResource TextBrush}"
+                       Visibility="{Binding ElementName=DescriptionText, Path=Markdown, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
+                <mdxam:MarkdownScrollViewer.MarkdownStyle>
+                    <Style TargetType="FlowDocument" BasedOn="{x:Static mdxam:MarkdownStyle.Compact}">
+                        <Setter Property="FontFamily" Value="{Binding ElementName=InstallationStatus, Path=FontFamily, Mode=OneWay}"/>
+                        <Setter Property="FontSize" Value="{Binding ElementName=InstallationStatus, Path=FontSize, Mode=OneWay}"/>
+                        <Style.Resources>
+                            <Style TargetType="Paragraph">
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </Style.Resources>
+                    </Style>
+                </mdxam:MarkdownScrollViewer.MarkdownStyle>
+                <mdxam:MarkdownScrollViewer.Resources>
+                    
+                </mdxam:MarkdownScrollViewer.Resources>
+            </mdxam:MarkdownScrollViewer>
+            <Separator/>
+            <ItemsControl ItemsSource="{Binding Screenshots}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Thumbnail}" Margin="0,5">
+                            <Image.ToolTip>
+                                <ToolTip Placement="Center" Background="Transparent" 
+                                         HorizontalAlignment="Center" 
+                                         VerticalAlignment="Center" 
+                                         HorizontalContentAlignment="Center" 
+                                         VerticalContentAlignment="Center">
+                                    <Border MaxHeight="800" MaxWidth="1600" 
+                                            HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center">
+                                        <Image Source="{Binding Image}" Stretch="Uniform" StretchDirection="DownOnly"
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center"/>
+                                    </Border>
+                                </ToolTip>
+                            </Image.ToolTip>
+                        </Image>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>
