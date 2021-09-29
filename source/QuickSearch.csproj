@@ -209,6 +209,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del /q $(ProjectDir)$(OutDir)*.xml
+del /q /s $(ProjectDir)$(OutDir)lib\*.pdb
 rmdir /s /q $(ProjectDir)$(OutDir)lib\alpine.3.9-x64
 rmdir /s /q $(ProjectDir)$(OutDir)lib\alpine-x64
 rmdir /s /q $(ProjectDir)$(OutDir)lib\debian.9-x64
