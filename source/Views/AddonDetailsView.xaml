@@ -17,7 +17,7 @@
     </UserControl.Resources>
     <Grid Grid.IsSharedSizeScope="True">
         <StackPanel>
-            <TextBlock Text="{Binding Name}" FontSize="20" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Name}" FontSize="16" Margin="0,0,0,10"/>
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="InstallationStatus">
                     <TextBlock.Style>
@@ -73,6 +73,7 @@
                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                                         ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                         Foreground="{DynamicResource TextBrush}"
+                                        IsHitTestVisible="False"
                        Visibility="{Binding ElementName=DescriptionText, Path=Markdown, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
                 <mdxam:MarkdownScrollViewer.MarkdownStyle>
                     <Style TargetType="FlowDocument" BasedOn="{x:Static mdxam:MarkdownStyle.Compact}">
@@ -104,7 +105,8 @@
                                          HorizontalAlignment="Center" 
                                          VerticalAlignment="Center" 
                                          HorizontalContentAlignment="Center" 
-                                         VerticalContentAlignment="Center">
+                                         VerticalContentAlignment="Center" 
+                                         Padding="0">
                                     <Border MaxHeight="800" MaxWidth="1600" 
                                             HorizontalAlignment="Center" 
                                             VerticalAlignment="Center">

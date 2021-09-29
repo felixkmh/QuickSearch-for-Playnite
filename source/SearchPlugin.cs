@@ -485,7 +485,7 @@ namespace QuickSearch
                 placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.MainWindow, "PART_ContentView").FirstOrDefault();
                 var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = true;
+                popup.StaysOpen = false;
                 popup.PlacementTarget = placementTarget;
                 searchWindow = new SearchWindow(this);
 
@@ -518,7 +518,7 @@ namespace QuickSearch
                 }
                 popup.PlacementTarget = placementTarget;
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = true;
+                popup.StaysOpen = false;
                 popup.VerticalOffset = 0;
                 popup.HorizontalOffset = 0;
             } else
@@ -535,7 +535,7 @@ namespace QuickSearch
                 dummyWindow.Activate();
                 popup.PlacementTarget = dummyWindow;
                 popup.Placement = PlacementMode.Center;
-                popup.StaysOpen = true;
+                popup.StaysOpen = false;
             }
 
             popup.IsOpen = !popup.IsOpen;

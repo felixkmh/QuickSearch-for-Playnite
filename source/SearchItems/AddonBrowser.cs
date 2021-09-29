@@ -11,7 +11,9 @@ using System.Diagnostics;
 using QuickSearch.Views;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch.SearchItems
 {
     public class AddonBrowser : ISearchSubItemSource<string>
@@ -22,34 +24,52 @@ namespace QuickSearch.SearchItems
 
         public IEnumerable<ISearchItem<string>> GetItems()
         {
-            var dataPath = Path.Combine(SearchPlugin.Instance.GetPluginUserDataPath());
-            var repoPath =Path.Combine(dataPath, "PlayniteAddonDatabase");
-            if (!Directory.Exists(repoPath))
+            try
             {
-                var client = new GitHubClient(new ProductHeaderValue("QuickSearch-for-Playnite"));
-                var addonRepo = client.Repository.Get("JosefNemec", "PlayniteAddonDatabase").Result;
-                LibGit2Sharp.Repository.Clone(addonRepo.CloneUrl, repoPath);
-            }
-            else
-            {
-                var repo = new LibGit2Sharp.Repository(repoPath);
-                Commands.Pull(
-                    repo,
-                    new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
-                    new PullOptions()
-                );
-            }
-            var manifestFiles = System.IO.Directory.GetFiles(repoPath, "*.yaml", SearchOption.AllDirectories);
-            var addonManifests = manifestFiles.AsParallel().Select(file =>
-            {
-                var deserializer = new YamlDotNet.Serialization.Deserializer();
-                using (var yaml = File.OpenText(file))
+                var dataPath = Path.Combine(SearchPlugin.Instance.GetPluginUserDataPath());
+                var repoPath = Path.Combine(dataPath, "PlayniteAddonDatabase");
+                if (!Directory.Exists(repoPath))
                 {
-                    var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
-                    return manifest;
+                    var client = new GitHubClient(new ProductHeaderValue("QuickSearch-for-Playnite"));
+                    client.Repository.Get("JosefNemec", "PlayniteAddonDatabase").ContinueWith(task => {
+                        if (!task.IsFaulted && task.Result is Octokit.Repository addonRepo)
+                        {
+                            LibGit2Sharp.Repository.Clone(addonRepo.CloneUrl, repoPath);
+                        }
+                    }).Wait(10000);
                 }
-            }).OfType<AddonManifestBase>();
-            return addonManifests.OrderBy(addon => addon.Type).ThenBy(addon => addon.Name).ThenBy(addon => addon.Author).Select(addon => new AddonItem(addon));
+                else
+                {
+                    var repo = new LibGit2Sharp.Repository(repoPath);
+                    if (repo is LibGit2Sharp.Repository)
+                    {
+                        Commands.Pull(
+                            repo,
+                            new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
+                            new PullOptions()
+                        );
+                    }
+                }
+                if (Directory.Exists(repoPath))
+                {
+                    var manifestFiles = System.IO.Directory.GetFiles(repoPath, "*.yaml", SearchOption.AllDirectories);
+                    var addonManifests = manifestFiles.AsParallel().Select(file =>
+                    {
+                        var deserializer = new YamlDotNet.Serialization.Deserializer();
+                        using (var yaml = File.OpenText(file))
+                        {
+                            var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
+                            return manifest;
+                        }
+                    }).OfType<AddonManifestBase>();
+                    return addonManifests.OrderBy(addon => addon.Type).ThenBy(addon => addon.Name).ThenBy(addon => addon.Author).Select(addon => new AddonItem(addon));
+                }
+            }
+            catch (Exception ex)
+            {
+                SearchPlugin.logger.Error(ex, "Could not Update Addon Database");
+            }
+            return null;
         }
 
         public IEnumerable<ISearchItem<string>> GetItems(string query)
@@ -125,7 +145,7 @@ namespace QuickSearch.SearchItems
 
         public Uri Icon { get; } = null;
 
-        public string TopLeft => $"{addon.Name}";
+        public string TopLeft => $"{addon.Name}" + (addon.IsInstalled ? $" ({ResourceProvider.GetString("LOCGameIsInstalledTitle")})" : string.Empty);
 
         public string TopRight => string.Format(ResourceProvider.GetString("LOC_QS_AddonByDev"), AddonTypeToString(addon.Type), addon.Author);
 
