@@ -64,11 +64,32 @@
                 <TextBlock Text=": "/>
                 <TextBlock x:Name="AuthorText" Text="{Binding Author}"/>
             </StackPanel>
+
+            <ItemsControl ItemsSource="{Binding Links}" Margin="0,0,0,5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock ToolTip="{Binding Value}">
+                                <Hyperlink NavigateUri="{Binding Value, Mode=OneWay}" RequestNavigate="Hyperlink_RequestNavigate">
+                                    <Run Text="{Binding Key, Mode=OneWay}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
             <StackPanel Orientation="Horizontal" 
                         Visibility="{Binding ElementName=DescriptionText, Path=Markdown, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
                 <TextBlock Text="{DynamicResource LOCGameDescriptionTitle}"/>
                 <TextBlock Text=":"/>
             </StackPanel>
+
             <mdxam:MarkdownScrollViewer x:Name="DescriptionText" Markdown="{Binding Description}" 
                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                                         ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -90,8 +111,9 @@
                     
                 </mdxam:MarkdownScrollViewer.Resources>
             </mdxam:MarkdownScrollViewer>
-            <Separator/>
-            <ItemsControl ItemsSource="{Binding Screenshots}">
+            <Separator Visibility="{Binding ElementName=Screenshots, Path=ItemsSource, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}"/>
+            <ItemsControl ItemsSource="{Binding Screenshots}" x:Name="Screenshots"
+                          Visibility="{Binding ElementName=Screenshots, Path=ItemsSource, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel/>
@@ -99,24 +121,45 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Image Source="{Binding Thumbnail}" Margin="0,5">
-                            <Image.ToolTip>
-                                <ToolTip Placement="Center" Background="Transparent" 
-                                         HorizontalAlignment="Center" 
-                                         VerticalAlignment="Center" 
-                                         HorizontalContentAlignment="Center" 
-                                         VerticalContentAlignment="Center" 
-                                         Padding="0">
-                                    <Border MaxHeight="800" MaxWidth="1600" 
-                                            HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center">
-                                        <Image Source="{Binding Image}" Stretch="Uniform" StretchDirection="DownOnly"
-                                               HorizontalAlignment="Center" 
-                                               VerticalAlignment="Center"/>
-                                    </Border>
-                                </ToolTip>
-                            </Image.ToolTip>
-                        </Image>
+                        <Grid>
+                            <Popup StaysOpen="False" Cursor="Hand" IsOpen="{Binding ElementName=ImageToggle, Path=IsChecked, Delay=150}"
+                                   PlacementTarget="{x:Null}" Placement="Center" MouseDown="Popup_MouseDown">
+                                <Popup.Style>
+                                    <Style TargetType="Popup" BasedOn="{StaticResource {x:Type Popup}}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsOpen" Value="True">
+                                                <Setter Property="Child">
+                                                    <Setter.Value>
+                                                        <Image Source="{Binding Image}" Stretch="Uniform" StretchDirection="DownOnly"
+                                                               HorizontalAlignment="Center" 
+                                                               VerticalAlignment="Center"
+                                                               MaxWidth="1600" MaxHeight="800"
+                                                               Cursor="Hand"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Popup.Style>
+                            </Popup>
+                            <ToggleButton x:Name="ImageToggle">
+                                <ToggleButton.Style>
+                                    <Style TargetType="ToggleButton">
+                                        <Setter Property="IsChecked" Value="False"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <ContentPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ToggleButton.Style>
+                                <Image Source="{Binding Thumbnail}" Margin="0,5" Cursor="Hand">
+                                </Image>
+                            </ToggleButton>
+                            
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
