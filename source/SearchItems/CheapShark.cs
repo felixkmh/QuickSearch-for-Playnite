@@ -68,7 +68,7 @@ namespace QuickSearch.SearchItems
                                 var title = (string)info["external"];
                                 var item = new CommandItem(title, () => Process.Start($"https://www.cheapshark.com/redirect?dealID={(string)info["cheapestDealID"]}").Dispose() , "", "Open", (string)info["thumb"])
                                 {
-                                    // IconChar = IconChars.ShoppingCart,
+                                    IconChar = IconChars.ShoppingCart,
                                     BottomLeft = ((float)info["cheapest"]).ToString("0.00") + " USD",
                                     BottomRight = "CheapShark.com API",
                                     Keys = new List<ISearchKey<string>>() { new CommandItemKey() { Key = title, Weight = 1 } }

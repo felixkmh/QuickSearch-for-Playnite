@@ -20,10 +20,10 @@
     </UserControl.Resources>
     <StackPanel IsHitTestVisible="False">
         <Grid ClipToBounds="True">
-           <Grid x:Name="DefaultView" ClipToBounds="True" Margin="0,0,2,0">
+            <Grid x:Name="DefaultView" ClipToBounds="True" Margin="0,0,2,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="22"/>
-                    <ColumnDefinition Width="10"/> 
+                    <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -95,9 +95,25 @@
                        MaxHeight="40"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="40" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           FontFamily="{DynamicResource FontIcoFont}"
-                           />
+                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"
+                           FontFamily="{DynamicResource FontIcoFont}" x:Name="TextIconSelected"
+                           >
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Bottom"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ActualHeight, ElementName=SelectedImage}" Value="0">
+                                    <Setter Property="FontSize" Value="40"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Grid>
         </Grid>
         <Separator x:Name="Seperator" Margin="0,0,0,-6.5" Padding="0"
