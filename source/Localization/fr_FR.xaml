@@ -77,6 +77,14 @@
     <sys:String x:Key="LOC_QS_EnableDetailsView"></sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth"></sys:String>
     <sys:String x:Key="LOC_QS_DetailsMaxWidth"></sys:String>
+    <sys:String x:Key="LOC_QS_AddonBrowserPrefix"></sys:String>
+    <sys:String x:Key="LOC_QS_AddonByDev"></sys:String>
+    <sys:String x:Key="LOC_QS_GenericExtension"></sys:String>
+    <sys:String x:Key="LOC_QS_LibraryIntegration"></sys:String>
+    <sys:String x:Key="LOC_QS_DesktopTheme"></sys:String>
+    <sys:String x:Key="LOC_QS_FullscreenTheme"></sys:String>
+    <sys:String x:Key="LOC_QS_MetadataProvider"></sys:String>
+    <sys:String x:Key="LOC_QS_Disabled"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
