@@ -208,7 +208,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del $(ProjectDir)$(OutDir)*.xml
+    <PostBuildEvent>del /q $(ProjectDir)$(OutDir)*.xml
+rmdir /s /q $(ProjectDir)$(OutDir)lib\alpine.3.9-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\alpine-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\debian.9-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\debian-arm64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\fedora-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\osx
+rmdir /s /q $(ProjectDir)$(OutDir)lib\rhel-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\ubuntu.16.04-arm64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\ubuntu.18.04-x64
+rmdir /s /q $(ProjectDir)$(OutDir)lib\linux-x64
 D:\Programmierung\playnite-dev\Playnite9Beta2\Toolbox.exe pack $(ProjectDir)$(OutDir) $(ProjectDir)bin</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
