@@ -85,6 +85,8 @@
     <sys:String x:Key="LOC_QS_FullscreenTheme">Fullscreen Theme</sys:String>
     <sys:String x:Key="LOC_QS_MetadataProvider">Metadata Provider</sys:String>
     <sys:String x:Key="LOC_QS_Disabled">Disabled</sys:String>
+    <sys:String x:Key="LOC_QS_UserData">User Data</sys:String>
+    <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>

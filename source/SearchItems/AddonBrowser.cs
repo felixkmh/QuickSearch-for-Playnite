@@ -12,13 +12,15 @@ using QuickSearch.Views;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Runtime.CompilerServices;
+using YamlDotNet.Serialization;
+using Playnite.SDK.Models;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch.SearchItems
 {
     public class AddonBrowser : ISearchSubItemSource<string>
     {
-        public string Prefix => ResourceProvider.GetString("LOC_QS_AddonBrowserPrefix");
+        public string Prefix => ResourceProvider.GetString("LOC_QS_Addons");
 
         public bool DisplayAllIfQueryIsEmpty => true;
 
@@ -36,7 +38,7 @@ namespace QuickSearch.SearchItems
                         {
                             LibGit2Sharp.Repository.Clone(addonRepo.CloneUrl, repoPath);
                         }
-                    }).Wait(10000);
+                    }).Wait(15000);
                 }
                 else
                 {
@@ -119,15 +121,17 @@ namespace QuickSearch.SearchItems
                 new CommandItemKey() { Key = addon.Name, Weight = 1 },
                 new CommandItemKey() { Key = addon.Author, Weight = 1 }
             };
+
             if (!string.IsNullOrWhiteSpace(addon.ShortDescription))
             {
                 Keys.Add(new CommandItemKey() { Key = addon.ShortDescription, Weight = 1 });
             }
+
             if (!string.IsNullOrWhiteSpace(addon.Description))
             {
                 Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 1 });
             }
-            Actions = new[] { new CommandAction() { Action = () => { Process.Start($"playnite://playnite/installaddon/{addon.AddonId}").Dispose(); }, Name = isInstalled ? ResourceProvider.GetString("LOC_QS_UpdateAction") : ResourceProvider.GetString("LOC_QS_InstallAction") } };
+            
             if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
             {
                 Icon = uri;
@@ -139,7 +143,7 @@ namespace QuickSearch.SearchItems
 
         public IList<ISearchKey<string>> Keys { get; } = null;
 
-        public IList<ISearchAction<string>> Actions { get; } = null;
+        public IList<ISearchAction<string>> Actions => GetActions(addon);
 
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
 
@@ -168,6 +172,45 @@ namespace QuickSearch.SearchItems
                 detailsView.DataContext = addon;
                 return detailsView;
             }
+        }
+
+        static private IList<ISearchAction<string>> GetActions(AddonManifestBase addon)
+        {
+            var actions = new List<ISearchAction<string>> { new CommandAction() { Action = () => { var p = Process.Start($"playnite://playnite/installaddon/{addon.AddonId}"); p?.Close(); p?.Dispose(); }, Name = addon.IsInstalled ? ResourceProvider.GetString("LOC_QS_UpdateAction") : ResourceProvider.GetString("LOC_QS_InstallAction") } };
+
+            if (addon.IsInstalled)
+            {
+                var api = SearchPlugin.Instance.PlayniteApi;
+                var installationBasePath = api.Paths.ConfigurationPath;
+                var installationPath = Path.Combine(installationBasePath, "Extensions", addon.AddonId);
+                if (Directory.Exists(installationPath))
+                {
+                    var extensionManifestPath = Path.Combine(installationPath, "extension.yaml");
+                    actions.Add(new CommandAction() { Action = () => { var p = Process.Start(installationPath); p?.Close(); p?.Dispose(); }, Name = ResourceProvider.GetString("LOC_QS_InstallationData") });
+                    if (File.Exists(extensionManifestPath))
+                    {
+                        try
+                        {
+                            if (ExtensionManifest.FromFile(extensionManifestPath) is ExtensionManifest manifest)
+                            {
+                                var dataBasePath = api.Paths.ExtensionsDataPath;
+                                var plugin = api.Addons.Plugins
+                                    .FirstOrDefault(p => (p.GetType().Assembly.GetName().Name + ".dll").Equals(manifest.Module, StringComparison.OrdinalIgnoreCase));
+                                if (plugin != null)
+                                {
+                                    actions.Insert(1, new CommandAction() { Action = () => { var p = Process.Start(plugin.GetPluginUserDataPath()); p?.Close(); p?.Dispose(); }, Name = ResourceProvider.GetString("LOC_QS_UserData") });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SearchPlugin.logger.Error(ex, $"Couldn't parse extension.yaml file at {extensionManifestPath}");
+                        }
+                    }
+                }
+            }
+
+            return actions;
         }
     }
 
@@ -270,5 +313,72 @@ namespace QuickSearch.SearchItems
         public System.Version RequiredApiVersion { get; set; }
         public DateTime ReleaseDate { get; set; }
         public List<string> Changelog { get; set; }
+    }
+
+    public enum ExtensionType
+    {
+        GenericPlugin,
+        GameLibrary,
+        Script,
+        MetadataProvider
+    }
+
+    public class BaseExtensionManifest
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Author { get; set; }
+
+        public string Version { get; set; }
+
+        public List<Link> Links { get; set; }
+
+        [YamlIgnore]
+        public string DirectoryPath { get; set; }
+
+        [YamlIgnore]
+        public string DirectoryName { get; set; }
+
+        [YamlIgnore]
+        public string DescriptionPath { get; set; }
+
+        public void VerifyManifest()
+        {
+            if (!System.Version.TryParse(Version, out var extver))
+            {
+                throw new Exception("Extension version string must be a real version!");
+            }
+        }
+    }
+
+    public class ExtensionManifest : BaseExtensionManifest
+    {
+        [YamlIgnore]
+        public bool IsExternalDev { get; set; }
+
+        //[YamlIgnore]
+        //public bool IsCompatible { get; } = false;
+
+        public string Module { get; set; }
+
+        public string Icon { get; set; }
+
+        public ExtensionType Type { get; set; }
+
+        public ExtensionManifest()
+        {
+        }
+
+        public static ExtensionManifest FromFile(string descriptorPath)
+        {
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            var description = deserializer.Deserialize<ExtensionManifest>(File.ReadAllText(descriptorPath));
+            description.DescriptionPath = descriptorPath;
+            description.DirectoryPath = Path.GetDirectoryName(descriptorPath);
+            description.DirectoryName = Path.GetFileNameWithoutExtension(description.DirectoryPath);
+            return description;
+        }
     }
 }
