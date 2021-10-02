@@ -257,7 +257,7 @@ namespace QuickSearch
         /// that should be used here.
         /// </param>
         /// <returns>The item that was added. Can be used to remove it.</returns>
-        public static SettingsItem<TSettings> AddPluginSettings<TSettings>(string pluginName, TSettings settings, OpenSettingsViewDelegate openSettingsViewAction)
+        public static CommandItem AddPluginSettings<TSettings>(string pluginName, TSettings settings, OpenSettingsViewDelegate openSettingsViewAction)
         {
             var assembly = Assembly.GetCallingAssembly();
             string assemblyName = assembly?.GetName()?.Name ?? "Null";
@@ -289,7 +289,7 @@ namespace QuickSearch
             {
                 source.entries.Add(key, settingsCommand);
             }
-            return source.entries[key] as SearchItems.Settings.SettingsItem<TSettings>;
+            return source.entries[key] as CommandItem;
         }
 
         private static ExternalCommandItemSource GetOrCreateSource(string assemblyName)
