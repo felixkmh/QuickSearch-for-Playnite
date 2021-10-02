@@ -43,6 +43,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="{DynamicResource LOCSourceLabel}" Grid.Column="0" Grid.Row="0" FontWeight="Bold" Opacity="0.8"/>
                 <TextBlock Text="{Binding Source, TargetNullValue=Playnite}" Grid.Column="2" Grid.Row="0" />
@@ -54,34 +55,42 @@
                            Visibility="{Binding ElementName=Platform, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Platform" Text="{Binding Platforms, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="3" 
                            Visibility="{Binding ElementName=Platform, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCDevelopersLabel}" Grid.Column="0" Grid.Row="4" FontWeight="Bold"
                            Visibility="{Binding ElementName=Developer, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Developer" Text="{Binding Developers, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="4" 
                            Visibility="{Binding ElementName=Developer, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCPublisherLabel}" Grid.Column="0" Grid.Row="5" FontWeight="Bold"
                            Visibility="{Binding ElementName=Developer, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Publisher" Text="{Binding Publishers, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="5" 
                            Visibility="{Binding ElementName=Publisher, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCCategoriesLabel}" Grid.Column="0" Grid.Row="6" FontWeight="Bold" 
                            Visibility="{Binding ElementName=Categories, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Categories" Text="{Binding Categories, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="6" 
                            Visibility="{Binding ElementName=Categories, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCGenresLabel}" Grid.Column="0" Grid.Row="7" FontWeight="Bold" 
                            Visibility="{Binding ElementName=Genres, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Genres" Text="{Binding Genres, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="7" 
                            Visibility="{Binding ElementName=Genres, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCFeaturesLabel}" Grid.Column="0" Grid.Row="8" FontWeight="Bold" 
                            Visibility="{Binding ElementName=Features, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Features" Text="{Binding Features, Converter={StaticResource ListToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="8" 
                            Visibility="{Binding ElementName=Features, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCCriticScore}" Grid.Column="0" Grid.Row="9" FontWeight="Bold" 
                            Visibility="{Binding ElementName=CriticScore, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="CriticScore" Text="{Binding CriticScore}" Grid.Column="2" Grid.Row="9" 
                            Visibility="{Binding ElementName=CriticScore, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="{DynamicResource LOCUserScore}" Grid.Column="0" Grid.Row="10" FontWeight="Bold" 
                            Visibility="{Binding ElementName=UserScore, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="UserScore" Text="{Binding UserScore}" Grid.Column="2" Grid.Row="10" 
                        Visibility="{Binding ElementName=UserScore, Path=Text, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}, Mode=OneWay}"/>
+                
                 <TextBlock Text="Roms" Grid.Column="0" Grid.Row="11" FontWeight="Bold" 
                            Visibility="{Binding ElementName=Roms, Path=Visibility, Mode=OneWay}" Opacity="0.8"/>
                 <TextBlock x:Name="Roms" Text="{Binding Roms, Converter={StaticResource RomsToStringConverter}, ConverterParameter=', '}" Grid.Column="2" Grid.Row="11" 
