@@ -95,25 +95,42 @@
                        MaxHeight="40"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"
-                           FontFamily="{DynamicResource FontIcoFont}" x:Name="TextIconSelected"
-                           >
-                    <TextBlock.Style>
-                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                            <Setter Property="FontSize" Value="18"/>
-                            <Setter Property="TextAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Border HorizontalAlignment="{Binding HorizontalAlignment, ElementName=TextIconSelected}" 
+                        VerticalAlignment="{Binding VerticalAlignment, ElementName=TextIconSelected}"
+                        Visibility="{Binding Text, ElementName=TextIconSelected, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="1"/>
+                            <Setter Property="Background" Value="{x:Null}"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ActualHeight, ElementName=SelectedImage}" Value="0">
-                                    <Setter Property="FontSize" Value="40"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                <DataTrigger Binding="{Binding ElementName=TextIconSelected, Path=FontSize}" Value="17">
+                                    <Setter Property="Background" Value="{DynamicResource PopupBackgroundBrush}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                    </Border.Style>
+                    <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"
+                               FontFamily="{DynamicResource FontIcoFont}" x:Name="TextIconSelected"
+                               >
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="FontSize" Value="17"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActualHeight, ElementName=SelectedImage}" Value="0">
+                                        <Setter Property="FontSize" Value="40"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
             </Grid>
         </Grid>
         <Separator x:Name="Seperator" Margin="0,0,0,-6.5" Padding="0"
