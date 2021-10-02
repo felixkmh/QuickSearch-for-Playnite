@@ -44,6 +44,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="{DynamicResource LOCSourceLabel}" Grid.Column="0" Grid.Row="0" FontWeight="Bold" Opacity="0.8"/>
                 <TextBlock Text="{Binding Source, TargetNullValue=Playnite}" Grid.Column="2" Grid.Row="0" />
