@@ -107,9 +107,6 @@
                         </Style.Resources>
                     </Style>
                 </mdxam:MarkdownScrollViewer.MarkdownStyle>
-                <mdxam:MarkdownScrollViewer.Resources>
-                    
-                </mdxam:MarkdownScrollViewer.Resources>
             </mdxam:MarkdownScrollViewer>
             <Separator Visibility="{Binding ElementName=Screenshots, Path=ItemsSource, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}"/>
             <ItemsControl ItemsSource="{Binding Screenshots}" x:Name="Screenshots"

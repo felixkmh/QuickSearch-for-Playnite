@@ -92,7 +92,8 @@
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="SelectedImage"
                        Effect="{StaticResource IconDropShadow}"
-                       MaxHeight="40"
+                       Height="40"
+                       MaxWidth="40"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
                 <Border HorizontalAlignment="{Binding HorizontalAlignment, ElementName=TextIconSelected}" 
@@ -121,7 +122,7 @@
                                 <Setter Property="HorizontalAlignment" Value="Right"/>
                                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ActualHeight, ElementName=SelectedImage}" Value="0">
+                                    <DataTrigger Binding="{Binding ActualWidth, ElementName=SelectedImage}" Value="0">
                                         <Setter Property="FontSize" Value="40"/>
                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>

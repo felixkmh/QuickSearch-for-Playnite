@@ -430,10 +430,14 @@ namespace QuickSearch
                         if (config != null)
                         {
                             string name = config["Name"] as string ?? plugin.GetType().Name;
-
+                            string icon = config["Icon"] as string;
                             if (name is string)
                             {
-                                QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                                var item = QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                                if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
+                                {
+                                    item.Icon = uri;
+                                }
                             }
                         }
                     }

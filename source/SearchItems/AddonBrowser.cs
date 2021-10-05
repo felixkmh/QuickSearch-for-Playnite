@@ -131,13 +131,22 @@ namespace QuickSearch.SearchItems
             {
                 Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 1 });
             }
-            
-            if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
+            if (isInstalled)
             {
-                Icon = uri;
-            } else
+                if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
+                {
+                    Icon = uri;
+                }
+            }
+            if (Icon == null)
             {
-                Icon = (System.Windows.Application.Current.FindResource("TrayIcon") as BitmapImage).UriSource;
+                if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
+                {
+                    Icon = uri;
+                } else
+                {
+                    Icon = (System.Windows.Application.Current.FindResource("TrayIcon") as BitmapImage).UriSource;
+                }
             }
         }
 
@@ -257,6 +266,10 @@ namespace QuickSearch.SearchItems
         [Newtonsoft.Json.JsonIgnore]
         [YamlDotNet.Serialization.YamlIgnore]
         public bool IsEnabled { get; set; } = false;
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string InstallationPath { get; } = null;
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string ExtensionManifest { get; } = null;
     }
 
     public class AddonInstallerManifest

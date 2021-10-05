@@ -244,7 +244,7 @@ namespace QuickSearch.SearchItems
             }
             var games = SearchPlugin.Instance.PlayniteApi.Database.Games;
             IEnumerable<ISearchItem<string>> items = SearchPlugin.Instance.PlayniteApi.Database.Sources
-                .Where(s => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Source == s, mode).Eval))
+                .Where(s => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Source == s, mode).Eval))
                 .Select(s =>
                 {
                     var source = s;
@@ -253,7 +253,7 @@ namespace QuickSearch.SearchItems
                     return item;
                 });
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Platforms
-                .Where(p => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Platforms?.FirstOrDefault() == p, mode).Eval))
+                .Where(p => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Platforms?.FirstOrDefault() == p, mode).Eval))
                 .Select(p =>
                 {
                     var platform = p;
@@ -262,7 +262,7 @@ namespace QuickSearch.SearchItems
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Genres
-                .Where(gr => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Genres?.Contains(gr) ?? false, mode).Eval))
+                .Where(gr => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Genres?.Contains(gr) ?? false, mode).Eval))
                 .Select(gr =>
                 {
                     GameFilter filter = new GameFilter(g => g.Genres?.Contains(gr) ?? false, previousFilter, mode);
@@ -270,7 +270,7 @@ namespace QuickSearch.SearchItems
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Categories
-                .Where(c => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Categories?.Contains(c) ?? false, mode).Eval))
+                .Where(c => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.Categories?.Contains(c) ?? false, mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => g.Categories?.Contains(c) ?? false, previousFilter, mode);
@@ -278,7 +278,7 @@ namespace QuickSearch.SearchItems
                     return item;
                 }));
             items = items.Concat(SearchPlugin.Instance.PlayniteApi.Database.Companies
-                .Where(c => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), mode).Eval))
+                .Where(c => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), previousFilter, mode);
@@ -286,7 +286,7 @@ namespace QuickSearch.SearchItems
                     return item;
                 }));
             items = items.Concat((new[] { true, false })
-                .Where(c => SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.IsInstalled == c, mode).Eval))
+                .Where(c => previousFilter.IsEmpty || SearchPlugin.Instance.PlayniteApi.Database.Games.Any(previousFilter.CopyAndAdd(g => g.IsInstalled == c, mode).Eval))
                 .Select(c =>
                 {
                     var name = c ? ResourceProvider.GetString("LOC_QS_Installed") : ResourceProvider.GetString("LOC_QS_Uninstalled");
@@ -511,7 +511,8 @@ namespace QuickSearch.SearchItems
         private string seperator;
         private GameFilter filter;
 
-        public IList<ISearchKey<string>> Keys { 
+        public IList<ISearchKey<string>> Keys
+        {
             get
             {
                 var keys = new List<ISearchKey<string>>();

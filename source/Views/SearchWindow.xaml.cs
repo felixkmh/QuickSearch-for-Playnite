@@ -620,7 +620,7 @@ namespace QuickSearch
                     var name = RemoveDiacritics(gameItem.game.Name).CompareTo(RemoveDiacritics(maxGameItem.game.Name));
                     var lastPlayed = (gameItem.game.LastActivity ?? DateTime.MinValue).CompareTo(maxGameItem.game.LastActivity ?? DateTime.MinValue);
                     var installed = gameItem.game.IsInstalled.CompareTo(maxGameItem.game.IsInstalled);
-
+                    var hidden = gameItem.game.Hidden.CompareTo(maxGameItem.game.Hidden);
                     if (SearchPlugin.Instance.Settings.InstallationStatusFirst)
                     {
                         if (installed != 0)
@@ -634,6 +634,10 @@ namespace QuickSearch
                         else if (lastPlayed != 0)
                         {
                             return -1 * lastPlayed;
+                        } 
+                        else if (hidden != 0)
+                        {
+                            return hidden;
                         }
                     } else
                     {
@@ -648,6 +652,10 @@ namespace QuickSearch
                         else if (installed != 0)
                         {
                             return -1 * installed;
+                        }
+                        else if (hidden != 0)
+                        {
+                            return hidden;
                         }
                     }                   
                 }
