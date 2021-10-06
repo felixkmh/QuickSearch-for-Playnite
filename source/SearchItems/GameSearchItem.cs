@@ -651,7 +651,7 @@ namespace QuickSearch.SearchItems
                     fullPath = SearchPlugin.Instance.PlayniteApi.Database.GetFullFilePath(path);
                 }
 
-                if (ImageExtensions.Contains(Path.GetExtension(Path.GetFileName(fullPath)).ToLower()))
+                if (!Path.GetExtension(Path.GetFileName(fullPath)).ToLower().EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                 {
                     return Uri.TryCreate(fullPath, UriKind.RelativeOrAbsolute, out uri);
                 }

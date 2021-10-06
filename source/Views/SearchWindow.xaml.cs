@@ -697,7 +697,7 @@ namespace QuickSearch
                 if (!double.IsNaN(heightSelected) && !double.IsNaN(heightNotSelected))
                 {
                     var availableHeight = WindowGrid.Height;
-                    availableHeight -= SearchBox.RenderSize.Height;
+                    availableHeight -= WindowGridSearchRow.ActualHeight;
                     availableHeight -= heightSelected;
                     availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
                     availableHeight -= SearchResults.Margin.Top + SearchResults.Margin.Bottom;
