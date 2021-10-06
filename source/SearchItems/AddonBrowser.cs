@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Octokit;
 using LibGit2Sharp;
 using System.IO;
 using System.Diagnostics;
@@ -32,13 +31,7 @@ namespace QuickSearch.SearchItems
                 var repoPath = Path.Combine(dataPath, "PlayniteAddonDatabase");
                 if (!Directory.Exists(repoPath))
                 {
-                    var client = new GitHubClient(new ProductHeaderValue("QuickSearch-for-Playnite"));
-                    client.Repository.Get("JosefNemec", "PlayniteAddonDatabase").ContinueWith(task => {
-                        if (!task.IsFaulted && task.Result is Octokit.Repository addonRepo)
-                        {
-                            LibGit2Sharp.Repository.Clone(addonRepo.CloneUrl, repoPath);
-                        }
-                    }).Wait(15000);
+                    LibGit2Sharp.Repository.Clone("https://github.com/JosefNemec/PlayniteAddonDatabase.git", repoPath);
                 }
                 else
                 {
