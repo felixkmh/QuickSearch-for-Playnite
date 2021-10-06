@@ -696,11 +696,11 @@ namespace QuickSearch
                 }
                 if (!double.IsNaN(heightSelected) && !double.IsNaN(heightNotSelected))
                 {
-                    var availableHeight = WindowGrid.Height;
-                    availableHeight -= WindowGridSearchRow.ActualHeight;
+                    var availableHeight = 400.0;
+                    //availableHeight -= WindowGridSearchRow.ActualHeight;
                     availableHeight -= heightSelected;
-                    availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
-                    availableHeight -= SearchResults.Margin.Top + SearchResults.Margin.Bottom;
+                    //availableHeight -= SearchResults.Padding.Top + SearchResults.Padding.Bottom;
+                    //availableHeight -= SearchResults.Margin.Top + SearchResults.Margin.Bottom;
                     var maxItems = Math.Floor(availableHeight / heightNotSelected);
                     var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
                     Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;

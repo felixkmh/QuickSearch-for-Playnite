@@ -54,7 +54,7 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Grid>
+                    <Grid x:Name="ExpandendUpper">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
@@ -77,7 +77,7 @@
                                                    ClipToBounds="True" 
                                                    HorizontalScrollBarVisibility="Hidden" 
                                                    VerticalScrollBarVisibility="Disabled" 
-                                                   MaxWidth="600">
+                                                   MaxWidth="{Binding ElementName=ExpandendUpper, Path=ActualWidth, Mode=OneWay}">
                             <TextBlock Text="{Binding BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
                         </controls:AutoScrollViewer>
                         <TextBlock Text="{Binding BottomCenter}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
@@ -98,25 +98,30 @@
                        VerticalAlignment="Center"/>
                 <Border HorizontalAlignment="{Binding HorizontalAlignment, ElementName=TextIconSelected}" 
                         VerticalAlignment="{Binding VerticalAlignment, ElementName=TextIconSelected}"
-                        Visibility="{Binding Text, ElementName=TextIconSelected, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}">
+                        Visibility="{Binding Text, ElementName=TextIconSelected, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
+                        Padding="0">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                             <Setter Property="BorderThickness" Value="0"/>
-                            <Setter Property="Padding" Value="1"/>
+                            <Setter Property="Padding" Value="0"/>
                             <Setter Property="Background" Value="{x:Null}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ElementName=TextIconSelected, Path=FontSize}" Value="17">
                                     <Setter Property="Background" Value="{DynamicResource PopupBackgroundBrush}"/>
+                                    <Setter Property="Padding" Value="1"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
                     <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"
                                FontFamily="{DynamicResource FontIcoFont}" x:Name="TextIconSelected"
+                               MaxHeight="40"
                                >
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
                                 <Setter Property="FontSize" Value="17"/>
                                 <Setter Property="TextAlignment" Value="Center"/>
                                 <Setter Property="HorizontalAlignment" Value="Right"/>
