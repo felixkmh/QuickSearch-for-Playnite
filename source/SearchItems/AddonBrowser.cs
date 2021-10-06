@@ -111,9 +111,17 @@ namespace QuickSearch.SearchItems
             addon.IsInstalled = isInstalled;
             this.addon = addon;
             Keys = new List<ISearchKey<string>> { 
-                new CommandItemKey() { Key = addon.Name, Weight = 1 },
-                new CommandItemKey() { Key = addon.Author, Weight = 1 }
+                new CommandItemKey() { Key = addon.Name ?? "Add-on Name", Weight = 1 },
+                new CommandItemKey() { Key = addon.Author ?? "Unknown Author", Weight = 1 },
             };
+            if (addon.Tags is List<string> tags && tags.Count > 0)
+            {
+                var tagString = string.Join(" ", tags);
+                if (!string.IsNullOrWhiteSpace(tagString))
+                {
+                    Keys.Add(new CommandItemKey() { Key = tagString, Weight = 1 });
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(addon.ShortDescription))
             {
