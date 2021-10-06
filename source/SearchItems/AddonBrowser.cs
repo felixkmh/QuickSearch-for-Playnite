@@ -128,10 +128,10 @@ namespace QuickSearch.SearchItems
                 Keys.Add(new CommandItemKey() { Key = addon.ShortDescription, Weight = 1 });
             }
 
-            if (!string.IsNullOrWhiteSpace(addon.Description))
-            {
-                Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 1 });
-            }
+            //if (!string.IsNullOrWhiteSpace(addon.Description))
+            //{
+            //    Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 1 });
+            //}
             if (isInstalled)
             {
                 if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
