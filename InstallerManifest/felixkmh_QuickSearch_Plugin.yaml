@@ -1,5 +1,11 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.8.1
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-06
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.8.1/felixkmh_QuickSearch_Plugin_2_8_1.pext
+    Changelog:
+      - fixed search box height not being set correctly
   - Version: 2.8.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-05
