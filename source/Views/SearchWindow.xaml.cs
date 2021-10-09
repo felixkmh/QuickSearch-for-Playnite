@@ -1,20 +1,16 @@
-﻿using DuoVia.FuzzyStrings;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading;
 using System;
-using Playnite.SDK.Models;
 using System.Collections.Generic;
-using System.Collections;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using static QuickSearch.Matching;
 using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 using QuickSearch.Controls;
 using QuickSearch.SearchItems;
@@ -310,7 +306,7 @@ namespace QuickSearch
                             }
                         }
                     }
-
+                    
                     Candidate[] canditates;
                     if (showAll)
                     {
