@@ -188,7 +188,9 @@ namespace QuickSearch
 
         internal float ComputeScore(ISearchItem<string> item, string input)
         {
-            var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k});
+            var scores = item.Keys
+                .Where(k => k.Weight > 0)
+                .Select(k => new { Score = GetCombinedScore(input, k.Key), Key = k});
             var weightSum = scores.Sum(s => s.Key.Weight);
             if (weightSum <= 0) weightSum = 1;
             switch (item.ScoreMode)
@@ -206,7 +208,7 @@ namespace QuickSearch
 
         internal float ComputePreliminaryScore(ISearchItem<string> item, string input)
         {
-            var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = MatchingLetterPairs(input, k.Key, ScoreNormalization.Str1), Key = k });
+            var scores = item.Keys.Where(k => k.Weight > 0).Select(k => new { Score = MatchingLetterPairs2(input, k.Key, ScoreNormalization.Str1), Key = k });
             var weightSum = scores.Sum(s => s.Key.Weight);
             if (weightSum <= 0) weightSum = 1;
             switch (item.ScoreMode)
@@ -286,21 +288,39 @@ namespace QuickSearch
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
                     var sources = searchItemSources;
-                    var queryDependantItems = sources
-                    .Select(source => source.GetItems(input))
-                    .Where(items => items != null)
-                    .SelectMany(items => items);
+                    List<ISearchItem<string>> queryDependantItems = new List<ISearchItem<string>>();
+
+                    foreach (var source in sources)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            searchSw.Stop();
+                            return;
+                        }
+                        if (source.GetItems(input) is IEnumerable<ISearchItem<string>> items)
+                        {
+                            foreach(var item in items)
+                            {
+                                queryDependantItems.Add(item);
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    searchSw.Stop();
+                                    return;
+                                }
+                            }
+                        }
+                    }
 
                     Candidate[] canditates;
                     if (showAll)
                     {
-                        canditates = searchItems.Concat(queryDependantItems)
-                        .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold))
+                        canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                        .Where(item => !cancellationToken.IsCancellationRequested)
                         .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
                     } else
                     {
                         canditates = searchItems.Concat(queryDependantItems).AsParallel()
-                        .Where(item => showAll || (ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold))
+                        .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
                         .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
                     }
 

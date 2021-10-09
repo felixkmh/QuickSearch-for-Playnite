@@ -19,6 +19,18 @@ namespace QuickSearch
             Both
         }
 
+        public static float GetCombinedScore(in string str1, in string str2)
+        {
+            return (6 * MatchingLetterPairs2(str1, str2, ScoreNormalization.Str1)
+                 + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score) / 8f;
+            //+ MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
+            //return Math.Max(
+            //    Math.Max(
+            //        MatchingLetterPairs(str1, str2, ScoreNormalization.Str1),
+            //        LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score),
+            //    MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1));
+        }
+
         static IEnumerable<string> GetLetterPairs(string str)
         {
             for(int i = 0; i < str.Length - 1; ++i)
@@ -29,13 +41,6 @@ namespace QuickSearch
             {
                 yield return str;
             }
-        }
-
-        public static float GetCombinedScore(in string str1, in string str2)
-        {
-            return (6 * MatchingLetterPairs(str1, str2, ScoreNormalization.Str1) 
-                 + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score 
-                 + MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
         }
 
         // http://www.catalysoft.com/articles/StrikeAMatch.html
@@ -62,6 +67,9 @@ namespace QuickSearch
             var pairs1 = GetWordLetterPairs(RemoveDiacritics(str1));
             var pairs2 = GetWordLetterPairs(RemoveDiacritics(str2));
 
+            var pairs1Count = pairs1.Count;
+            var pairs2Count = pairs2.Count;
+
             float matches = 0;
             for(int i = 0; i < pairs1.Count; ++i)
             {
@@ -80,11 +88,156 @@ namespace QuickSearch
                 case ScoreNormalization.None:
                     return matches;
                 case ScoreNormalization.Str1:
-                    return matches / pairs1.Count;
+                    return matches / pairs1Count;
                 case ScoreNormalization.Str2:
-                    return matches / pairs2.Count;
+                    return matches / pairs2Count;
                 case ScoreNormalization.Both:
-                    return 2 * matches / (pairs1.Count + pairs2.Count);
+                    return 2 * matches / (pairs1Count + pairs2Count);
+                default:
+                    return matches;
+            }
+        }
+
+        private class IndexPair
+        {
+            public IndexPair(int a, int b)
+            {
+                this.a = a;
+                this.b = b;
+                this.single = false;
+            }
+
+            public IndexPair(int a)
+            {
+                this.a = a;
+                this.b = a;
+                this.single = true;
+            }
+            public int a;
+            public int b;
+            public bool single;
+        }
+
+        // http://www.catalysoft.com/articles/StrikeAMatch.html
+        static List<IndexPair> GetWordLetterPairs2(in string str)
+        {
+            var result = new List<IndexPair>();
+            if (str.Length == 0)
+            {
+                return result;
+            }
+            else if (str.Length == 1)
+            {
+                result.Add(new IndexPair(0));
+            }
+            else
+            {
+                for (int i = 0; i < str.Length; ++i)
+                {
+                    if (i + 1 < str.Length && str[i] != ' ' && str[i + 1] != ' ')
+                    {
+                        result.Add(new IndexPair(i, i + 1));
+                    }
+                    else if (i > 0 && i + 1 < str.Length && str[i - 1] == ' ' && str[i + 1] == ' ' && str[i] != ' ')
+                    {
+                        result.Add(new IndexPair(i));
+                    }
+                    else if (i == 0 && str[i] != ' ' && str[i + 1] == ' ')
+                    {
+                        result.Add(new IndexPair(i));
+                    } 
+                    else if (i == str.Length - 1 && str[i-1] == ' ' && str[i] != ' ')
+                    {
+                        result.Add(new IndexPair(i));
+                    }
+                }
+            }
+
+            return result;
+        }
+        // http://www.catalysoft.com/articles/StrikeAMatch.html
+        public static float MatchingLetterPairs2(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
+        {
+            if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
+            {
+                return 0f;
+            }
+
+            var normalized1 = RemoveDiacritics(str1).ToLower();
+            var normalized2 = RemoveDiacritics(str2).ToLower();
+
+            var pairs1 = GetWordLetterPairs2(normalized1);
+            var pairs2 = GetWordLetterPairs2(normalized2);
+
+            var pairs1Count = pairs1.Count;
+            var pairs2Count = pairs2.Count;
+
+            float matches = 0;
+            for (int i = 0; i < pairs1.Count && pairs2.Count > 0; ++i)
+            {
+                for (int j = pairs2.Count - 1; j >= 0; --j)
+                {
+                    if (!pairs1[i].single && !pairs2[j].single)
+                    {
+                        if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a] && normalized1[pairs1[i].b] == normalized2[pairs2[j].b])
+                        {
+                            ++matches;
+                            pairs2.RemoveAt(j);
+                            break;
+                        }
+                    }
+                    else if (pairs1[i].single && pairs2[j].single)
+                    {
+                        if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a])
+                        {
+                            ++matches;
+                            pairs2.RemoveAt(j);
+                            break;
+                        }
+                    } 
+                }
+            }
+
+            var max_matches = Math.Min(pairs1Count, pairs2Count);
+
+            if (pairs2.Count > 0)
+            {
+                for (int i = 0; i < pairs1.Count && matches < max_matches && pairs2.Count > 0; ++i)
+                {
+                    for (int j = pairs2.Count - 1; j >= 0; --j)
+                    {
+                        if (pairs1[i].single && !pairs2[j].single)
+                        {
+                            if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a] || normalized1[pairs1[i].a] == normalized2[pairs2[j].b])
+                            {
+                                ++matches;
+                                pairs2.RemoveAt(j);
+                                break;
+                            }
+                        }
+                        else if (!pairs1[i].single && pairs2[j].single)
+                        {
+                            if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a] || normalized1[pairs1[i].b] == normalized2[pairs2[j].a])
+                            {
+                                ++matches;
+                                pairs2.RemoveAt(j);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            switch (normalization)
+            {
+                case ScoreNormalization.None:
+                    return matches;
+                case ScoreNormalization.Str1:
+                    return matches / pairs1Count;
+                case ScoreNormalization.Str2:
+                    return matches / pairs2Count;
+                case ScoreNormalization.Both:
+                    return 2 * matches / (pairs1Count + pairs2Count);
                 default:
                     return matches;
             }
@@ -125,6 +278,7 @@ namespace QuickSearch
                 for (int j = 0; j < words2.Count; ++j)
                 {
                     var val = (float)words1[i].FuzzyMatch(words2[j]);
+                    // var val = MatchingLetterPairs(words1[i], words2[j], normalization);
                     if (val > maxValue)
                     {
                         maxValue = val;
@@ -184,10 +338,10 @@ namespace QuickSearch
             }
             var a = RemoveDiacritics(str1.ToLower());
             var b = RemoveDiacritics(str2.ToLower());
-            var stringsA = Substrings(a).ToList();
-            var stringsB = Substrings(b).ToList();
+            var stringsA = Substrings(a);
+            var stringsB = Substrings(b);
             var common = stringsA.Intersect(stringsB).OrderByDescending(s => s.Length);
-            var lcs = common.FirstOrDefault()??string.Empty;
+            var lcs = common.FirstOrDefault() ?? string.Empty;
             var result = new LcsResult { String = lcs, Score = lcs.Length };
             switch (normalization)
             {
