@@ -310,7 +310,7 @@ namespace QuickSearch
                     Candidate[] canditates;
                     if (showAll)
                     {
-                        canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                        canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
                         .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
                     } else
