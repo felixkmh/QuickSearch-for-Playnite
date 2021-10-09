@@ -22,8 +22,8 @@ namespace QuickSearch
         public static float GetCombinedScore(in string str1, in string str2)
         {
             return (6 * MatchingLetterPairs2(str1, str2, ScoreNormalization.Str1)
-                 + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score) / 8f;
-            //+ MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
+                  + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score
+                  + 1 * MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
             //return Math.Max(
             //    Math.Max(
             //        MatchingLetterPairs(str1, str2, ScoreNormalization.Str1),
@@ -210,7 +210,7 @@ namespace QuickSearch
                         {
                             if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a] || normalized1[pairs1[i].a] == normalized2[pairs2[j].b])
                             {
-                                ++matches;
+                                matches += 0.5f;
                                 pairs2.RemoveAt(j);
                                 break;
                             }
@@ -219,7 +219,7 @@ namespace QuickSearch
                         {
                             if (normalized1[pairs1[i].a] == normalized2[pairs2[j].a] || normalized1[pairs1[i].b] == normalized2[pairs2[j].a])
                             {
-                                ++matches;
+                                matches += 0.5f;
                                 pairs2.RemoveAt(j);
                                 break;
                             }
@@ -277,8 +277,10 @@ namespace QuickSearch
                 int maxIdx = 0;
                 for (int j = 0; j < words2.Count; ++j)
                 {
-                    var val = (float)words1[i].FuzzyMatch(words2[j]);
-                    // var val = MatchingLetterPairs(words1[i], words2[j], normalization);
+                    // var val = (float)words1[i].FuzzyMatch(words2[j]);
+                    // var val = FuzzySharp.Fuzz.PartialRatio(words1[i], words2[j]) * 1f / 100f;
+                    var val = MatchingLetterPairs2(words1[i], words2[j], ScoreNormalization.Str2);
+                    // var val = 1f - ((float)words1[i].LevenshteinDistance(words2[j]) / (float) Math.Max(words1[i].Length, words2[j].Length));
                     if (val > maxValue)
                     {
                         maxValue = val;
