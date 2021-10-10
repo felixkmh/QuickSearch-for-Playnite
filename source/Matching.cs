@@ -20,9 +20,10 @@ namespace QuickSearch
 
         public static float GetCombinedScore(in string str1, in string str2)
         {
-            return (6 * MatchingLetterPairs2(str1, str2, ScoreNormalization.Str1)
-                  + 1f * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score
-                  + 3f * MatchingWords(str1, str2, 0.7f, ScoreNormalization.Both)) / 10f;
+            var score = (12f * MatchingLetterPairs2(str1, str2, ScoreNormalization.Str1)
+                + 1f * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score
+                + 3f * MatchingWords(str1, str2, 0.7f, ScoreNormalization.Both)) / 16f;
+            return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
             //        MatchingLetterPairs(str1, str2, ScoreNormalization.Str1),

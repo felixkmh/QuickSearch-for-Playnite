@@ -324,13 +324,17 @@ namespace QuickSearch
                         .ToArray();
                     }
 
-                    foreach (var candidate in canditates)
+                    if (canditates.Any(candidate => candidate.Item is GameSearchItem))
                     {
-                        if (!(candidate.Item is GameSearchItem))
+                        foreach (var candidate in canditates)
                         {
-                            candidate.Score = (float)Math.Pow(candidate.Score, 8);
+                            if (candidate.Item is FilterItem)
+                            {
+                                candidate.Score = (float)Math.Pow(candidate.Score, 8);
+                            }
                         }
                     }
+
 
                     maxResults = canditates.Count();
                     if (SearchPlugin.Instance.Settings.MaxNumberResults > 0)
