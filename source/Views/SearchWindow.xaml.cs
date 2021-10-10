@@ -312,12 +312,24 @@ namespace QuickSearch
                     {
                         canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) })
+                        .Where(candidate => candidate.Score >= searchPlugin.Settings.Threshold)
+                        .ToArray();
                     } else
                     {
                         canditates = searchItems.Concat(queryDependantItems).AsParallel()
                         .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) }).ToArray();
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) })
+                        .Where(candidate => candidate.Score >= searchPlugin.Settings.Threshold)
+                        .ToArray();
+                    }
+
+                    foreach (var candidate in canditates)
+                    {
+                        if (!(candidate.Item is GameSearchItem))
+                        {
+                            candidate.Score = (float)Math.Pow(candidate.Score, 8);
+                        }
                     }
 
                     maxResults = canditates.Count();
@@ -401,7 +413,14 @@ namespace QuickSearch
                     searchSw.Stop();
                     return;
                 }
-
+#if DEBUG
+                Debug.WriteLine("------------------");
+                foreach (var c in addedCandidates)
+                {
+                    Debug.WriteLine($"{c.Item.TopLeft} : {c.Score}");
+                }
+                Debug.WriteLine("------------------");
+#endif
                 Dispatcher.Invoke(() =>
                 {
                     for (int i = ListDataContext.Count - 1; i >= addedItems; --i)

@@ -21,8 +21,8 @@ namespace QuickSearch
         public static float GetCombinedScore(in string str1, in string str2)
         {
             return (6 * MatchingLetterPairs2(str1, str2, ScoreNormalization.Str1)
-                  + 2 * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score
-                  + 1 * MatchingWords(str1, str2, 0.7f, ScoreNormalization.Str1)) / 9f;
+                  + 1f * LongestCommonSubstringDP(str1, str2, ScoreNormalization.Str1).Score
+                  + 3f * MatchingWords(str1, str2, 0.7f, ScoreNormalization.Both)) / 10f;
             //return Math.Max(
             //    Math.Max(
             //        MatchingLetterPairs(str1, str2, ScoreNormalization.Str1),
@@ -236,7 +236,7 @@ namespace QuickSearch
                 case ScoreNormalization.Str2:
                     return matches / pairs2Count;
                 case ScoreNormalization.Both:
-                    return 2 * matches / (pairs1Count + pairs2Count);
+                    return matches / Math.Max(pairs1Count, pairs2Count);
                 default:
                     return matches;
             }
@@ -268,6 +268,10 @@ namespace QuickSearch
 
             var words1 = RemoveDiacritics(str1).ToLower().Split(' ').ToList();
             var words2 = RemoveDiacritics(str2).ToLower().Split(' ').ToList();
+
+            var words1Count = words1.Count;
+            var words2Count = words2.Count;
+
             float sum = 0;
             for (int i = 0; i < words1.Count; ++i)
             {
@@ -278,7 +282,7 @@ namespace QuickSearch
                 {
                     // var val = (float)words1[i].FuzzyMatch(words2[j]);
                     // var val = FuzzySharp.Fuzz.PartialRatio(words1[i], words2[j]) * 1f / 100f;
-                    var val = MatchingLetterPairs2(words1[i], words2[j], ScoreNormalization.Str2);
+                    var val = MatchingLetterPairs2(words1[i], words2[j], ScoreNormalization.Both);
                     // var val = 1f - ((float)words1[i].LevenshteinDistance(words2[j]) / (float) Math.Max(words1[i].Length, words2[j].Length));
                     if (val > maxValue)
                     {
@@ -298,11 +302,11 @@ namespace QuickSearch
                 case ScoreNormalization.None:
                     return sum;
                 case ScoreNormalization.Str1:
-                    return sum / words1.Count;
+                    return sum / words1Count;
                 case ScoreNormalization.Str2:
-                    return sum / words2.Count;
+                    return sum / words2Count;
                 case ScoreNormalization.Both:
-                    return 2 * sum / (words1.Count + words2.Count);
+                    return sum / Math.Max(words1Count, words2Count);
                 default:
                     return sum;
             }
