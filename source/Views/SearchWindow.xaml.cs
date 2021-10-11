@@ -101,10 +101,10 @@ namespace QuickSearch
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
                 }
                 SearchResults.ScrollIntoView(e.AddedItems[0]);
-                if (e.AddedItems[0] is ISearchItem<string> item && item.DetailsView != null)
-                {
-                    DetailsBorder.Visibility = Visibility.Visible;
-                }
+                //if (e.AddedItems[0] is ISearchItem<string> item && item.DetailsView != null)
+                //{
+                //    DetailsBorder.Visibility = Visibility.Visible;
+                //}
             }
             // DetailsScrollViewer.ScrollToVerticalOffset(0);
             SearchBox.Focus();
@@ -121,6 +121,7 @@ namespace QuickSearch
                     {
                         DetailsScrollViewer.Content = view;
                         DetailsScrollViewer.ScrollToVerticalOffset(0);
+                        DetailsBorder.Visibility = Visibility.Visible;
                         DetailsPopup.PopupAnimation = PopupAnimation.Fade;
                         DetailsPopup.IsOpen = true;
                     }
