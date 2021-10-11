@@ -271,6 +271,34 @@ namespace QuickSearch.SearchItems
         public string InstallationPath { get; } = null;
         [YamlDotNet.Serialization.YamlIgnore]
         public string ExtensionManifest { get; } = null;
+        [YamlDotNet.Serialization.YamlIgnore]
+        private AddonInstallerManifest installerManifest = null;
+        [YamlDotNet.Serialization.YamlIgnore]
+        public AddonInstallerManifest InstallerManifest
+        {
+            get
+            {
+                if (installerManifest == null)
+                {
+                    using(var client = new System.Net.Http.HttpClient())
+                    {
+                        using (var response = client.GetStringAsync(InstallerManifestUrl))
+                        {
+                            response.Wait();
+                            if (!response.IsFaulted)
+                            {
+                                var yaml = response.Result;
+                                var deserializer = new YamlDotNet.Serialization.Deserializer();
+                                var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
+                                installerManifest = manifest;
+                                installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
+                            }
+                        }
+                    }
+                }
+                return installerManifest;
+            }
+        }
     }
 
     public class AddonInstallerManifest
