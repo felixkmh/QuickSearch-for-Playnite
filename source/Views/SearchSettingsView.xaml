@@ -89,6 +89,10 @@
                         <CheckBox  IsChecked="{Binding EnableDetailsView}" Margin="5"/>
                         <TextBlock Text="{DynamicResource LOC_QS_EnableDetailsView}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding IgnoreHiddenGames}" Margin="5"/>
+                        <TextBlock Text="{DynamicResource LOC_QS_IgnoreHiddenGames}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

@@ -171,6 +171,9 @@ namespace QuickSearch
         }
         private int detailsViewMaxWidth = 400;
 
+        [GenericOption("LOC_QS_IgnoreHiddenGames")]
+        public bool IgnoreHiddenGames { get; set; } = false;
+
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
 

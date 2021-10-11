@@ -88,7 +88,8 @@
     <sys:String x:Key="LOC_QS_UserData">User Data</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">Changelog</sys:String>
-    
+    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignore hidden Games</sys:String>
+
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding.</sys:String>
