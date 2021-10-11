@@ -280,20 +280,27 @@ namespace QuickSearch.SearchItems
             {
                 if (installerManifest == null)
                 {
-                    using(var client = new System.Net.Http.HttpClient())
+                    try
                     {
-                        using (var response = client.GetStringAsync(InstallerManifestUrl))
+                        using (var client = new System.Net.Http.HttpClient())
                         {
-                            response.Wait();
-                            if (!response.IsFaulted)
+                            using (var response = client.GetStringAsync(InstallerManifestUrl))
                             {
-                                var yaml = response.Result;
-                                var deserializer = new YamlDotNet.Serialization.Deserializer();
-                                var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
-                                installerManifest = manifest;
-                                installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
+                                response.Wait();
+                                if (!response.IsFaulted)
+                                {
+                                    var yaml = response.Result;
+                                    var deserializer = new YamlDotNet.Serialization.Deserializer();
+                                    var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
+                                    installerManifest = manifest;
+                                    installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
+                                }
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        SearchPlugin.logger.Error(ex, $"Failed to download InstallerManifest for \"{Name}\"");
                     }
                 }
                 return installerManifest;
