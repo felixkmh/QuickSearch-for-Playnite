@@ -88,7 +88,8 @@
     <sys:String x:Key="LOC_QS_UserData">Nutzerdaten</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">Änderungsprotokoll</sys:String>
-    
+    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Versteckte Spiele ignorieren</sys:String>
+
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Hänge diese Zeichenfolge ans Ende der Suchanfrage um mit ITAD zu suchen. Freilassen um das manuelle Überschreiben zu deaktivieren.</sys:String>
