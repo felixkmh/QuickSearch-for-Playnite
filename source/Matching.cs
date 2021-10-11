@@ -175,7 +175,7 @@ namespace QuickSearch
             var pairs2Count = pairs2.Count;
 
             float matches = 0;
-            for (int i = 0; i < pairs1.Count && pairs2.Count > 0; ++i)
+            for (int i = pairs1.Count - 1; i >= 0 && pairs2.Count > 0; --i)
             {
                 for (int j = pairs2.Count - 1; j >= 0; --j)
                 {
@@ -185,6 +185,7 @@ namespace QuickSearch
                         {
                             ++matches;
                             pairs2.RemoveAt(j);
+                            pairs1.RemoveAt(i);
                             break;
                         }
                     }
@@ -194,6 +195,7 @@ namespace QuickSearch
                         {
                             ++matches;
                             pairs2.RemoveAt(j);
+                            pairs1.RemoveAt(i);
                             break;
                         }
                     } 
@@ -202,7 +204,7 @@ namespace QuickSearch
 
             var max_matches = Math.Min(pairs1Count, pairs2Count);
 
-            if (pairs2.Count > 0)
+            if (pairs2.Count > 0 && pairs1.Count > 0)
             {
                 for (int i = 0; i < pairs1.Count && matches < max_matches && pairs2.Count > 0; ++i)
                 {
