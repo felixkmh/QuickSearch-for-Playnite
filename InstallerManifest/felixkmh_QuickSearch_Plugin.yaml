@@ -11,7 +11,7 @@ Packages:
     ReleaseDate: 2021-10-11
     PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.10.0/felixkmh_QuickSearch_Plugin_2_10_0.pext
     Changelog:
-      - teaked string matching algorithm (might require to lower the threshold)
+      - tweaked string matching algorithm (might require to lower the threshold)
       - prioritize games over filter items
       - added changelogs to addon details view
   - Version: 2.9.0
