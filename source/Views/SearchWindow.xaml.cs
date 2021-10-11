@@ -313,7 +313,6 @@ namespace QuickSearch
                         canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
                         .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) })
-                        .Where(candidate => candidate.Score >= searchPlugin.Settings.Threshold)
                         .ToArray();
                     } else
                     {
