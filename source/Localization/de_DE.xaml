@@ -87,6 +87,7 @@
     <sys:String x:Key="LOC_QS_Disabled">Deaktiviert</sys:String>
     <sys:String x:Key="LOC_QS_UserData">Nutzerdaten</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
+    <sys:String x:Key="LOC_QS_Changelog">Änderungsprotokoll</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>

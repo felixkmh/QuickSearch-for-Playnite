@@ -87,6 +87,7 @@
     <sys:String x:Key="LOC_QS_Disabled"></sys:String>
     <sys:String x:Key="LOC_QS_UserData"></sys:String>
     <sys:String x:Key="LOC_QS_InstallationData"></sys:String>
+    <sys:String x:Key="LOC_QS_Changelog"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
