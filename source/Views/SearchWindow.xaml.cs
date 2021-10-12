@@ -80,19 +80,24 @@ namespace QuickSearch
 
         DispatcherTimer timer = null;
 
+        object previouslySelected = null;
+
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (timer == null)
+            if ((e.AddedItems.Count > 0 && e.AddedItems[0] != previouslySelected) || ListDataContext.Count == 0)
             {
-                timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
-                timer.Interval = TimeSpan.FromSeconds(0.3333);
-                timer.Tick += Timer_Tick;
+                if (timer == null)
+                {
+                    timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+                    timer.Interval = TimeSpan.FromSeconds(0.3333);
+                    timer.Tick += Timer_Tick;
+                }
+                timer.Stop();
+                DetailsPopup.PopupAnimation = PopupAnimation.None;
+                DetailsScrollViewer.Content = null;
+                DetailsPopup.IsOpen = false;
+                DetailsBorder.Visibility = Visibility.Hidden;
             }
-            timer.Stop();
-            DetailsPopup.PopupAnimation = PopupAnimation.None;
-            DetailsScrollViewer.Content = null;
-            DetailsPopup.IsOpen = false;
-            DetailsBorder.Visibility = Visibility.Hidden;
             if (e.AddedItems.Count > 0)
             {
                 timer.Start();
@@ -101,12 +106,12 @@ namespace QuickSearch
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
                 }
                 SearchResults.ScrollIntoView(e.AddedItems[0]);
-                //if (e.AddedItems[0] is ISearchItem<string> item && item.DetailsView != null)
-                //{
-                //    DetailsBorder.Visibility = Visibility.Visible;
-                //}
+                previouslySelected = e.AddedItems[0];
             }
-            // DetailsScrollViewer.ScrollToVerticalOffset(0);
+            if (ListDataContext.Count == 0)
+            {
+                previouslySelected = null;
+            }
             SearchBox.Focus();
         }
 
