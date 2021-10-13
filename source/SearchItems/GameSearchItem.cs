@@ -64,7 +64,7 @@ namespace QuickSearch.SearchItems
 
     struct CleanNameKey : ISearchKey<string>
     {
-        static public readonly Regex regex = new Regex($"[{Regex.Escape("{}&.,:;^°_`´~+!\"§$%&/()=?<>#|'’")}-]");
+        static public readonly Regex regex = new Regex(@"[\[\]\-{}&.,:;^°_`´~+!""§$%&/()=?<>#|'’]");
 
         public CleanNameKey(Game game)
         {
