@@ -96,9 +96,7 @@
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">If enabled, show more details for the selected result after a short delay, if available.</sys:String>
-    <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip" xml:space="preserve">Minimal number of words a game name needs to get an acrynom. 
-Setting value to 0 disables acronyms. Acronyms are created using the initial letter of each word. 
-Numbers, either roman numerals or decimals, are retained completely.</sys:String>
+    <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">Minimal number of words a game name needs to get an acrynom. Setting value to 0 disables acronyms. Acronyms are created using the initial letter of each word. Numbers, either roman numerals or decimals, are retained completely.</sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">Set Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Press Hotkey (+ modfiers) now</sys:String>
