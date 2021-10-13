@@ -37,11 +37,11 @@ namespace QuickSearch.SearchItems
 
     struct AcronymKey : ISearchKey<string>
     {
-        public static readonly Regex romanNumerals = new Regex(@"^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$");
+        public static readonly Regex romanNumerals = new Regex(@"^(?=[MDCLXVI])M*D?C{0,4}L?X{0,4}V?I{0,4}$");
         public AcronymKey(Game game)
         {
             this.game = game;
-            var words = game.Name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var words = CleanNameKey.regex.Replace(game.Name, string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             foreach(var word in words)
             {
@@ -705,8 +705,11 @@ namespace QuickSearch.SearchItems
             }
             return false;
         }
-
+#if DEBUG
+        public string TopLeft => game.Name + $" ({keys.OfType<AcronymKey>().FirstOrDefault().Key})";
+#else
         public string TopLeft => game.Name;
+#endif
 
         public string TopRight => (game.Source != null ? (game.Source.Name + " - ") : "") + (game.IsInstalled ?
             ResourceProvider.GetString("LOCGameIsInstalledTitle") :

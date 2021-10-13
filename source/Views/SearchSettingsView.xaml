@@ -93,6 +93,13 @@
                         <CheckBox  IsChecked="{Binding IgnoreHiddenGames}" Margin="5"/>
                         <TextBlock Text="{DynamicResource LOC_QS_IgnoreHiddenGames}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <TextBlock Text="{DynamicResource LOC_QS_MinAcronmLength}" Margin="2" Foreground="{StaticResource TextBrush}" ToolTip="{DynamicResource LOC_QS_MinAcronmLengthTooltip}"/>
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <Slider Value="{Binding MinAcronmLength}" Minimum="0" Maximum="10" Width="230" 
+                        HorizontalAlignment="Left" Margin="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding MinAcronmLength}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
