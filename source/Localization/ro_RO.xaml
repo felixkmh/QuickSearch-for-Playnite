@@ -89,12 +89,14 @@
     <sys:String x:Key="LOC_QS_InstallationData"></sys:String>
     <sys:String x:Key="LOC_QS_Changelog"></sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames"></sys:String>
+    <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
+    
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip"></sys:String>
-
+    <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton"></sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton"></sys:String>
