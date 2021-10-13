@@ -41,9 +41,10 @@ namespace QuickSearch.SearchItems
         public AcronymKey(Game game)
         {
             this.game = game;
-            var words = CleanNameKey.regex.Replace(game.Name, string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            // var words = game.Name.Split(new[] { ' ', '-', ':', '"', '\'', '&', '.', '«', '»', '“', '”', '„', '‟' }, StringSplitOptions.RemoveEmptyEntries);
+            var words = CleanNameKey.regex.Replace(game.Name, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
-            foreach(var word in words)
+            foreach (var word in words)
             {
                 if (int.TryParse(word, out var _) || romanNumerals.IsMatch(word))
                 {
@@ -58,12 +59,12 @@ namespace QuickSearch.SearchItems
         public Game game;
         public string Key { get; internal set; }
 
-        public float Weight => 0.9f;
+        public float Weight => 0.95f;
     }
 
     struct CleanNameKey : ISearchKey<string>
     {
-        static public readonly Regex regex = new Regex("[" + Regex.Escape("{}&.,:;^°_`´~+!\"§$%&/()=?<>#|'’") + "]");
+        static public readonly Regex regex = new Regex($"[{Regex.Escape("{}&.,:;^°_`´~+!\"§$%&/()=?<>#|'’")}-]");
 
         public CleanNameKey(Game game)
         {
