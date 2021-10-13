@@ -6,7 +6,7 @@ Packages:
     PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.11.0/felixkmh_QuickSearch_Plugin_2_11_0.pext
     Changelog:
       - games can now be searched by acronyms made from the initials of each word in the game name
-      - acronym feature can be disabled by setting the minimal acronym length to 0
+      - acronym feature can be disabled by setting the minimal acronym length to 0 in the options
   - Version: 2.10.2
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-12
