@@ -50,9 +50,9 @@ namespace QuickSearch.SearchItems
                     var manifestFiles = System.IO.Directory.GetFiles(repoPath, "*.yaml", SearchOption.AllDirectories);
                     var addonManifests = manifestFiles.AsParallel().Select(file =>
                     {
-                        var deserializer = new YamlDotNet.Serialization.Deserializer();
                         using (var yaml = File.OpenText(file))
                         {
+                            var deserializer = new YamlDotNet.Serialization.Deserializer();
                             var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
                             return manifest;
                         }

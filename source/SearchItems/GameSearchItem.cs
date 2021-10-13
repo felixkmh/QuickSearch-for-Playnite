@@ -25,17 +25,54 @@ namespace QuickSearch.SearchItems
 
     struct NameKey : ISearchKey<string>
     {
+        public NameKey(Game game)
+        {
+            this.game = game;
+        }
         public Game game;
         public string Key => game.Name;
 
         public float Weight => 1f;
     }
 
+    struct AcronymKey : ISearchKey<string>
+    {
+        public static readonly Regex romanNumerals = new Regex(@"^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$");
+        public AcronymKey(Game game)
+        {
+            this.game = game;
+            var words = game.Name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var sb = new StringBuilder();
+            foreach(var word in words)
+            {
+                if (int.TryParse(word, out var _) || romanNumerals.IsMatch(word))
+                {
+                    sb.Append(word);
+                } else if (!CleanNameKey.regex.IsMatch(word[0].ToString()))
+                {
+                    sb.Append(word[0]);
+                }
+            }
+            Key = sb.ToString().ToUpper();
+        }
+        public Game game;
+        public string Key { get; internal set; }
+
+        public float Weight => 0.9f;
+    }
+
     struct CleanNameKey : ISearchKey<string>
     {
         static public readonly Regex regex = new Regex("[" + Regex.Escape("{}&.,:;^°_`´~+!\"§$%&/()=?<>#|'’") + "]");
+
+        public CleanNameKey(Game game)
+        {
+            this.game = game;
+            Key = regex.Replace(game.Name, string.Empty);
+        }
+
         public Game game;
-        public string Key => regex.Replace(game.Name, string.Empty);
+        public string Key { get; internal set; }
 
         public float Weight => 1f;
     }
@@ -562,9 +599,19 @@ namespace QuickSearch.SearchItems
             this.game = game;
             keys = new List<ISearchKey<string>>();
             if (!string.IsNullOrEmpty(game.Name))
-                keys.Add(new NameKey { game = game });
+            {
+                keys.Add(new NameKey(game));
+                if (SearchPlugin.Instance.Settings.MinAcronmLength > 0)
+                {
+                    var ac = new AcronymKey(game);
+                    if (ac.Key.Length >= SearchPlugin.Instance.Settings.MinAcronmLength)
+                    {
+                        keys.Add(ac);
+                    }
+                }
+            }
             if (!string.IsNullOrEmpty(game.Name) && CleanNameKey.regex.IsMatch(game.Name))
-                keys.Add(new CleanNameKey { game = game });
+                keys.Add(new CleanNameKey(game));
             if (game.Roms?.Count > 0)
                 keys.Add(new RomKey { game = game });
         }

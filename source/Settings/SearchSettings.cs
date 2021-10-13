@@ -174,6 +174,9 @@ namespace QuickSearch
         [GenericOption("LOC_QS_IgnoreHiddenGames")]
         public bool IgnoreHiddenGames { get; set; } = false;
 
+        [NumberOption("LOC_QS_MinAcronmLength", Min = 0, Tick = 1, Description = "LOC_QS_MinAcronmLengthTooltip")]
+        public int MinAcronmLength { get; set; } = 0;
+
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
 
