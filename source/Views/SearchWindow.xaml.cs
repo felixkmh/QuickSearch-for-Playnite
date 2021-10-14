@@ -84,7 +84,9 @@ namespace QuickSearch
 
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((e.AddedItems.Count > 0 && e.AddedItems[0] != previouslySelected) || ListDataContext.Count == 0)
+            if ((e.AddedItems.Count > 0 && e.AddedItems[0] != previouslySelected)
+                || ListDataContext.Count == 0
+                || (e.RemovedItems.Count > 0 && !ListDataContext.Contains(e.RemovedItems[0])))
             {
                 if (timer == null)
                 {
