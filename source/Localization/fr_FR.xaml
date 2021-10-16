@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 	<!--Actions-->
-    <sys:String x:Key="LOC_QS_PlayAction"></sys:String>
-    <sys:String x:Key="LOC_QS_InstallAction"></sys:String>
-    <sys:String x:Key="LOC_QS_RunAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ApplyAction"></sys:String>
-    <sys:String x:Key="LOC_QS_SearchAction"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ShowAction"></sys:String>
+    <sys:String x:Key="LOC_QS_PlayAction">Jouer</sys:String>
+    <sys:String x:Key="LOC_QS_InstallAction">Installer</sys:String>
+    <sys:String x:Key="LOC_QS_RunAction">Lancer</sys:String>
+    <sys:String x:Key="LOC_QS_ApplyAction">Appliquer</sys:String>
+    <sys:String x:Key="LOC_QS_SearchAction">Rechercher</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAction">Ouvrir</sys:String>
+    <sys:String x:Key="LOC_QS_ShowAction">Afficher</sys:String>
     <sys:String x:Key="LOC_QS_ToggleAction"></sys:String>
     <sys:String x:Key="LOC_QS_SetAction"></sys:String>
     <sys:String x:Key="LOC_QS_SetToAction"></sys:String>
