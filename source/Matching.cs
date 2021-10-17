@@ -23,8 +23,8 @@ namespace QuickSearch
             var pattern = str2.ToLower();
             var input = str1.ToLower();
             var score = (12f * MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1)
-                + 3f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
-                + 3f * MatchingWords(input, pattern, 0.6777f, ScoreNormalization.Both)) / 18f;
+                + 2f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
+                + 4f * MatchingWords(input, pattern, 0.6777f, ScoreNormalization.Str1)) / 18f;
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
@@ -427,10 +427,12 @@ namespace QuickSearch
             switch (normalization)
             {
                 case ScoreNormalization.Str1:
-                    result.Score /= a.Length + b.IndexOf(subStr);
+                    result.Score /= a.Length;
+                    result.Score *= 1f - (float)b.IndexOf(subStr) / b.Length;
                     break;
                 case ScoreNormalization.Str2:
-                    result.Score /= b.Length + a.IndexOf(subStr);
+                    result.Score /= b.Length;
+                    result.Score *= 1f - (float)a.IndexOf(subStr) / a.Length;
                     break;
                 case ScoreNormalization.Both:
                     result.Score /= 0.5f * (a.Length + b.Length + a.IndexOf(subStr) + b.IndexOf(subStr));

@@ -119,18 +119,18 @@ namespace QuickSearch.SearchItems
                 var tagString = string.Join(" ", tags);
                 if (!string.IsNullOrWhiteSpace(tagString))
                 {
-                    Keys.Add(new CommandItemKey() { Key = tagString, Weight = 1 });
+                    Keys.Add(new CommandItemKey() { Key = tagString, Weight = 0.95f });
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(addon.ShortDescription))
             {
-                Keys.Add(new CommandItemKey() { Key = addon.ShortDescription, Weight = 1 });
+                Keys.Add(new CommandItemKey() { Key = addon.ShortDescription, Weight = 0.95f });
             }
 
             if (!string.IsNullOrWhiteSpace(addon.Description))
             {
-                Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 1 });
+                Keys.Add(new CommandItemKey() { Key = addon.Description, Weight = 0.95f });
             }
             if (isInstalled)
             {

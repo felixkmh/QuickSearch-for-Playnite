@@ -261,6 +261,14 @@ namespace QuickSearch
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
@@ -270,6 +278,14 @@ namespace QuickSearch
                         var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Playnite Settings", ResourceProvider.GetString("LOC_QS_OpenAction"));
                         item.IconChar = IconChars.Settings;
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
@@ -283,6 +299,14 @@ namespace QuickSearch
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
@@ -294,6 +318,14 @@ namespace QuickSearch
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
@@ -303,6 +335,14 @@ namespace QuickSearch
                         var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Switch to Fullscreen Mode", ResourceProvider.GetString("LOC_QS_SwitchAction"));
                         item.IconChar = IconChars.Maximize;
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
@@ -325,6 +365,14 @@ namespace QuickSearch
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
@@ -337,6 +385,14 @@ namespace QuickSearch
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
@@ -347,6 +403,14 @@ namespace QuickSearch
                         var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Download Metadata", ResourceProvider.GetString("LOC_QS_OpenAction"));
                         item.IconChar = IconChars.Copy;
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
+                        foreach (CommandItemKey key in item.Keys.ToArray())
+                        {
+                            var clean = SearchItems.CleanNameKey.regex.Replace(key.Key, "");
+                            if (clean != key.Key)
+                            {
+                                item.Keys.Add(new CommandItemKey() { Key = clean, Weight = 1 });
+                            }
+                        }
                         foreach (CommandItemKey key in item.Keys.ToArray())
                         {
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
@@ -376,6 +440,7 @@ namespace QuickSearch
 
             var addonSubItemAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new AddonBrowser() };
             var addonItem = new CommandItem("Add-on Browser", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_AddonBrowserPrefix"))) { IconChar = '\uEEA0' };
+            addonItem.Keys.Add(new CommandItemKey { Key = "Addon Browser" });
             addonItem.Actions.Add(addonSubItemAction);
             QuickSearchSDK.AddCommand(addonItem);
         }
