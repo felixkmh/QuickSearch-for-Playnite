@@ -88,7 +88,7 @@
     <sys:String x:Key="LOC_QS_UserData">Données de l'utilisateur</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">Journal des modifications</sys:String>
-    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignorer les jeux cachés</sys:String>
+    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignorer les jeux masqués</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
     
     <!--Tool Tips-->
