@@ -23,8 +23,8 @@ namespace QuickSearch
             var pattern = str2.ToLower();
             var input = str1.ToLower();
             var score = (12f * MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1)
-                + 2f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
-                + 4f * MatchingWords(input, pattern, 0.5f, ScoreNormalization.Str1)) / 18f;
+                + 1f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
+                + 1f * MatchingWords(input, pattern, 0.67f, ScoreNormalization.Str1)) / 14f;
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
