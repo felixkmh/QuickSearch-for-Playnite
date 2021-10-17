@@ -24,7 +24,7 @@ namespace QuickSearch
             var input = str1.ToLower();
             var score = (12f * MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1)
                 + 2f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
-                + 4f * MatchingWords(input, pattern, 0.6777f, ScoreNormalization.Str1)) / 18f;
+                + 4f * MatchingWords(input, pattern, 0.5f, ScoreNormalization.Str1)) / 18f;
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
