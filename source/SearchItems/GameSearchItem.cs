@@ -46,7 +46,8 @@ namespace QuickSearch.SearchItems
             this.game = game;
             // var words = game.Name.Split(new[] { ' ', '-', ':', '"', '\'', '&', '.', '«', '»', '“', '”', '„', '‟' }, StringSplitOptions.RemoveEmptyEntries);
             var nameWithoutQuotes = game.Name.Replace("\'", "");
-            var words = CleanNameKey.regex.Replace(nameWithoutQuotes, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var normalized = Matching.RemoveDiacritics(nameWithoutQuotes);
+            var words = CleanNameKey.regex.Replace(normalized, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             foreach (var word in words)
             {
