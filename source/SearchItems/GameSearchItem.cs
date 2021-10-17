@@ -37,19 +37,23 @@ namespace QuickSearch.SearchItems
 
     struct AcronymKey : ISearchKey<string>
     {
-        public static readonly Regex romanNumerals = new Regex(@"^(?=[MDCLXVI])M*D?C{0,4}L?X{0,4}V?I{0,4}$");
+        public static readonly Regex romanNumerals = new Regex(@"^[MDCLXVI]+$");
+        // https://mnaoumov.wordpress.com/2014/06/14/stripping-invalid-characters-from-utf-16-strings/
+        public static readonly Regex invalidChar = new Regex(@"([\ud800-\udbff](?![\udc00-\udfff]))|((?<![\ud800-\udbff])[\udc00-\udfff])");
+
         public AcronymKey(Game game)
         {
             this.game = game;
             // var words = game.Name.Split(new[] { ' ', '-', ':', '"', '\'', '&', '.', '«', '»', '“', '”', '„', '‟' }, StringSplitOptions.RemoveEmptyEntries);
-            var words = CleanNameKey.regex.Replace(game.Name, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var nameWithoutQuotes = game.Name.Replace("\'", "");
+            var words = CleanNameKey.regex.Replace(nameWithoutQuotes, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             foreach (var word in words)
             {
                 if (int.TryParse(word, out var _) || romanNumerals.IsMatch(word))
                 {
                     sb.Append(word);
-                } else if (!CleanNameKey.regex.IsMatch(word[0].ToString()))
+                } else if (!invalidChar.IsMatch(word[0].ToString()))
                 {
                     sb.Append(word[0]);
                 }
