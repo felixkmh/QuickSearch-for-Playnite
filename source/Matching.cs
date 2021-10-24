@@ -22,9 +22,12 @@ namespace QuickSearch
         {
             var pattern = str2.ToLower();
             var input = str1.ToLower();
-            var score = (12f * MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1)
-                + 1f * LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1).Score
-                + 1f * MatchingWords(input, pattern, 0.67f, ScoreNormalization.Str1)) / 14f;
+            float matchingPairs = MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1);
+            var lcs = LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1);
+            float matchingWords = MatchingWords(input, pattern, 0.67f, ScoreNormalization.Str1);
+            var score = (12f * matchingPairs
+                + 1.5f * lcs.Score
+                + 1f * matchingWords) / 14.5f;
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
@@ -428,14 +431,15 @@ namespace QuickSearch
             {
                 case ScoreNormalization.Str1:
                     result.Score /= a.Length;
-                    result.Score *= 1f - (float)b.IndexOf(subStr) / b.Length;
+                    result.Score /= b.IndexOf(subStr) + 1f;
                     break;
                 case ScoreNormalization.Str2:
                     result.Score /= b.Length;
-                    result.Score *= 1f - (float)a.IndexOf(subStr) / a.Length;
+                    result.Score /= a.IndexOf(subStr) + 1f;
                     break;
                 case ScoreNormalization.Both:
-                    result.Score /= 0.5f * (a.Length + b.Length + a.IndexOf(subStr) + b.IndexOf(subStr));
+                    result.Score /= Math.Max(a.Length, b.Length);
+                    result.Score /= b.IndexOf(subStr) + a.IndexOf(subStr) + 1f;
                     break;
             }
 
