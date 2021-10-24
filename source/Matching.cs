@@ -438,7 +438,7 @@ namespace QuickSearch
                     result.Score /= a.IndexOf(subStr) + 1f;
                     break;
                 case ScoreNormalization.Both:
-                    result.Score /= Math.Max(a.Length, b.Length);
+                    result.Score /= Math.Min(a.Length, b.Length);
                     result.Score /= b.IndexOf(subStr) + a.IndexOf(subStr) + 1f;
                     break;
             }
