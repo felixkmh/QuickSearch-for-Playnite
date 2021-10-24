@@ -1,5 +1,11 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.11.4
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-24
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.11.4/felixkmh_QuickSearch_Plugin_2_11_4.pext
+    Changelog:
+      - fixed error in score normalization
   - Version: 2.11.3
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-17
