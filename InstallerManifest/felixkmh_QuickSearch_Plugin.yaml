@@ -8,6 +8,7 @@ Packages:
       - better tolerance for typos
       - increased acronym weight
       - use placeholder icons if download fails
+      - acronym improvements (e.g. BioShock 2 -> BS2)
   - Version: 2.11.4
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-24
