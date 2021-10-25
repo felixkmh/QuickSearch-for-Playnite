@@ -26,9 +26,12 @@ namespace QuickSearch
             float matchingPairs = MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1);
             var lcs = LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1);
             float matchingWords = MatchingWords(input, pattern, 0.666f, ScoreNormalization.Str1);
-            var score = (18f * matchingPairs
-                + 1f * lcs.Score
-                + 1f * matchingWords) / 20f;
+            var w0 = 18f;
+            var w1 = 1f;
+            var w2 = 1f;
+            var score = (w0 * matchingPairs
+                + w1 * lcs.Score
+                + w2 * matchingWords) / (w0 + w1 + w2);
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
@@ -471,7 +474,7 @@ namespace QuickSearch
                     break;
                 case ScoreNormalization.Both:
                     result.Score /= Math.Min(a.Length, b.Length);
-                    result.Score /= (b.IndexOf(subStr) + a.IndexOf(subStr)) * 0.25f + 1f;
+                    result.Score /= (b.IndexOf(subStr) + a.IndexOf(subStr)) * 0.3f + 1f;
                     break;
             }
 

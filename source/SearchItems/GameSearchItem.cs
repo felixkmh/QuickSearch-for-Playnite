@@ -71,7 +71,7 @@ namespace QuickSearch.SearchItems
         public Game game;
         public string Key { get; internal set; }
 
-        public float Weight => 0.98f;
+        public float Weight => 0.9998f;
     }
 
     struct CleanNameKey : ISearchKey<string>
