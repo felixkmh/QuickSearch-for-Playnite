@@ -27,7 +27,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True}" 
+                <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}" 
                        Stretch="UniformToFill" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="DefaultIcon"
@@ -86,7 +86,7 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True}"
+                <Image Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}"
                        Stretch="UniformToFill" 
                        Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
