@@ -1,5 +1,14 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.11.5
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-25
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.11.5/felixkmh_QuickSearch_Plugin_2_11_5.pext
+    Changelog:
+      - better tolerance for typos
+      - increased acronym weight
+      - use placeholder icons if download fails
+      - acronym improvements (e.g. BioShock 2 -> BS2)
   - Version: 2.11.4
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-24
