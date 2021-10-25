@@ -47,7 +47,14 @@ namespace QuickSearch.SearchItems
             // var words = game.Name.Split(new[] { ' ', '-', ':', '"', '\'', '&', '.', '«', '»', '“', '”', '„', '‟' }, StringSplitOptions.RemoveEmptyEntries);
             var nameWithoutQuotes = game.Name.Replace("\'", "");
             var normalized = Matching.RemoveDiacritics(nameWithoutQuotes);
-            var words = CleanNameKey.regex.Replace(normalized, " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            normalized = CleanNameKey.spaceLike.Replace(normalized, " ");
+            normalized = CleanNameKey.regex.Replace(normalized, string.Empty);
+            var matches = CleanNameKey.words.Matches(normalized);
+            List<string> words = new List<string>();
+            foreach(Match match in matches)
+            {
+                words.Add(match.Value);
+            }
             var sb = new StringBuilder();
             foreach (var word in words)
             {
@@ -64,17 +71,20 @@ namespace QuickSearch.SearchItems
         public Game game;
         public string Key { get; internal set; }
 
-        public float Weight => 0.95f;
+        public float Weight => 0.98f;
     }
 
     struct CleanNameKey : ISearchKey<string>
     {
-        static public readonly Regex regex = new Regex(@"[\[\]\-{}&.,:;^°_`´~+!""§$%&/()=?<>#|'’]");
+        static public readonly Regex regex = new Regex(@"[\[\]\{}&.,:;^°_`´~!""§$%&/()=?<>#|'’]");
+        static public readonly Regex spaceLike = new Regex(@"[-+]");
+        static public readonly Regex words = new Regex(@"([A-Z][a-z]+)|([A-Z,a-z]+)|([A-Z,a-z,0-9]+)");
 
         public CleanNameKey(Game game)
         {
             this.game = game;
-            Key = regex.Replace(game.Name, string.Empty);
+            Key = spaceLike.Replace(game.Name, " ");
+            Key = regex.Replace(Key, string.Empty);
         }
 
         public Game game;

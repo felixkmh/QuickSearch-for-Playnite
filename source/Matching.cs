@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using F23.StringSimilarity;
 
 namespace QuickSearch
 {
@@ -19,15 +20,15 @@ namespace QuickSearch
         }
 
         public static float GetCombinedScore(in string str1, in string str2)
-        {
+       {
             var pattern = str2.ToLower();
             var input = str1.ToLower();
             float matchingPairs = MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1);
             var lcs = LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1);
             float matchingWords = MatchingWords(input, pattern, 0.67f, ScoreNormalization.Str1);
-            var score = (12f * matchingPairs
-                + 1.5f * lcs.Score
-                + 1f * matchingWords) / 14.5f;
+            var score = (18f * matchingPairs
+                + 1f * lcs.Score
+                + 1f * matchingWords) / 20f;
             return Math.Min(1f, score);
             //return Math.Max(
             //    Math.Max(
@@ -103,7 +104,7 @@ namespace QuickSearch
             }
         }
 
-        private class IndexPair
+        private struct IndexPair
         {
             public IndexPair(int a, int b)
             {
@@ -267,6 +268,8 @@ namespace QuickSearch
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
+        public static readonly Regex WhiteSpaceLike = new Regex(@"[\s+-]+");
+
         public static float MatchingWords(in string str1, in string str2, float wordThreshold = 0.6667f, ScoreNormalization normalization = ScoreNormalization.None)
         {
             if (string.IsNullOrWhiteSpace(str1) || string.IsNullOrWhiteSpace(str2))
@@ -274,14 +277,20 @@ namespace QuickSearch
                 return 0f;
             }
 
-            var words1 = RemoveDiacritics(str1).ToLower().Split(' ').ToList();
-            var words2 = RemoveDiacritics(str2).ToLower().Split(' ').ToList();
+            var words1 = WhiteSpaceLike.Split(RemoveDiacritics(str1).ToLower()).ToArray();
+            var words2 = WhiteSpaceLike.Split(RemoveDiacritics(str2).ToLower()).ToList();
 
-            var words1Count = words1.Count;
-            var words2Count = words2.Count;
+            var words1Count = words1.Count();
+            var words2Count = words2.Count();
+
+            var matchedPairs = new List<IndexPair>();
 
             float sum = 0;
-            for (int i = 0; i < words1.Count; ++i)
+
+            var normalizedLevenshtein = new NormalizedLevenshtein();
+            var damerau = new Damerau();
+
+            for (int i = 0; i < words1.Count(); ++i)
             {
                 if (words2.Count == 0) break;
                 float maxValue = 0;
@@ -290,7 +299,12 @@ namespace QuickSearch
                 {
                     // var val = (float)words1[i].FuzzyMatch(words2[j]);
                     // var val = FuzzySharp.Fuzz.PartialRatio(words1[i], words2[j]) * 1f / 100f;
-                    var val = MatchingLetterPairs2(words1[i], words2[j], ScoreNormalization.Both);
+                    // var val = MatchingLetterPairs2(words1[i], words2[j], ScoreNormalization.Both);
+                    var val = (float)normalizedLevenshtein.Similarity(words1[i], words2[j]);
+                    //var maxLength = Math.Max(words1[i].Length, words2[j].Length);
+                    //val = (maxLength - val) / maxLength;
+                    //val = 1f - val;
+                    //val /= (Math.Abs(j - i) / Math.Max(words1Count, words2Count)) + 1;
                     // var val = 1f - ((float)words1[i].LevenshteinDistance(words2[j]) / (float) Math.Max(words1[i].Length, words2[j].Length));
                     if (val > maxValue)
                     {
@@ -300,21 +314,39 @@ namespace QuickSearch
                 }
                 if (maxValue >= wordThreshold)
                 {
+                    matchedPairs.Add(new IndexPair(i, maxIdx));
                     sum += maxValue;
                     words2.RemoveAt(maxIdx);
                 }
             }
+
+            var orderScore = 1f;
+
+            if (matchedPairs.Count > 1)
+            {
+                int pairsInOrder = 0;
+                for (int i = 0; i < matchedPairs.Count - 1; ++i)
+                {
+                    if (matchedPairs[i].b <= matchedPairs[i + 1].b)
+                    {
+                        ++pairsInOrder;
+                    }
+                }
+
+                orderScore = 1f * pairsInOrder / (matchedPairs.Count - 1);
+            }
+
 
             switch (normalization)
             {
                 case ScoreNormalization.None:
                     return sum;
                 case ScoreNormalization.Str1:
-                    return sum / words1Count;
+                    return (float)Math.Pow(sum / words1Count, 1f + (1f - orderScore));
                 case ScoreNormalization.Str2:
-                    return sum / words2Count;
+                    return (float)Math.Pow(sum / words2Count, 1f + (1f - orderScore));
                 case ScoreNormalization.Both:
-                    return sum / Math.Max(words1Count, words2Count);
+                    return (float)Math.Pow(sum / Math.Max(words1Count, words2Count), 1f + (1f - orderScore));
                 default:
                     return sum;
             }
@@ -431,15 +463,15 @@ namespace QuickSearch
             {
                 case ScoreNormalization.Str1:
                     result.Score /= a.Length;
-                    result.Score /= b.IndexOf(subStr) + 1f;
+                    result.Score /= (b.IndexOf(subStr) * 0.25f) + 1f;
                     break;
                 case ScoreNormalization.Str2:
                     result.Score /= b.Length;
-                    result.Score /= a.IndexOf(subStr) + 1f;
+                    result.Score /= (a.IndexOf(subStr) * 0.25f) + 1f;
                     break;
                 case ScoreNormalization.Both:
                     result.Score /= Math.Min(a.Length, b.Length);
-                    result.Score /= b.IndexOf(subStr) + a.IndexOf(subStr) + 1f;
+                    result.Score /= (b.IndexOf(subStr) + a.IndexOf(subStr)) * 0.25f + 1f;
                     break;
             }
 
