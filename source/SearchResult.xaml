@@ -16,6 +16,9 @@
         <ResourceDictionary>
             <system:Double x:Key="DetailsOpacity">0.8</system:Double>
             <DropShadowEffect x:Key="IconDropShadow" ShadowDepth="0" Color="Black" Opacity="0.5" BlurRadius="4" RenderingBias="Performance"/>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="ClipToBounds" Value="False"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel IsHitTestVisible="False">
@@ -60,7 +63,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
-                            <TextBlock Text="{Binding TopLeft}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" ClipToBounds="True" Padding="0,0,5,0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding TopLeft}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Padding="0,0,5,0" FontWeight="Bold"/>
                             <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
