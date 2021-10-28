@@ -18,6 +18,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
+using System.Text.RegularExpressions;
+using System.Windows.Media.Imaging;
 
 namespace QuickSearch.SearchItems
 {
@@ -196,6 +198,34 @@ namespace QuickSearch.SearchItems
 
                                             Application.Current.Dispatcher.Invoke(() => {
                                                 var stackPanel = new StackPanel();
+
+                                                if (game.Value.Prices.FirstOrDefault(p => p.Shop.Name == "Steam") is PricesResponse.PricesItem steamItem)
+                                                {
+                                                    var appIdRegex = new Regex(@"(?<=app\/)(\w*)(?=\/)");
+                                                    if (appIdRegex.IsMatch(steamItem.URL))
+                                                    {
+                                                        var appId = appIdRegex.Match(steamItem.URL).Value;
+                                                        var logoUrl = string.Format("https://steamcdn-a.akamaihd.net/steam/apps/{0}/logo.png", appId);
+                                                        if (Uri.TryCreate(logoUrl, UriKind.RelativeOrAbsolute, out var uri))
+                                                        {
+                                                            var bitmap = new BitmapImage();
+                                                            bitmap.BeginInit();
+                                                            bitmap.UriSource = uri;
+                                                            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                                                            bitmap.CacheOption = BitmapCacheOption.OnDemand;
+                                                            bitmap.EndInit();
+                                                            var logo = new Image
+                                                            {
+                                                                Source = bitmap,
+                                                                MaxHeight = 100,
+                                                                Stretch = Stretch.Uniform, StretchDirection = StretchDirection.Both,
+                                                                Margin = new Thickness(0, 0, 0, 10)
+                                                            };
+                                                            stackPanel.Children.Add(logo);
+                                                        }
+                                                    }
+                                                }
+
                                                 var dataGrid = new DataGrid()
                                                 {
                                                     ItemsSource = game.Value.Prices.Select(deal => new { Shop = deal.Shop.Name, Price = $"{deal.NewPrice:0.00}{currencySign}" }),
