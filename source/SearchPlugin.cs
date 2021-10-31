@@ -227,18 +227,24 @@ namespace QuickSearch
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
                 Settings.SettingsChanged += OnSettingsChanged;
-                mainWindow = Application.Current.MainWindow;
-                windowInterop = new WindowInteropHelper(mainWindow);
-                mainWindowHandle = windowInterop.Handle;
-                source = HwndSource.FromHwnd(mainWindowHandle);
-                if (Settings.EnableGlobalHotkey)
+                mainWindow = Application.Current.Windows.Cast<Window>().FirstOrDefault(w => w.Name.Equals("WindowMain", StringComparison.InvariantCultureIgnoreCase));
+                if (mainWindow is Window)
                 {
-                    RegisterGlobalHotkey();
-                }
+                    windowInterop = new WindowInteropHelper(mainWindow);
+                    mainWindowHandle = windowInterop.Handle;
+                    source = HwndSource.FromHwnd(mainWindowHandle);
+                    if (Settings.EnableGlobalHotkey)
+                    {
+                        RegisterGlobalHotkey();
+                    }
 
-                HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(Settings.SearchShortcut.Key, Settings.SearchShortcut.Modifiers));
-                mainWindow.InputBindings.Add(HotkeyBinding);
-                AddBuiltInCommands();
+                    HotkeyBinding = new InputBinding(new ActionCommand(ToggleSearch), new KeyGesture(Settings.SearchShortcut.Key, Settings.SearchShortcut.Modifiers));
+                    mainWindow.InputBindings.Add(HotkeyBinding);
+                    AddBuiltInCommands();
+                } else
+                {
+                    logger.Error("Could not find main window. Shortcuts could not be registered.");
+                }
             }
 
         }
@@ -460,7 +466,7 @@ namespace QuickSearch
 
         private void ToggleSearch()
         {
-            //PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
+            // PlayniteApi.Dialogs.ShowMessage("Shortcut Pressed!");
 
             if (popup is null)
             {
