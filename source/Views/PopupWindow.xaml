@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:QuickSearch.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
-        WindowStyle="None" AllowsTransparency="True" Opacity="0">
+        WindowStyle="None" AllowsTransparency="True" Opacity="0"
+        ShowActivated="False" ShowInTaskbar="False">
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="0"/>
     </WindowChrome.WindowChrome>
