@@ -1,5 +1,12 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.11.6
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-31
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.11.6/felixkmh_QuickSearch_Plugin_2_11_6.pext
+    Changelog:
+      - fixed shortcuts not working correctly when InstallationStatusUpdater is also installed
+      - hide taskbar item for search window
   - Version: 2.11.5
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-10-25
