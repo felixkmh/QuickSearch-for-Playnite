@@ -30,7 +30,7 @@
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey">Hotkey to open the search popup:</sys:String>
     <sys:String x:Key="LOC_QS_LocalHotkeyShort">Search Hotkey</sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey">Gloabl hotkey to open the search popup:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey">Global hotkey to open the search popup:</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyShort">Global Search Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Enable global hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold">Fuzzy search threshold (higher value = more strict = quicker search):</sys:String>
