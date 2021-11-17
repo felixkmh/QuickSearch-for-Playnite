@@ -30,7 +30,7 @@
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey">Hotkey zum Öffnen des Suchfensters:</sys:String>
     <sys:String x:Key="LOC_QS_LocalHotkeyShort">Such-Hotkey</sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey">Globaler Hotkey zum Öffnen des Suchfensters:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyShort">Globaler Such-Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Aktiviere globalen Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold">Grenzwert für unscharfe Suche (größerer Wert = strikter = schnellere Suche):</sys:String>
