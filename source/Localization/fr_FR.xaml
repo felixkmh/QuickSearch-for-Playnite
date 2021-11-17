@@ -30,7 +30,7 @@
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey">Raccourci de la fenêtre de recherche rapide :</sys:String>
     <sys:String x:Key="LOC_QS_LocalHotkeyShort">Raccourcis de recherche</sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey">Raccourci global :</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey"></sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyShort">Raccourci global</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Activer le raccourci global</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold">Seuil de tolérance de la recherche (Plus la valeur est élevée, plus la recherche est stricte)</sys:String>
