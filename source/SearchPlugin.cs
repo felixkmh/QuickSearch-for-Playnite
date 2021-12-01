@@ -219,7 +219,7 @@ namespace QuickSearch
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
 
-
+            
 
             // searchItemSources.Add("Commands", simpleCommands);
             // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
@@ -433,6 +433,16 @@ namespace QuickSearch
             QuickSearchSDK.AddPluginSettings("QuickSearch", Settings, OpenSettingsView);
             QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
 
+            //foreach(var metadataPlugin in PlayniteApi.Addons.Plugins.OfType<MetadataPlugin>().Where(p => p.Name == "IGDB"))
+            //{
+            //    var imdbSubItemsAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new MetadataSource(metadataPlugin) };
+            //    var imdbCommand = new CommandItem(metadataPlugin.Name, new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction"), metadataPlugin.Name));
+            //    // imdbCommand.Keys.Add(new CommandItemKey() { Key = "itad", Weight = 1 });
+            //    imdbCommand.Actions.Add(imdbSubItemsAction);
+            //    QuickSearchSDK.AddCommand(imdbCommand);
+            //}
+
+
             var itadSubItemsAction = new SubItemsAction() { Action = () => { }, Name = ResourceProvider.GetString("LOC_QS_OpenAction"), CloseAfterExecute = false, SubItemSource = new ITADItemSource() };
             var itadCommand = new CommandItem("IsThereAnyDeal", new List<CommandAction>(), string.Format(ResourceProvider.GetString("LOC_QS_SearchOnAction") , "IsThereAnyDeal.com"), "https://d2uym1p5obf9p8.cloudfront.net/images/banners/150x150.gif");
             itadCommand.Keys.Add(new CommandItemKey() { Key = "itad", Weight = 1 });
@@ -557,7 +567,7 @@ namespace QuickSearch
                     dummyWindow.Hide();
                 };
 
-                placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.MainWindow, "PART_ContentView").FirstOrDefault();
+                placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Name == "WindowMain"), "PART_ContentView").FirstOrDefault();
                 var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;

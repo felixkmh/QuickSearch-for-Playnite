@@ -96,6 +96,7 @@
     <Compile Include="MultiFilter.cs" />
     <Compile Include="SearchItems\AddonBrowser.cs" />
     <Compile Include="SearchItems\CheapShark.cs" />
+    <Compile Include="SearchItems\MetadataSource.cs" />
     <Compile Include="Settings\Hotkey.cs" />
     <Compile Include="HotkeyHelper.cs" />
     <Compile Include="Settings\ITADShopOption.cs" />
