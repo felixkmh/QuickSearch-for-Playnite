@@ -52,7 +52,9 @@ namespace QuickSearch.SearchItems
                     {
                         using (var yaml = File.OpenText(file))
                         {
-                            var deserializer = new YamlDotNet.Serialization.Deserializer();
+                            IDeserializer deserializer = new DeserializerBuilder()
+                                .IgnoreUnmatchedProperties()
+                                .Build();
                             var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
                             return manifest;
                         }
