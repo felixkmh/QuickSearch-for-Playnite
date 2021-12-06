@@ -219,7 +219,7 @@
                 </Image.Triggers>
             </Image>
             <ListBox x:Name="ActionsListBox" Height="{Binding ActualHeight, ElementName=SearchBox}" Grid.Row="0" HorizontalAlignment="Right"
-                     ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Actions}" 
+                     ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Item.Actions}" 
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -247,7 +247,7 @@
                     <DataTemplate>
                         <controls:ActionButton Click="ActionButton_Click"  ClipToBounds="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                 Content="{Binding Name}"
-                                local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem}"
+                                local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem.Item}"
                                 MouseEnter="ActionButton_MouseEnter"
                                 IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="1"
                                 Padding="6,0"

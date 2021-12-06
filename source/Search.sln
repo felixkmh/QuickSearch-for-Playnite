@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK", "QuickSear
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK.Attributes", "QuickSearchSDK.Attributes\QuickSearchSDK.Attributes.csproj", "{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{896BB5D7-35CD-4634-878D-11BEC89DB6A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Release|Any CPU.Build.0 = Release|Any CPU
+		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

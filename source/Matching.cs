@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using F23.StringSimilarity;
 
 namespace QuickSearch
 {
-    class Matching
+    public class Matching
     {
         public enum ScoreNormalization
         {
@@ -20,7 +21,7 @@ namespace QuickSearch
         }
 
         public static float GetCombinedScore(in string str1, in string str2)
-       {
+        {
             var pattern = str2.ToLower();
             var input = str1.ToLower();
             float matchingPairs = MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1);
@@ -376,6 +377,8 @@ namespace QuickSearch
             public string String;
             public float Score;
             public int Index;
+            public int[] PositionsA;
+            public int[] PositionsB;
         } 
 
         public static LcsResult LongestCommonSubstring(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
@@ -412,10 +415,24 @@ namespace QuickSearch
             var a = RemoveDiacritics(str1.ToLower());
             var b = RemoveDiacritics(str2.ToLower());
 
+            bool swapped = a.Length < b.Length;
+
+            if (swapped)
+            {
+                var temp = a;
+                a = b;
+                b = temp;
+            }
+
             var subStr = string.Empty;
 
+            var matchingPositionsA = new HashSet<int>();
+            var matchingPositionsB = new HashSet<int>();
+
             if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
-                return new LcsResult() { Score = 0, String = subStr };
+                return new LcsResult() { Score = 0, String = subStr, 
+                    PositionsA = matchingPositionsA.OrderBy(i => i).ToArray(), 
+                    PositionsB = matchingPositionsB.OrderBy(i => i).ToArray() };
 
             int[,] num = new int[a.Length, b.Length];
             int maxlen = 0;
@@ -458,9 +475,63 @@ namespace QuickSearch
                 }
             }
 
+            //for(int n = 0; n < a.Length; ++n)
+            //{
+            //    Debug.Write("[");
+            //    for(int m = 0; m < b.Length; ++m)
+            //    {
+            //        Debug.Write(num[n, m]);
+            //        if (m < b.Length - 1)
+            //            Debug.Write(", ");
+            //    }
+            //    Debug.Write("]\n");
+            //}
+
+            var y = b.Length - 1;
+
+            while (y >= 0)
+            {
+                var max = 0;
+                var maxColumn = -1;
+                for (int x = 0; x < a.Length; ++x)
+                {
+                    if (num[x, y] > max && !matchingPositionsA.Contains(x))
+                    {
+                        max = num[x, y];
+                        maxColumn = x;
+                    }
+                }
+                if (maxColumn > -1)
+                {
+                    Enumerable.Range(maxColumn - max + 1, max).ForEach(pos => { matchingPositionsA.Add(pos); });
+                    Enumerable.Range(y - max + 1, max).ForEach(pos => { matchingPositionsB.Add(pos); });
+                    y -= max;
+                } else
+                {
+                    y -= 1;
+                }
+            }
+
             subStr = subStrBuilder.ToString();
 
-            var result = new LcsResult { String = subStr, Score = subStr.Length, Index = b.IndexOf(subStr) };
+            if (swapped)
+            {
+                var temp = a;
+                a = b;
+                b = temp;
+                var tempSet = matchingPositionsA;
+                matchingPositionsA = matchingPositionsB;
+                matchingPositionsB = tempSet;
+            }
+
+            var result = new LcsResult
+            {
+                String = subStr,
+                Score = subStr.Length,
+                Index = b.IndexOf(subStr),
+                PositionsA = matchingPositionsA.OrderBy(i => i).ToArray(),
+                PositionsB = matchingPositionsB.OrderBy(i => i).ToArray()
+            };
 
             switch (normalization)
             {

@@ -30,7 +30,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}" 
+                <Image Grid.Column="0" Source="{Binding Item.Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}" 
                        Stretch="UniformToFill" Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
                        x:Name="DefaultIcon"
@@ -38,12 +38,12 @@
                        MaxHeight="22"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-                <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"  FontSize="22" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <TextBlock Padding="0" Text="{Binding Item.IconChar, TargetNullValue=''}"  FontSize="22" TextAlignment="Center" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontFamily="{DynamicResource FontIcoFont}"
                            />
-                <TextBlock Text="{Binding TopLeft}" Grid.Column="2" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding TopLeftFormatted}" Grid.Column="2" TextTrimming="CharacterEllipsis" ClipToBounds="True" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="SemiBold"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="3" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
-                    <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Item.TopRight}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
             <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,2,2,2" ClipToBounds="False">
@@ -63,11 +63,12 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
-                            <TextBlock Text="{Binding TopLeft}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Padding="0,0,5,0" FontWeight="SemiBold"/>
+                            <!--<TextBlock Text="{Binding Item.TopLeft}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Padding="0,0,5,0" FontWeight="SemiBold"/>-->
+                            <ContentControl Content="{Binding TopLeftFormatted}" HorizontalAlignment="Left" Padding="0,0,5,0"/>
                             <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
-                            <TextBlock Text="{Binding TopRight}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Item.TopRight}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Row="1" Opacity="{StaticResource DetailsOpacity}">
@@ -81,15 +82,15 @@
                                                    HorizontalScrollBarVisibility="Hidden" 
                                                    VerticalScrollBarVisibility="Disabled" 
                                                    MaxWidth="{Binding ElementName=ExpandendUpper, Path=ActualWidth, Mode=OneWay}">
-                            <TextBlock Text="{Binding BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
+                            <TextBlock Text="{Binding Item.BottomLeft}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
                         </controls:AutoScrollViewer>
-                        <TextBlock Text="{Binding BottomCenter}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="{Binding Item.BottomCenter}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
-                            <TextBlock Text="{Binding BottomRight}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Item.BottomRight}" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Image Source="{Binding Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}"
+                <Image Source="{Binding Item.Icon, TargetNullValue={x:Null}, IsAsync=True, FallbackValue={StaticResource TrayIcon}}"
                        Stretch="UniformToFill" 
                        Margin="0"
                        RenderOptions.BitmapScalingMode="Fant"
@@ -117,7 +118,7 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Padding="0" Text="{Binding IconChar, TargetNullValue=''}"
+                    <TextBlock Padding="0" Text="{Binding Item.IconChar, TargetNullValue=''}"
                                FontFamily="{DynamicResource FontIcoFont}" x:Name="TextIconSelected"
                                MaxHeight="40"
                                >

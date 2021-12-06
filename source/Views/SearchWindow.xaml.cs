@@ -16,6 +16,7 @@ using QuickSearch.Controls;
 using QuickSearch.SearchItems;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Windows.Documents;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -45,6 +46,56 @@ namespace QuickSearch
         public static DependencyProperty IsLoadingResultsProperty =
             DependencyProperty.Register(nameof(IsLoadingResults), typeof(Boolean), typeof(SearchWindow), new PropertyMetadata(false));
 
+        public class Candidate
+        {
+            public Candidate()
+            {
+
+            }
+
+            public Candidate(SearchItems.Candidate candidate)
+            {
+                Item = candidate.Item;
+                Score = candidate.Score;
+                Marked = candidate.Marked;
+            }
+            public ISearchItem<string> Item { get; internal set; }
+            public float Score { get; internal set; }
+            public TextBlock TopLeftFormatted { get; internal set; }
+            internal bool Marked;
+
+            public void Format(string query)
+            {
+                if (Item?.TopLeft != null)
+                {
+                    var textBlock = new TextBlock() { TextTrimming = TextTrimming.CharacterEllipsis };
+                    TopLeftFormatted = textBlock;
+                    var topLeft = Item.TopLeft;
+                    var lcs = LongestCommonSubstringDP(query, topLeft);
+
+                    int i = 0;
+                    while (i < topLeft.Length)
+                    {
+                        int j = i;
+                        while (j < topLeft.Length && lcs.PositionsB.Contains(i) == lcs.PositionsB.Contains(j))
+                        {
+                            ++j;
+                        }
+
+                        if (lcs.PositionsB.Contains(i))
+                        {
+                            textBlock.Inlines.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.SemiBold });
+                        }
+                        else
+                        {
+                            textBlock.Inlines.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.Normal });
+                        }
+                        i += j - i;
+                    }
+                }
+            }
+        }
+
         public void Reset()
         {
             heightSelected = double.NaN;
@@ -53,7 +104,7 @@ namespace QuickSearch
         }
 
 
-        public ObservableCollection<ISearchItem<string>> ListDataContext { get; private set; } = new ObservableCollection<ISearchItem<string>>();
+        public ObservableCollection<Candidate> ListDataContext { get; private set; } = new ObservableCollection<Candidate>();
 
         public SearchWindow(SearchPlugin plugin)
         {
@@ -122,9 +173,9 @@ namespace QuickSearch
             if (SearchPlugin.Instance.Settings.EnableDetailsView)
             {
                 timer.Stop();
-                if (SearchResults.SelectedItem is ISearchItem<string> item)
+                if (SearchResults.SelectedItem is Candidate item)
                 {
-                    if (IsVisible && item.DetailsView is FrameworkElement view)
+                    if (IsVisible && item.Item.DetailsView is FrameworkElement view)
                     {
                         DetailsScrollViewer.Content = view;
                         DetailsScrollViewer.ScrollToVerticalOffset(0);
@@ -380,15 +431,17 @@ namespace QuickSearch
                                 if (maxIdx >= 0)
                                 {
                                     canditates[maxIdx].Marked = true;
+                                    canditates[maxIdx].Format(input);
+
                                     addedCandidates.Add(canditates[maxIdx]);
 
                                     if (ListDataContext.Count > addedItems)
                                     {
-                                        ListDataContext[addedItems] = canditates[maxIdx].Item;
+                                        ListDataContext[addedItems] = canditates[maxIdx];
                                     }
                                     else
                                     {
-                                        ListDataContext.Add(canditates[maxIdx].Item);
+                                        ListDataContext.Add(canditates[maxIdx]);
                                     }
 #if DEBUG
                                     PlaceholderText.Text = SearchBox.Text;
@@ -494,7 +547,7 @@ namespace QuickSearch
                 highestScore = ComputePreliminaryScore(addedCandidates.First().Item, input);
             }
 
-            List<Candidate> addedItems = addedCandidates.ToList();
+            List<SearchItems.Candidate> addedItems = addedCandidates.Select(c => new SearchItems.Candidate { Item = c.Item, Marked = c.Marked, Score = c.Score }).ToList();
             var tasks = sources
                 .AsParallel()
                 .Select(source =>
@@ -579,7 +632,9 @@ namespace QuickSearch
 
                         if (insertionIdx >= 0 && (insertionIdx < maxItems || maxItems < 1))
                         {
-                            addedCandidates.Insert(insertionIdx, new Candidate() { Item = item, Score = score });
+                            Candidate candidateItem = new Candidate() { Item = item, Score = score };
+                            Dispatcher.Invoke(() => candidateItem.Format(input));
+                            addedCandidates.Insert(insertionIdx, candidateItem);
 
                             if (addedCandidates.Count > maxItems && maxItems > 0)
                             {
@@ -587,7 +642,7 @@ namespace QuickSearch
                             }
                             Dispatcher.Invoke(() =>
                             {
-                                ListDataContext.Insert(insertionIdx, item);
+                                ListDataContext.Insert(insertionIdx, candidateItem);
 
                                 if (ListDataContext.Count > maxItems && maxItems > 0)
                                 {
@@ -905,11 +960,11 @@ namespace QuickSearch
             {
                 searchPlugin.popup.IsOpen = false;
             }
-            if (SearchResults.SelectedItem is ISearchItem<string> item)
+            if (SearchResults.SelectedItem is Candidate item)
             {
-                if (action.CanExecute(item))
+                if (action.CanExecute(item.Item))
                 {
-                    action.Execute(item);
+                    action.Execute(item.Item);
                 }
             }
             SearchResults.Items.Refresh();
