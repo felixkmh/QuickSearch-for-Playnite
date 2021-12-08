@@ -66,6 +66,16 @@ namespace QuickSearch
         {
             AlwaysExpand = SearchPlugin.Instance.Settings.ExpandAllItems;
             Seperator.Height = SearchPlugin.Instance.Settings.ShowSeperator ? 5 : 0;
+            TopLeftCollapsed.Inlines.Clear();
+            TopLeftExpanded.Inlines.Clear();
+            if (e.NewValue is SearchWindow.Candidate candidate)
+            {
+                foreach(var run in candidate.GetFormattedRuns(candidate.Query))
+                {
+                    TopLeftCollapsed.Inlines.Add(new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations });
+                    TopLeftExpanded.Inlines.Add(run);
+                }
+            }
         }
 
         private void GameResult_Unselected(object sender, RoutedEventArgs e)

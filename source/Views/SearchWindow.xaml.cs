@@ -61,15 +61,15 @@ namespace QuickSearch
             }
             public ISearchItem<string> Item { get; internal set; }
             public float Score { get; internal set; }
-            public TextBlock TopLeftFormatted { get; internal set; }
+            //public TextBlock TopLeftFormatted { get; internal set; }
             internal bool Marked;
+            public string Query { get; internal set; }
 
-            public void Format(string query)
+            public List<Run> GetFormattedRuns(string query)
             {
+                var runs = new List<Run>();
                 if (Item?.TopLeft != null)
                 {
-                    var textBlock = new TextBlock() { TextTrimming = TextTrimming.CharacterEllipsis };
-                    TopLeftFormatted = textBlock;
                     var topLeft = Item.TopLeft;
                     var lcs = LongestCommonSubstringDP(query, topLeft);
 
@@ -84,15 +84,17 @@ namespace QuickSearch
 
                         if (lcs.PositionsB.Contains(i))
                         {
-                            textBlock.Inlines.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.SemiBold });
+                            Run run = new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.DemiBold };
+                            runs.Add(run);
                         }
                         else
                         {
-                            textBlock.Inlines.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.Normal });
+                            runs.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.Normal });
                         }
                         i += j - i;
                     }
                 }
+                return runs;
             }
         }
 
@@ -367,17 +369,25 @@ namespace QuickSearch
                     }
                     
                     Candidate[] canditates;
+                    var prefix = searchItemSources.FirstOrDefault() is ISearchSubItemSource<string> subSource ? subSource.Prefix : string.Empty;
+                    prefix = prefix.Trim();
+                    var query = input;
+                    if (query.StartsWith(prefix))
+                    {
+                        query = query.Substring(prefix.Length);
+                        query = query.Trim();
+                    }
                     if (showAll)
                     {
                         canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) })
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query })
                         .ToArray();
                     } else
                     {
                         canditates = searchItems.Concat(queryDependantItems).AsParallel()
                         .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input) })
+                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query })
                         .Where(candidate => candidate.Score >= searchPlugin.Settings.Threshold)
                         .ToArray();
                     }
@@ -431,7 +441,6 @@ namespace QuickSearch
                                 if (maxIdx >= 0)
                                 {
                                     canditates[maxIdx].Marked = true;
-                                    canditates[maxIdx].Format(input);
 
                                     addedCandidates.Add(canditates[maxIdx]);
 
@@ -597,6 +606,14 @@ namespace QuickSearch
                 allTasksList.RemoveAt(i);
             }
 
+            var prefix = searchItemSources.FirstOrDefault() is ISearchSubItemSource<string> subSource ? subSource.Prefix : string.Empty;
+            prefix = prefix.Trim();
+            var query = input;
+            if (query.StartsWith(prefix))
+            {
+                query = query.Substring(prefix.Length);
+                query = query.Trim();
+            }
             allTasksList.Add(allTasks);
 
             while(!cancellationToken.IsCancellationRequested)
@@ -632,8 +649,7 @@ namespace QuickSearch
 
                         if (insertionIdx >= 0 && (insertionIdx < maxItems || maxItems < 1))
                         {
-                            Candidate candidateItem = new Candidate() { Item = item, Score = score };
-                            Dispatcher.Invoke(() => candidateItem.Format(input));
+                            Candidate candidateItem = new Candidate() { Item = item, Score = score, Query = query };
                             addedCandidates.Insert(insertionIdx, candidateItem);
 
                             if (addedCandidates.Count > maxItems && maxItems > 0)
