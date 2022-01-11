@@ -110,6 +110,15 @@ namespace QuickSearch.SearchItems
             var isInstalled = api.Addons.Addons.Contains(addon.AddonId);
             var isDisabled = isInstalled && api.Addons.DisabledAddons.Contains(addon.AddonId);
             addon.IsEnabled = !isDisabled;
+            if (addon.Type == AddonType.ThemeDesktop || addon.Type == AddonType.ThemeFullscreen)
+            {
+                var typeFolder = addon.Type == AddonType.ThemeDesktop ? "Desktop" : "Fullscreen";
+                var themePath = Path.Combine(api.Paths.ConfigurationPath, "Themes", typeFolder, addon.AddonId);
+                if (Directory.Exists(themePath))
+                {
+                    isInstalled = File.Exists(Path.Combine(themePath, "theme.yaml"));
+                }
+            }
             addon.IsInstalled = isInstalled;
             this.addon = addon;
             Keys = new List<ISearchKey<string>> { 
@@ -161,7 +170,7 @@ namespace QuickSearch.SearchItems
 
         public Uri Icon { get; } = null;
 
-        public string TopLeft => $"{addon.Name}" + (addon.IsInstalled ? $" ({ResourceProvider.GetString("LOCGameIsInstalledTitle")})" : string.Empty);
+        public string TopLeft => addon.Name;
 
         public string TopRight => string.Format(ResourceProvider.GetString("LOC_QS_AddonByDev"), AddonTypeToString(addon.Type), addon.Author);
 
@@ -171,7 +180,7 @@ namespace QuickSearch.SearchItems
 
         public string BottomRight => null;
 
-        public char? IconChar => null;
+        public char? IconChar => addon.IsEnabled ? (addon.IsInstalled ? '' : default) : '';
 
         public FrameworkElement DetailsView
         {
@@ -220,6 +229,16 @@ namespace QuickSearch.SearchItems
                         }
                     }
                 }
+                //if (addon.Type == AddonType.Generic || addon.Type == AddonType.GameLibrary)
+                //{
+                //    if (addon.IsEnabled)
+                //    {
+                //        actions.Add(new CommandAction { Action = () => { api.Addons.DisabledAddons.AddMissing(addon.AddonId); addon.IsEnabled = false; }, CloseAfterExecute = false, Name = "Disable" });
+                //    } else
+                //    {
+                //        actions.Add(new CommandAction { Action = () => { api.Addons.DisabledAddons.Remove(addon.AddonId); addon.IsEnabled = true; }, CloseAfterExecute = false, Name = "Enable" });
+                //    }
+                //}
             }
 
             return actions;
