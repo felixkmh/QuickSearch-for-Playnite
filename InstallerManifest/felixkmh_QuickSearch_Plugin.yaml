@@ -1,5 +1,13 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.13.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-01-31
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.13.0/felixkmh_QuickSearch_Plugin_2_13_0.pext
+    Changelog:
+      - added installation/enabled status indicator to icons in add-on browser
+      - fixed installation status of themes in add-on browser
+      - updated localizations
   - Version: 2.12.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-12-14
