@@ -5,27 +5,27 @@
     <sys:String x:Key="LOC_QS_InstallAction"></sys:String>
     <sys:String x:Key="LOC_QS_RunAction"></sys:String>
     <sys:String x:Key="LOC_QS_ApplyAction"></sys:String>
-    <sys:String x:Key="LOC_QS_SearchAction"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ShowAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ToggleAction"></sys:String>
-    <sys:String x:Key="LOC_QS_SetAction"></sys:String>
-    <sys:String x:Key="LOC_QS_SetToAction"></sys:String>
-    <sys:String x:Key="LOC_QS_UpdateAction"></sys:String>
+    <sys:String x:Key="LOC_QS_SearchAction">بحث</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAction">فتح</sys:String>
+    <sys:String x:Key="LOC_QS_ShowAction">إظهار</sys:String>
+    <sys:String x:Key="LOC_QS_ToggleAction">تبديل</sys:String>
+    <sys:String x:Key="LOC_QS_SetAction">تعيين</sys:String>
+    <sys:String x:Key="LOC_QS_SetToAction">تعيين إلى {0}</sys:String>
+    <sys:String x:Key="LOC_QS_UpdateAction">تحديث</sys:String>
     <sys:String x:Key="LOC_QS_UpdateAllLibraries"></sys:String>
-    <sys:String x:Key="LOC_QS_DownloadMetaData"></sys:String>
-    <sys:String x:Key="LOC_QS_Addons"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenAddons"></sys:String>
-    <sys:String x:Key="LOC_QS_SwitchAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ConfigureAction"></sys:String>
-    <sys:String x:Key="LOC_QS_SearchOnAction"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadMetaData">تحميل بيانات التعريف</sys:String>
+    <sys:String x:Key="LOC_QS_Addons">الإضافة</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAddons">فتح نافذة الإضافات</sys:String>
+    <sys:String x:Key="LOC_QS_SwitchAction">تبديل</sys:String>
+    <sys:String x:Key="LOC_QS_ConfigureAction">ضبط</sys:String>
+    <sys:String x:Key="LOC_QS_SearchOnAction">البحث في {0}</sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
 	<sys:String x:Key="LOC_QS_CommonTab"></sys:String>
-	<sys:String x:Key="LOC_QS_AppearanceTab"></sys:String>
-    <sys:String x:Key="LOC_QS_ExternalTab"></sys:String>
-    <sys:String x:Key="LOC_QS_ITADTab"></sys:String>
+	<sys:String x:Key="LOC_QS_AppearanceTab">المظهر</sys:String>
+    <sys:String x:Key="LOC_QS_ExternalTab">خارجي</sys:String>
+    <sys:String x:Key="LOC_QS_ITADTab">IsThereAnyDeal</sys:String>
 
 	<!--Labels-->
     <sys:String x:Key="LOC_QS_LocalHotkey"></sys:String>
@@ -38,8 +38,8 @@
     <sys:String x:Key="LOC_QS_AsyncDelay"></sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelayShort"></sys:String>
     <sys:String x:Key="LOC_QS_MaxResults"></sys:String>
-    <sys:String x:Key="LOC_QS_ExpandAllItems"></sys:String>
-    <sys:String x:Key="LOC_QS_ShowSeparator"></sys:String>
+    <sys:String x:Key="LOC_QS_ExpandAllItems">توسيع جميع العناصر</sys:String>
+    <sys:String x:Key="LOC_QS_ShowSeparator">إظهار الفاصل</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding"></sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAddingShort"></sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus"></sys:String>
@@ -53,7 +53,7 @@
     <sys:String x:Key="LOC_QS_AllowExternalItems"></sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings"></sys:String>
-    <sys:String x:Key="LOC_QS_Extension"></sys:String>
+    <sys:String x:Key="LOC_QS_Extension">الإضافات</sys:String>
     <sys:String x:Key="LOC_QS_Items"></sys:String>
     <sys:String x:Key="LOC_QS_Actions"></sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD"></sys:String>
