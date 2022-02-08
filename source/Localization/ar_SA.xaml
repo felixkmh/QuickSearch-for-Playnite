@@ -28,28 +28,28 @@
     <sys:String x:Key="LOC_QS_ITADTab">IsThereAnyDeal</sys:String>
 
 	<!--Labels-->
-    <sys:String x:Key="LOC_QS_LocalHotkey"></sys:String>
-    <sys:String x:Key="LOC_QS_LocalHotkeyShort"></sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey"></sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkeyShort"></sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkey">مفتاح فتح نافذة البحث:</sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkeyShort">مفتاح البحث</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey">المفتاح العام لفتح نافذة البحث:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyShort">المفتاح العام للبحث</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">تفعيل مفتاح الاختصار العام</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold"></sys:String>
     <sys:String x:Key="LOC_QS_SearchThresholdShort"></sys:String>
-    <sys:String x:Key="LOC_QS_AsyncDelay"></sys:String>
-    <sys:String x:Key="LOC_QS_AsyncDelayShort"></sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelay">مقدار الوقت بالمللي ثانية للانتظار قبل طلب عناصر الـ async:</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelayShort">تأخير عنصر Async (ms)</sys:String>
     <sys:String x:Key="LOC_QS_MaxResults">الحد الأقصى لعدد النتائج (0 = بلا حدود):</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">توسيع جميع العناصر</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">إظهار الفاصل</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding"></sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">إضافة عناصر ذات أولوية أقل</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">الفرز حسب حالة التثبيت قبل الاسم إذا كانت النتيجة متساوية</sys:String>
-    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort"></sys:String>
-    <sys:String x:Key="LOC_QS_FilterSubItems"></sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">أولوية حالة التثبيت للترتيب</sys:String>
+    <sys:String x:Key="LOC_QS_FilterSubItems">تمكين تصفية مصادر العناصر الفرعية</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArt">تفضيل غلاف الفن على أيقونة الألعاب</sys:String>
-    <sys:String x:Key="LOC_QS_GlassEffect"></sys:String>
+    <sys:String x:Key="LOC_QS_GlassEffect">تمكين تأثير الزجاج الشفاف على نافذة البحث</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffectShort">تأثير الزجاج</sys:String>
-    <sys:String x:Key="LOC_QS_BorderWidth"></sys:String>
-    <sys:String x:Key="LOC_QS_BorderWidthShort"></sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidth">عرض الحدود الخارجية لنافذة البحث:</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidthShort">عرض الحدود الخارجية</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems">تمكين العناصر المضافة بواسطة إضافات أخرى.</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions">تمكين إجراءات اللعبة المضافة بواسطة إضافات أخرى.</sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings">تمكين العناصر وإجراءات اللعبة لكل إضافة:</sys:String>
@@ -76,7 +76,7 @@
     <sys:String x:Key="LOC_QS_XFilter">{0} فلتر</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsView">تفعيل عرض التفاصيل</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">عرض نافذة البحث</sys:String>
-    <sys:String x:Key="LOC_QS_DetailsMaxWidth"></sys:String>
+    <sys:String x:Key="LOC_QS_DetailsMaxWidth">أقصى عرض للوحة التفاصيل</sys:String>
     <sys:String x:Key="LOC_QS_AddonBrowserPrefix">تصفح الإضافات</sys:String>
     <sys:String x:Key="LOC_QS_AddonByDev">{0} من {1}</sys:String>
     <sys:String x:Key="LOC_QS_GenericExtension">الإضافة</sys:String>
@@ -85,7 +85,7 @@
     <sys:String x:Key="LOC_QS_FullscreenTheme">سِمة ملء الشاشة</sys:String>
     <sys:String x:Key="LOC_QS_MetadataProvider">موفر بيانات التعريف</sys:String>
     <sys:String x:Key="LOC_QS_Disabled">معطل</sys:String>
-    <sys:String x:Key="LOC_QS_UserData"></sys:String>
+    <sys:String x:Key="LOC_QS_UserData">بيانات المستخدم</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">التثبيت</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">سِجل التغييرات</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">تجاهل الألعاب المخفية</sys:String>
@@ -93,8 +93,8 @@
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
-    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip"></sys:String>
-    <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip"></sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">أضف هذه السلسلة إلى نهاية استعلام البحث لإجبار البحث مع ITAD. اتركها فارغة لتعطيل التجاوز اليدوي.</sys:String>
+    <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">إذا تم تفعيله، يعرض مزيدًا من التفاصيل للنتيجة المحددة بعد مهلة قصيرة، إذا كان ذلك متاحًا.</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">وضع مفتاح اختصار</sys:String>
