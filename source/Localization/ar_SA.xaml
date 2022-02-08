@@ -76,7 +76,7 @@
     <sys:String x:Key="LOC_QS_XFilter">{0} فلتر</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsView">تفعيل عرض التفاصيل</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">عرض نافذة البحث</sys:String>
-    <sys:String x:Key="LOC_QS_DetailsMaxWidth"></sys:String>
+    <sys:String x:Key="LOC_QS_DetailsMaxWidth">أقصى عرض للوحة التفاصيل</sys:String>
     <sys:String x:Key="LOC_QS_AddonBrowserPrefix">تصفح الإضافات</sys:String>
     <sys:String x:Key="LOC_QS_AddonByDev">{0} من {1}</sys:String>
     <sys:String x:Key="LOC_QS_GenericExtension">الإضافة</sys:String>
