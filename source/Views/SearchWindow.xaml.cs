@@ -141,38 +141,40 @@ namespace QuickSearch
 
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count > 0 && e.AddedItems[0] is Candidate candidate)
+            SelectionChanged(e.AddedItems, e.RemovedItems);
+        }
+
+        private void SelectionChanged(System.Collections.IList addedItems, System.Collections.IList removedItems)
+        {
+            if ((addedItems.Count > 0 && addedItems[0] is Candidate candidate && candidate.Item != previouslySelected)
+                || ListDataContext.Count == 0
+                || (removedItems.Count > 0 && !ListDataContext.Contains(removedItems[0])))
             {
-                if ((e.AddedItems.Count > 0 && candidate.Item != previouslySelected)
-                    || ListDataContext.Count == 0
-                    || (e.RemovedItems.Count > 0 && !ListDataContext.Contains(e.RemovedItems[0])))
+                if (timer == null)
                 {
-                    if (timer == null)
-                    {
-                        timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
-                        timer.Interval = TimeSpan.FromSeconds(0.3333);
-                        timer.Tick += Timer_Tick;
-                    }
-                    timer.Stop();
-                    DetailsPopup.PopupAnimation = PopupAnimation.None;
-                    DetailsScrollViewer.Content = null;
-                    DetailsPopup.IsOpen = false;
-                    DetailsBorder.Visibility = Visibility.Hidden;
+                    timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+                    timer.Interval = TimeSpan.FromSeconds(0.3333);
+                    timer.Tick += Timer_Tick;
                 }
-                if (e.AddedItems.Count > 0)
+                timer.Stop();
+                DetailsPopup.PopupAnimation = PopupAnimation.None;
+                DetailsScrollViewer.Content = null;
+                DetailsPopup.IsOpen = false;
+                DetailsBorder.Visibility = Visibility.Hidden;
+            }
+            if (addedItems.Count > 0 && addedItems[0] is Candidate candidate1)
+            {
+                timer.Start();
+                if (ActionsListBox.Items.Count > 0)
                 {
-                    timer.Start();
-                    if (ActionsListBox.Items.Count > 0)
-                    {
-                        ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
-                    }
-                    SearchResults.ScrollIntoView(e.AddedItems[0]);
-                    previouslySelected = candidate.Item;
+                    ActionsListBox.Dispatcher.BeginInvoke((Action<int>)SelectActionButton, DispatcherPriority.Normal, 0);
                 }
-                if (ListDataContext.Count == 0)
-                {
-                    previouslySelected = null;
-                }
+                SearchResults.ScrollIntoView(addedItems[0]);
+                previouslySelected = candidate1.Item;
+            }
+            if (ListDataContext.Count == 0)
+            {
+                previouslySelected = null;
             }
             SearchBox.Focus();
         }
@@ -467,6 +469,12 @@ namespace QuickSearch
                                             } else
                                             {
                                                 ActionsListBox.SelectedIndex = 0;
+                                            }
+                                            if (prevItem != canditates[maxIdx].Item)
+                                            {
+                                                Dispatcher.Invoke(() => { 
+                                                    SelectionChanged(new List<object> { canditates[maxIdx] }, new List<object> {});
+                                                });
                                             }
                                         }
                                     }
