@@ -90,6 +90,7 @@
     <sys:String x:Key="LOC_QS_Changelog"></sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames"></sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
+    <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
