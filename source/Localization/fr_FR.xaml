@@ -90,6 +90,7 @@
     <sys:String x:Key="LOC_QS_Changelog">Journal des modifications</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignorer les jeux masqués</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength">Longueur minimale des acronymes : (Exemple : Final Fantasy VII -&gt; FFVII, Resident Evil 7 -&gt; RE7)</sys:String>
+    <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Permet d'afficher les couvertures des jeux à la place de leurs icônes lorsqu'elles existent.</sys:String>
