@@ -104,6 +104,7 @@
                x:Name="DetailsPopup"
                PopupAnimation="Fade"
                HorizontalOffset="10"
+               Focusable="False"
                PlacementTarget="{Binding ElementName=BackgroundGrid}">
             <Border Width="400" Height="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" x:Name="DetailsBorder"
                     Effect="{DynamicResource DropShadow}"
@@ -219,7 +220,8 @@
                 </Image.Triggers>
             </Image>
             <ListBox x:Name="ActionsListBox" Height="{Binding ActualHeight, ElementName=SearchBox}" Grid.Row="0" HorizontalAlignment="Right"
-                     ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Item.Actions}" 
+                     ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Item.Actions}"
+                     SelectionMode="Single"
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ScrollViewer.VerticalScrollBarVisibility="Disabled"

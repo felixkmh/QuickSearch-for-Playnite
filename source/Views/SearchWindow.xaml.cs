@@ -453,15 +453,21 @@ namespace QuickSearch
 
                                     if (ListDataContext.Count > addedItems)
                                     {
-                                        if (ListDataContext[addedItems].Item != canditates[maxIdx].Item)
+                                        var selectedAction = ActionsListBox.SelectedIndex != -1 ? ActionsListBox.SelectedIndex : 1;
+                                        var prevItem = ListDataContext[addedItems].Item;
+                                        ListDataContext[addedItems].Item = canditates[maxIdx].Item;
+                                        ListDataContext[addedItems].Query = canditates[maxIdx].Query;
+                                        ListDataContext[addedItems].Score = canditates[maxIdx].Score;
+                                        ListDataContext[addedItems].Marked = canditates[maxIdx].Marked;
+                                        if (addedItems == 0)
                                         {
-                                            ListDataContext[addedItems] = canditates[maxIdx];
-                                        } else
-                                        {
-                                            ListDataContext[addedItems].Item = canditates[maxIdx].Item;
-                                            ListDataContext[addedItems].Query = canditates[maxIdx].Query;
-                                            ListDataContext[addedItems].Score = canditates[maxIdx].Score;
-                                            ListDataContext[addedItems].Marked = canditates[maxIdx].Marked;
+                                            if (prevItem == canditates[maxIdx].Item)
+                                            {
+                                                ActionsListBox.SelectedIndex = selectedAction;
+                                            } else
+                                            {
+                                                ActionsListBox.SelectedIndex = 0;
+                                            }
                                         }
                                     }
                                     else

@@ -664,6 +664,13 @@ namespace QuickSearch.SearchItems
 
                 var actions = new List<ISearchAction<string>> { launchAciton, showAction };
 
+                if (SearchPlugin.Instance.Settings.SwapGameActions)
+                {
+                    var tmp = actions[0];
+                    actions[0] = actions[1];
+                    actions[1] = tmp;
+                }
+
                 if (game.IsInstalled)
                 {
                     //var uninstallAction = new GameAction() 

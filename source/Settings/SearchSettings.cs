@@ -177,6 +177,9 @@ namespace QuickSearch
         [NumberOption("LOC_QS_MinAcronmLength", Min = 0, Max = 10, Tick = 1, Description = "LOC_QS_MinAcronmLengthTooltip")]
         public int MinAcronmLength { get; set; } = 3;
 
+        [GenericOption("LOC_QS_SwapGameActions")]
+        public bool SwapGameActions { get; set; } = false;
+
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
 
