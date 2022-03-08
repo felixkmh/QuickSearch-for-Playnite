@@ -112,7 +112,21 @@ namespace QuickSearch
         public int OuterBorderThickness
         {
             get => outerBorderThickness;
-            set { outerBorderThickness = value; plugin?.UpdateBorder(value); plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true); }
+            set 
+            { 
+                plugin?.searchWindow?.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true);
+                outerBorderThickness = value; plugin?.UpdateBorder(value);
+                if (EnableGlassEffect)
+                {
+                    plugin?.DisableGlassEffect();
+                    plugin?.EnableGlassEffect();
+                }
+                else
+                {
+                    plugin?.EnableGlassEffect();
+                    plugin?.DisableGlassEffect();
+                }
+            }
         }
         [GenericOption("LOC_QS_FilterSubItems")]
         public bool EnableFilterSubSources { get; set; } = true;
@@ -127,7 +141,7 @@ namespace QuickSearch
         public int SearchWindowWidth { get => searchWindowWidth; 
             set
             {
-                if ((plugin?.searchWindow ?? null) != null)
+                if (plugin?.searchWindow != null)
                 {
                     plugin.searchWindow.WindowGrid.Width = value;
                     plugin.searchWindow.UpdateListBox(plugin.searchWindow.SearchResults.Items.Count, true);
