@@ -90,6 +90,7 @@
     <sys:String x:Key="LOC_QS_Changelog">Changelog</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignore hidden Games</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength">Minimal searchable Acronym length (e.g. Final Fantasy VII -> FFVII, Resident Evil 7 -> RE7)</sys:String>
+    <sys:String x:Key="LOC_QS_SwapGameActions">Swap Play Action and Show Action</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
