@@ -46,7 +46,7 @@ namespace QuickSearch
         public static DependencyProperty IsLoadingResultsProperty =
             DependencyProperty.Register(nameof(IsLoadingResults), typeof(Boolean), typeof(SearchWindow), new PropertyMetadata(false));
 
-        public class Candidate
+        public class Candidate : ObservableObject
         {
             public Candidate()
             {
@@ -59,11 +59,15 @@ namespace QuickSearch
                 Score = candidate.Score;
                 Marked = candidate.Marked;
             }
-            public ISearchItem<string> Item { get; internal set; }
-            public float Score { get; internal set; }
+
+            public ISearchItem<string> Item { get => item; internal set => SetValue(ref item, value); }
+            private ISearchItem<string> item;
+            public float Score { get => score; internal set => SetValue(ref score, value); }
+            private float score;
             //public TextBlock TopLeftFormatted { get; internal set; }
             internal bool Marked;
-            public string Query { get; internal set; }
+            public string Query { get => query; internal set => SetValue(ref query, value); }
+            private string query;
 
             public List<Run> GetFormattedRuns(string query)
             {
@@ -133,39 +137,42 @@ namespace QuickSearch
 
         DispatcherTimer timer = null;
 
-        object previouslySelected = null;
+        ISearchItem<string> previouslySelected = null;
 
         private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((e.AddedItems.Count > 0 && e.AddedItems[0] != previouslySelected)
-                || ListDataContext.Count == 0
-                || (e.RemovedItems.Count > 0 && !ListDataContext.Contains(e.RemovedItems[0])))
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is Candidate candidate)
             {
-                if (timer == null)
+                if ((e.AddedItems.Count > 0 && candidate.Item != previouslySelected)
+                    || ListDataContext.Count == 0
+                    || (e.RemovedItems.Count > 0 && !ListDataContext.Contains(e.RemovedItems[0])))
                 {
-                    timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
-                    timer.Interval = TimeSpan.FromSeconds(0.3333);
-                    timer.Tick += Timer_Tick;
+                    if (timer == null)
+                    {
+                        timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+                        timer.Interval = TimeSpan.FromSeconds(0.3333);
+                        timer.Tick += Timer_Tick;
+                    }
+                    timer.Stop();
+                    DetailsPopup.PopupAnimation = PopupAnimation.None;
+                    DetailsScrollViewer.Content = null;
+                    DetailsPopup.IsOpen = false;
+                    DetailsBorder.Visibility = Visibility.Hidden;
                 }
-                timer.Stop();
-                DetailsPopup.PopupAnimation = PopupAnimation.None;
-                DetailsScrollViewer.Content = null;
-                DetailsPopup.IsOpen = false;
-                DetailsBorder.Visibility = Visibility.Hidden;
-            }
-            if (e.AddedItems.Count > 0)
-            {
-                timer.Start();
-                if (ActionsListBox.Items.Count > 0)
+                if (e.AddedItems.Count > 0)
                 {
-                    ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
+                    timer.Start();
+                    if (ActionsListBox.Items.Count > 0)
+                    {
+                        ActionsListBox.Dispatcher.BeginInvoke((Action<int>) SelectActionButton, DispatcherPriority.Normal, 0);
+                    }
+                    SearchResults.ScrollIntoView(e.AddedItems[0]);
+                    previouslySelected = candidate.Item;
                 }
-                SearchResults.ScrollIntoView(e.AddedItems[0]);
-                previouslySelected = e.AddedItems[0];
-            }
-            if (ListDataContext.Count == 0)
-            {
-                previouslySelected = null;
+                if (ListDataContext.Count == 0)
+                {
+                    previouslySelected = null;
+                }
             }
             SearchBox.Focus();
         }
@@ -446,7 +453,16 @@ namespace QuickSearch
 
                                     if (ListDataContext.Count > addedItems)
                                     {
-                                        ListDataContext[addedItems] = canditates[maxIdx];
+                                        if (ListDataContext[addedItems].Item != canditates[maxIdx].Item)
+                                        {
+                                            ListDataContext[addedItems] = canditates[maxIdx];
+                                        } else
+                                        {
+                                            ListDataContext[addedItems].Item = canditates[maxIdx].Item;
+                                            ListDataContext[addedItems].Query = canditates[maxIdx].Query;
+                                            ListDataContext[addedItems].Score = canditates[maxIdx].Score;
+                                            ListDataContext[addedItems].Marked = canditates[maxIdx].Marked;
+                                        }
                                     }
                                     else
                                     {

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:QuickSearch"
              xmlns:controls="clr-namespace:QuickSearch.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="40"
+             d:DesignHeight="450" d:DesignWidth="800" Margin="25"
              Effect="{DynamicResource DropShadow}"
              IsVisibleChanged="UserControl_IsVisibleChanged">
     <UserControl.CacheMode>
@@ -94,7 +94,7 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-        <DropShadowEffect x:Key="DropShadow" BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="1" RenderingBias="Performance"/>
+        <DropShadowEffect x:Key="DropShadow" BlurRadius="25" ShadowDepth="0" Color="Black" Opacity="0.95" RenderingBias="Quality"/>
     </UserControl.Resources>
     <Grid x:Name="BackgroundGrid">
         <Popup StaysOpen="True" 
@@ -107,7 +107,7 @@
                PlacementTarget="{Binding ElementName=BackgroundGrid}">
             <Border Width="400" Height="{Binding ElementName=WindowGrid, Path=Height, Mode=OneWay}" x:Name="DetailsBorder"
                     Effect="{DynamicResource DropShadow}"
-                    Margin="40"
+                    Margin="25"
                     Visibility="Hidden">
                 <Grid MaxHeight="{Binding ElementName=BackgroundGrid, Path=ActualHeight, Mode=OneWay}" 
                       MaxWidth="{Binding ElementName=DetailsBorder, Path=Width, Mode=OneWay}"
@@ -170,7 +170,7 @@
         <Border Background="{DynamicResource PopupBackgroundBrush}" VerticalAlignment="Top" CornerRadius="15" Opacity="1" x:Name="HeaderBorder">
             <Border VerticalAlignment="Top" 
                     Height="{Binding ActualHeight, ElementName=SearchBox}" 
-                    CornerRadius="15"
+                    CornerRadius="{Binding CornerRadius, ElementName=HeaderBorder, Mode=OneWay}"
                     Margin="{Binding Margin, ElementName=WindowGrid}"
                     />
         </Border>

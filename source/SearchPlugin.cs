@@ -631,6 +631,10 @@ namespace QuickSearch
             if (searchWindow != null)
             {
                 searchWindow.WindowGrid.Margin = new Thickness(thickness);
+                searchWindow.OutsideBorder.CornerRadius = new CornerRadius(thickness);
+                searchWindow.HeaderBorder.CornerRadius = new CornerRadius(thickness);
+                searchWindow.DetailsBackgroundBorder.CornerRadius = new CornerRadius(thickness);
+                searchWindow.DetailsBackgroundBorderFallback.CornerRadius = new CornerRadius(thickness);
                 var margin = searchWindow.SearchResults.Margin;
                 margin.Top = thickness + 8;
                 searchWindow.SearchResults.Margin = margin;

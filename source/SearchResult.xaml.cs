@@ -75,6 +75,24 @@ namespace QuickSearch
                     TopLeftCollapsed.Inlines.Add(new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations });
                     TopLeftExpanded.Inlines.Add(run);
                 }
+                candidate.PropertyChanged += Candidate_PropertyChanged;
+            }
+        }
+
+        private void Candidate_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SearchWindow.Candidate.Query))
+            {
+                if (sender is SearchWindow.Candidate candidate)
+                {
+                    TopLeftCollapsed.Inlines.Clear();
+                    TopLeftExpanded.Inlines.Clear();
+                    foreach (var run in candidate.GetFormattedRuns(candidate.Query))
+                    {
+                        TopLeftCollapsed.Inlines.Add(new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations });
+                        TopLeftExpanded.Inlines.Add(run);
+                    }
+                }
             }
         }
 
