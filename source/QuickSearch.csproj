@@ -218,7 +218,8 @@ rmdir /s /q $(ProjectDir)$(OutDir)lib\rhel-x64
 rmdir /s /q $(ProjectDir)$(OutDir)lib\ubuntu.16.04-arm64
 rmdir /s /q $(ProjectDir)$(OutDir)lib\ubuntu.18.04-x64
 rmdir /s /q $(ProjectDir)$(OutDir)lib\linux-x64
-D:\Programmierung\playnite-dev\Playnite9Beta2\Toolbox.exe pack $(ProjectDir)$(OutDir) $(ProjectDir)bin</PostBuildEvent>
+%25LOCALAPPDATA%25\Playnite\Toolbox.exe pack $(ProjectDir)$(OutDir) $(ProjectDir)bin
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

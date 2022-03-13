@@ -263,7 +263,10 @@ namespace QuickSearch.SearchItems
                 }
             }
 
-            var items = SearchPlugin.Instance.PlayniteApi.Database.Games.Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames).Select(g =>
+            var items = SearchPlugin.Instance.PlayniteApi.Database.Games
+                .Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId) ?? true))
+                .Select(g =>
             {
                 var item = new GameSearchItem(g);
                 if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
