@@ -49,6 +49,44 @@ namespace QuickSearch
             Settings = new SearchSettings(this);
             instance = this;
             Properties = new GenericPluginProperties { HasSettings = true };
+            UpdateUsedFields(api);
+            api.Database.Games.ItemUpdated += Games_ItemUpdated;
+            api.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
+        }
+
+        private void UpdateUsedFields(IPlayniteAPI api)
+        {
+            UsedSources = api.Database.Sources.Where(p => api.Database.Games.Any(g => g.SourceId == p.Id));
+            UsedGenres = api.Database.Genres.Where(p => api.Database.Games.Any(g => g.GenreIds?.Contains(p.Id) ?? false));
+            UsedFeatures = api.Database.Features.Where(p => api.Database.Games.Any(g => g.FeatureIds?.Contains(p.Id) ?? false));
+            UsedPlatforms = api.Database.Platforms.Where(p => api.Database.Games.Any(g => g.PlatformIds?.Contains(p.Id) ?? false));
+            UsedTags = api.Database.Tags.Where(p => api.Database.Games.Any(g => g.TagIds?.Contains(p.Id) ?? false));
+            UsedCategories = api.Database.Categories.Where(p => api.Database.Games.Any(g => g.TagIds?.Contains(p.Id) ?? false));
+            UsedCompanies = api.Database.Companies.Where(p => api.Database.Games.Any(g => (g.DeveloperIds?.Contains(p.Id) ?? false) || (g.PublisherIds?.Contains(p.Id) ?? false)));
+        }
+
+        public IEnumerable<GameSource> UsedSources { get; private set; }
+        public IEnumerable<Genre> UsedGenres { get; private set; }
+        public IEnumerable<GameFeature> UsedFeatures { get; private set; }
+        public IEnumerable<Platform> UsedPlatforms { get; private set; }
+        public IEnumerable<Tag> UsedTags { get; private set; }
+        public IEnumerable<Category> UsedCategories { get; private set; }
+        public IEnumerable<Company> UsedCompanies { get; private set; }
+
+        private void Games_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs<Game> e)
+        {
+            if (PlayniteApi is IPlayniteAPI api)
+            {
+                UpdateUsedFields(api);
+            }
+        }
+
+        private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
+        {
+            if (PlayniteApi is IPlayniteAPI api)
+            {
+                UpdateUsedFields(api);
+            }
         }
 
         internal bool RegisterGlobalHotkey()

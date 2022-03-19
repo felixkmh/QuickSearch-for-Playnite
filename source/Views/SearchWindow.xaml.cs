@@ -451,6 +451,14 @@ namespace QuickSearch
                                 {
                                     canditates[maxIdx].Marked = true;
 
+                                    if (canditates[maxIdx].Item is FilterItem filterItem && !filterItem.filter.IsEmpty)
+                                    {
+                                        if (!SearchPlugin.Instance.PlayniteApi.Database.Games.AsParallel().Any(filterItem.filter.Eval))
+                                        {
+                                            continue;
+                                        }
+                                    }
+
                                     addedCandidates.Add(canditates[maxIdx]);
 
                                     if (ListDataContext.Count > addedItems)
