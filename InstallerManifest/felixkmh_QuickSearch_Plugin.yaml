@@ -5,7 +5,6 @@ Packages:
     ReleaseDate: 2022-03-19
     PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.15.0/felixkmh_QuickSearch_Plugin_2_15_0.pext
     Changelog:
-      - added [SPG] tags to ignore games for shelves or most played
       - filters now include tags and features
       - improved performance when combining multiple filters
   - Version: 2.14.0
