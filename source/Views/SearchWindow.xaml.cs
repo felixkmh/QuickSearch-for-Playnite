@@ -512,7 +512,7 @@ namespace QuickSearch
                                     break;
                                 }
                                 sw.Stop();
-                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < 15);
+                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds <= 8);
                             sw.Stop();
                         }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
                     }
@@ -634,7 +634,7 @@ namespace QuickSearch
                 }
             });
 
-            for(int i = allTasksList.Count -1; i >= 0; --i)
+            for(int i = allTasksList.Count - 1; i >= 0; --i)
             {
                 var task = allTasksList[i];
                 if (task.IsCompleted || task.IsCanceled || task.IsFaulted)

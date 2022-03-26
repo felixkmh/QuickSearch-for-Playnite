@@ -10,6 +10,7 @@ using QuickSearch.Views;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -293,6 +294,39 @@ namespace QuickSearch
             {
                 IconChar = IconChars.GameConsole
             };
+
+            try 
+            {
+                var mainMenuBorder = Helper.UiHelper.FindVisualChildren<Border>(mainWindow, "PART_ElemMainMenu").FirstOrDefault();
+                if (mainMenuBorder != null)
+                {
+                    if (mainMenuBorder.ContextMenu is ContextMenu mainMenu)
+                    {
+                        var description = ResourceProvider.GetString("LOCMenuReloadLibrary");
+                        if (mainMenu.Items.OfType<MenuItem>().FirstOrDefault(item => item.Header.ToString() == description ) is MenuItem updateItem)
+                        {
+                            var items = updateItem.Items.OfType<MenuItem>().Skip(2).ToList();
+                            foreach(var libraryUpdateItem in items)
+                            {
+                                var name = string.Format(ResourceProvider.GetString("LOC_QS_UpdateLibraryX"), libraryUpdateItem.Header.ToString());
+                                var icon = PlayniteApi.Addons.Plugins.OfType<LibraryPlugin>().FirstOrDefault(p => p.Name.Contains(libraryUpdateItem.Header.ToString()))?.LibraryIcon;
+                                var actionName = ResourceProvider.GetString("LOC_QS_UpdateAction");
+                                Action action = () => libraryUpdateItem.Command.Execute(libraryUpdateItem.CommandParameter);
+                                var command = QuickSearchSDK.AddCommand(name, action, description, actionName, icon);
+                                command.IconChar = QuickSearch.IconChars.Refresh;
+                            }
+                        }
+                    }
+
+                }
+            
+            } catch (Exception e)
+            {
+                logger.Error(e, "Could not create library update commands.");
+            }
+
+
+
             foreach (InputBinding binding in mainWindow.InputBindings)
             {
                 if (binding.Gesture is KeyGesture keyGesture)
@@ -337,7 +371,7 @@ namespace QuickSearch
                     }
                     if (keyGesture.Key == Key.F5 && keyGesture.Modifiers == ModifierKeys.None)
                     {
-                        string name = (string)Application.Current.FindResource("LOCUpdateAll") + " " + (string)Application.Current.FindResource("LOCLibraries");
+                        string name = ResourceProvider.GetString("LOC_QS_UpdateAllLibraries");
                         var item = QuickSearchSDK.AddCommand(name, () => binding.Command.Execute(binding.CommandParameter), "Update All Libraries", (string)Application.Current.FindResource("LOCUpdateAll"));
                         item.IconChar = IconChars.Refresh;
                         item.Actions[0] = new InputBindingWrapper(item.Actions[0].Name, binding);
