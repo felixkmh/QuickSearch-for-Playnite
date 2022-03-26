@@ -308,12 +308,14 @@ namespace QuickSearch
                             var items = updateItem.Items.OfType<MenuItem>().Skip(2).ToList();
                             foreach(var libraryUpdateItem in items)
                             {
-                                var name = string.Format(ResourceProvider.GetString("LOC_QS_UpdateLibraryX"), libraryUpdateItem.Header.ToString());
-                                var icon = PlayniteApi.Addons.Plugins.OfType<LibraryPlugin>().FirstOrDefault(p => p.Name.Contains(libraryUpdateItem.Header.ToString()))?.LibraryIcon;
+                                string libraryName = libraryUpdateItem.Header.ToString();
+                                var name = string.Format(ResourceProvider.GetString("LOC_QS_UpdateLibraryX"), libraryName);
+                                var icon = PlayniteApi.Addons.Plugins.OfType<LibraryPlugin>().FirstOrDefault(p => p.Name.Contains(libraryName))?.LibraryIcon;
                                 var actionName = ResourceProvider.GetString("LOC_QS_UpdateAction");
                                 Action action = () => libraryUpdateItem.Command.Execute(libraryUpdateItem.CommandParameter);
                                 var command = QuickSearchSDK.AddCommand(name, action, description, actionName, icon);
                                 command.IconChar = QuickSearch.IconChars.Refresh;
+                                command.Keys.Add(new CommandItemKey() { Key = $"Update {libraryName}", Weight = 1 });
                             }
                         }
                     }

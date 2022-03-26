@@ -465,10 +465,16 @@ namespace QuickSearch
                                     {
                                         var selectedAction = ActionsListBox.SelectedIndex != -1 ? ActionsListBox.SelectedIndex : 1;
                                         var prevItem = ListDataContext[addedItems].Item;
-                                        ListDataContext[addedItems].Item = canditates[maxIdx].Item;
-                                        ListDataContext[addedItems].Query = canditates[maxIdx].Query;
-                                        ListDataContext[addedItems].Score = canditates[maxIdx].Score;
-                                        ListDataContext[addedItems].Marked = canditates[maxIdx].Marked;
+                                        if (canditates[maxIdx].Item.TopLeft == prevItem.TopLeft)
+                                        {
+                                            ListDataContext[addedItems].Item = canditates[maxIdx].Item;
+                                            ListDataContext[addedItems].Query = canditates[maxIdx].Query;
+                                            ListDataContext[addedItems].Score = canditates[maxIdx].Score;
+                                            ListDataContext[addedItems].Marked = canditates[maxIdx].Marked;
+                                        } else
+                                        {
+                                            ListDataContext[addedItems] = canditates[maxIdx];
+                                        }
                                         if (addedItems == 0)
                                         {
                                             if (prevItem == canditates[maxIdx].Item)
@@ -824,7 +830,22 @@ namespace QuickSearch
                 return bIsGame.CompareTo(aIsGame);
             }
 
-            return a.TopLeft.CompareTo(b.TopLeft);
+            var topLeftComparison = a.TopLeft.CompareTo(b.TopLeft);
+            if (topLeftComparison != 0)
+            {
+                return topLeftComparison;
+            }
+
+            var bottomLeftComparison = a.BottomLeft.CompareTo(b.BottomLeft);
+            if (bottomLeftComparison != 0)
+            {
+                return bottomLeftComparison;
+            }
+
+            var aType = a.GetType().Name;
+            var bType = b.GetType().Name;
+
+            return aType.CompareTo(bType);
         } 
 
         internal void UpdateListBox(int items, bool refresh = false)
