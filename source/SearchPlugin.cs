@@ -315,7 +315,11 @@ namespace QuickSearch
                                 Action action = () => libraryUpdateItem.Command.Execute(libraryUpdateItem.CommandParameter);
                                 var command = QuickSearchSDK.AddCommand(name, action, description, actionName, icon);
                                 command.IconChar = QuickSearch.IconChars.Refresh;
-                                command.Keys.Add(new CommandItemKey() { Key = $"Update {libraryName}", Weight = 1 });
+                                var englishKey = $"Update {libraryName} library";
+                                if (!command.Keys.Any(k => k.Key == englishKey))
+                                {
+                                    command.Keys.Add(new CommandItemKey() { Key = englishKey, Weight = 1 });
+                                }
                             }
                         }
                     }
