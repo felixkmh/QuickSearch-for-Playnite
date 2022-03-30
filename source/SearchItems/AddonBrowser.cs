@@ -278,26 +278,22 @@ namespace QuickSearch.SearchItems
             {
                 var sb = new StringBuilder();
                 sb.Append("Total Downloads: ");
-                if (stats.total >= 100000000)
-                    sb.Append((stats.total / 1000000.0).ToString("#,0M"));
-                else if (stats.total >= 10000000)
-                    sb.Append((stats.total / 1000000.0).ToString("0.#") + "M");
-                else if (stats.total >= 100000)
-                    sb.Append((stats.total / 1000.0).ToString("#,0K"));
-                else if (stats.total >= 10000)
-                    sb.Append((stats.total / 1000.0).ToString("0.#") + "K");
+                if (stats.total >= 10_000_000_000)
+                    sb.Append((stats.total / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                else if (stats.total >= 10_000_000)
+                    sb.Append((stats.total / 1_000_000.0).ToString("#,##0.##") + "M");
+                else if (stats.total >= 10_000)
+                    sb.Append((stats.total / 1_000.0).ToString("#,##0.#") + "K");
                 else
                     sb.Append(stats.total.ToString());
 
                 sb.Append(", Latest: ");
-                if (stats.latest >= 100000000)
-                    sb.Append((stats.total / 1000000.0).ToString("#,0M"));
-                else if (stats.latest >= 10000000)
-                    sb.Append((stats.total / 1000000.0).ToString("0.#") + "M");
-                else if (stats.latest >= 100000)
-                    sb.Append((stats.total / 1000.0).ToString("#,0K"));
-                else if (stats.latest >= 10000)
-                    sb.Append((stats.total / 1000.0).ToString("0.#") + "K");
+                if (stats.latest >= 10_000_000_000)
+                    sb.Append((stats.latest / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                else if (stats.latest >= 10_000_000)
+                    sb.Append((stats.latest / 1_000_000.0).ToString("#,##0.##") + "M");
+                else if (stats.latest >= 10_000)
+                    sb.Append((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
                 else
                     sb.Append(stats.latest.ToString());
                 return sb.ToString();
@@ -306,8 +302,8 @@ namespace QuickSearch.SearchItems
 
         class DownloadStats
         {
-            public int total = 0;
-            public int latest = 0;
+            public Int64 total = 0;
+            public Int64 latest = 0;
         }
 
         private DownloadStats GetDownloadCount()
