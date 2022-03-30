@@ -1036,11 +1036,9 @@ namespace QuickSearch
                 {
                     string input = source.Prefix + " ";
 
-                    enableSearch = false;
                     SearchBox.Text = input;
                     SearchBox.CaretIndex = SearchBox.Text.Length;
                     PlaceholderText.Text = SearchBox.Text;
-                    enableSearch = true;
 
                     bool displayAllIfQueryIsEmpty = source.DisplayAllIfQueryIsEmpty;
                     QueueSearch(input, displayAllIfQueryIsEmpty);

@@ -285,7 +285,7 @@ namespace QuickSearch.SearchItems
                 else if (stats.total >= 10_000)
                     sb.Append((stats.total / 1_000.0).ToString("#,##0.#") + "K");
                 else
-                    sb.Append(stats.total.ToString());
+                    sb.Append(stats.total.ToString("#,##0.#"));
 
                 sb.Append(", Latest: ");
                 if (stats.latest >= 1_000_000_000)
@@ -295,7 +295,7 @@ namespace QuickSearch.SearchItems
                 else if (stats.latest >= 10_000)
                     sb.Append((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
                 else
-                    sb.Append(stats.latest.ToString());
+                    sb.Append(stats.latest.ToString("#,##0.#"));
                 return sb.ToString();
             }
         }
