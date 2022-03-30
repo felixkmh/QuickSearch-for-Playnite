@@ -92,6 +92,8 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength">Minimal searchable Acronym length (e.g. Final Fantasy VII -> FFVII, Resident Evil 7 -> RE7)</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions">Swap Play Action and Show Action</sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX">Update {0} library</sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats">Total Downloads: {0}, Latest: {0}</sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation">Create [QS] tags on launch</sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>

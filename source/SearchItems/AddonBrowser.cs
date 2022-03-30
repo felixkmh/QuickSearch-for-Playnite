@@ -276,27 +276,26 @@ namespace QuickSearch.SearchItems
                 return null;
             } else
             {
-                var sb = new StringBuilder();
-                sb.Append("Total Downloads: ");
+                string total;
                 if (stats.total >= 1_000_000_000)
-                    sb.Append((stats.total / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                    total = ((stats.total / 1_000_000_000.0).ToString("#,##0.###") + "G");
                 else if (stats.total >= 1_000_000)
-                    sb.Append((stats.total / 1_000_000.0).ToString("#,##0.##") + "M");
+                    total = ((stats.total / 1_000_000.0).ToString("#,##0.##") + "M");
                 else if (stats.total >= 10_000)
-                    sb.Append((stats.total / 1_000.0).ToString("#,##0.#") + "K");
+                    total = ((stats.total / 1_000.0).ToString("#,##0.#") + "K");
                 else
-                    sb.Append(stats.total.ToString("#,##0.#"));
+                    total = (stats.total.ToString("#,##0.#"));
+                string latest;
 
-                sb.Append(", Latest: ");
                 if (stats.latest >= 1_000_000_000)
-                    sb.Append((stats.latest / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                    latest = ((stats.latest / 1_000_000_000.0).ToString("#,##0.###") + "G");
                 else if (stats.latest >= 1_000_000)
-                    sb.Append((stats.latest / 1_000_000.0).ToString("#,##0.##") + "M");
+                    latest = ((stats.latest / 1_000_000.0).ToString("#,##0.##") + "M");
                 else if (stats.latest >= 10_000)
-                    sb.Append((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
+                    latest = ((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
                 else
-                    sb.Append(stats.latest.ToString("#,##0.#"));
-                return sb.ToString();
+                    latest = (stats.latest.ToString("#,##0.#"));
+                return string.Format(ResourceProvider.GetString("LOC_QS_DownloadStats"), total, latest);
             }
         }
 
