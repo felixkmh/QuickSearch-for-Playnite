@@ -92,6 +92,8 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
