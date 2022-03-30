@@ -92,6 +92,8 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength">可搜索的最短缩写长度（例如：Final Fantasy VII-&gt;FFVII，Resident Evil 7-&gt;RE7）</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">若可用，使用游戏封面艺术而非游戏图标作为游戏结果的图标。</sys:String>

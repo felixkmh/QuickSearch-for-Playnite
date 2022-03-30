@@ -92,6 +92,8 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength">Comprimento mínimo pesquisável do acrônimo (ex. Fantasia Final VII -&gt; FFVII, Resident Evil 7 -&gt; RE7)</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Se disponível, use a arte da capa do jogo em vez do ícone do jogo como o ícone para os resultados do jogo.</sys:String>

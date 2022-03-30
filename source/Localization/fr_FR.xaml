@@ -92,6 +92,8 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength">Longueur minimale des acronymes : (Exemple : Final Fantasy VII -&gt; FFVII, Resident Evil 7 -&gt; RE7)</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Permet d'afficher les couvertures des jeux à la place de leurs icônes lorsqu'elles existent.</sys:String>
