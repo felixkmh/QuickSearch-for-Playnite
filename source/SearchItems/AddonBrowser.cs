@@ -276,7 +276,31 @@ namespace QuickSearch.SearchItems
                 return null;
             } else
             {
-                return string.Format("Total Downloads: {0:n0}, Latest: {1:n0}", stats.total, stats.latest);
+                var sb = new StringBuilder();
+                sb.Append("Total Downloads: ");
+                if (stats.total >= 100000000)
+                    sb.Append((stats.total / 1000000.0).ToString("#,0M"));
+                else if (stats.total >= 10000000)
+                    sb.Append((stats.total / 1000000.0).ToString("0.#") + "M");
+                else if (stats.total >= 100000)
+                    sb.Append((stats.total / 1000.0).ToString("#,0K"));
+                else if (stats.total >= 10000)
+                    sb.Append((stats.total / 1000.0).ToString("0.#") + "K");
+                else
+                    sb.Append(stats.total.ToString());
+
+                sb.Append(", Latest: ");
+                if (stats.latest >= 100000000)
+                    sb.Append((stats.total / 1000000.0).ToString("#,0M"));
+                else if (stats.latest >= 10000000)
+                    sb.Append((stats.total / 1000000.0).ToString("0.#") + "M");
+                else if (stats.latest >= 100000)
+                    sb.Append((stats.total / 1000.0).ToString("#,0K"));
+                else if (stats.latest >= 10000)
+                    sb.Append((stats.total / 1000.0).ToString("0.#") + "K");
+                else
+                    sb.Append(stats.latest.ToString());
+                return sb.ToString();
             }
         }
 
