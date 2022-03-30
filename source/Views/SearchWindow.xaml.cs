@@ -292,8 +292,11 @@ namespace QuickSearch
 
         string lastInput = string.Empty;
 
+        bool enableSearch = true;
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (!enableSearch) return;
             if (sender is TextBox textBox)
             {
                 PlaceholderText.Text = (string)Application.Current.FindResource("LOCSearchLabel");
@@ -322,7 +325,7 @@ namespace QuickSearch
                             }
                             if (popped)
                             {
-                                StartIndexUpdate();
+                                QueueIndexUpdate();
                             }
                         }
                         QueueSearch(input, showAll);
@@ -337,6 +340,7 @@ namespace QuickSearch
             var oldSource = textChangedTokeSource;
             textChangedTokeSource = new CancellationTokenSource();
             var cancellationToken = textChangedTokeSource.Token;
+            var sources = searchItemSources;
             backgroundTask = backgroundTask.ContinueWith(t =>
             {
                 var searchSw = Stopwatch.StartNew();
@@ -353,7 +357,6 @@ namespace QuickSearch
                 List<Candidate> addedCandidates = new List<Candidate>();
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
-                    var sources = searchItemSources;
                     List<ISearchItem<string>> queryDependantItems = new List<ISearchItem<string>>();
 
                     foreach (var source in sources)
@@ -390,15 +393,21 @@ namespace QuickSearch
                     {
                         canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query })
+                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
                         .ToArray();
                     } else
                     {
                         canditates = searchItems.Concat(queryDependantItems).AsParallel()
                         .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
-                        .Select(item => new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query })
-                        .Where(candidate => candidate.Score >= searchPlugin.Settings.Threshold)
+                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
+                        .Where(candidate => (candidate?.Score ?? 0) >= searchPlugin.Settings.Threshold)
                         .ToArray();
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        searchSw.Stop();
+                        return;
                     }
 
                     if (canditates.Any(candidate => candidate.Item is GameSearchItem))
@@ -1025,10 +1034,16 @@ namespace QuickSearch
                 QueueIndexUpdate(new ISearchItemSource<string>[] { source }, true);
                 if (source != null)
                 {
-                    SearchBox.Text = source.Prefix + " ";
+                    string input = source.Prefix + " ";
+
+                    enableSearch = false;
+                    SearchBox.Text = input;
                     SearchBox.CaretIndex = SearchBox.Text.Length;
                     PlaceholderText.Text = SearchBox.Text;
-                    QueueSearch(source.Prefix + " ", source.DisplayAllIfQueryIsEmpty);
+                    enableSearch = true;
+
+                    bool displayAllIfQueryIsEmpty = source.DisplayAllIfQueryIsEmpty;
+                    QueueSearch(input, displayAllIfQueryIsEmpty);
                 }
             }
             else if (action.CloseAfterExecute)

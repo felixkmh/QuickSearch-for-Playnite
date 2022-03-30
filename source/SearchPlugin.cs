@@ -258,15 +258,19 @@ namespace QuickSearch
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
 
-            
+            if (!string.IsNullOrWhiteSpace(Settings.GitHubAccessToken))
+            {
+                AddonManifestBase.gitHub.Credentials = new Octokit.Credentials(Settings.GitHubAccessToken);
+            }
 
             // searchItemSources.Add("Commands", simpleCommands);
             // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
             // Add code to be executed when Playnite is initialized.
-            if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop || Settings.EnableInFullscreenMode)
             {
                 Settings.SettingsChanged += OnSettingsChanged;
                 mainWindow = Application.Current.Windows.Cast<Window>().FirstOrDefault(w => w.Name.Equals("WindowMain", StringComparison.InvariantCultureIgnoreCase));
+                if (mainWindow == null) mainWindow = Application.Current.MainWindow;
                 if (mainWindow is Window)
                 {
                     windowInterop = new WindowInteropHelper(mainWindow);

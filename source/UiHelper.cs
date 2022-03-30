@@ -12,6 +12,7 @@ namespace Helper
     {
         public static IEnumerable<FrameworkElement> FindVisualChildren(DependencyObject parent, string name = null)
         {
+            if (parent == null) yield return null;
             Stack<DependencyObject> stack = new Stack<DependencyObject>();
             stack.Push(parent);
             while (stack.Count > 0)

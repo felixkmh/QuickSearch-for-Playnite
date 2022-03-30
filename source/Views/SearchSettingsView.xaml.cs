@@ -125,5 +125,10 @@ namespace QuickSearch
             setHotkeyButton.Focus();
             setHotkeyButton.Content = ResourceProvider.GetString("LOC_QS_SetHotkeyButton");
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/settings/tokens/new");
+        }
     }
 }

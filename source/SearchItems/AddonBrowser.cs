@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Runtime.CompilerServices;
 using YamlDotNet.Serialization;
 using Playnite.SDK.Models;
+using Playnite.SDK.Data;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch.SearchItems
@@ -121,7 +122,7 @@ namespace QuickSearch.SearchItems
             }
             addon.IsInstalled = isInstalled;
             this.addon = addon;
-            Keys = new List<ISearchKey<string>> { 
+            Keys = new List<ISearchKey<string>> {
                 new CommandItemKey() { Key = addon.Name ?? "Add-on Name", Weight = 1 },
                 new CommandItemKey() { Key = addon.Author ?? "Unknown Author", Weight = 1 },
             };
@@ -257,6 +258,104 @@ namespace QuickSearch.SearchItems
 
     public class AddonManifestBase : ObservableObject
     {
+        static Octokit.GitHubClient GetGithubClient()
+        {
+            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("QuickSearch-for-Playnite"));
+            return client;
+        }
+        internal static Octokit.GitHubClient gitHub = GetGithubClient();
+
+        private DownloadStats downloadStats = null;
+
+        private string GetDownloadString()
+        {
+            var stats = downloadStats ?? GetDownloadCount();
+            downloadStats = stats;
+            if ((downloadStats?.total ?? -1) < 0)
+            {
+                return null;
+            } else
+            {
+                return string.Format("Total Downloads: {0:n0}, Latest: {1:n0}", stats.total, stats.latest);
+            }
+        }
+
+        class DownloadStats
+        {
+            public int total = 0;
+            public int latest = 0;
+        }
+
+        private DownloadStats GetDownloadCount()
+        {
+            var stats = new DownloadStats();
+            var source = SourceUrl;
+            if (source.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    if (gitHub.GetLastApiInfo() is Octokit.ApiInfo info)
+                    {
+                        if (info.RateLimit.Remaining <= 0)
+                        {
+                            var limits = gitHub.Miscellaneous.GetRateLimits().Result;
+                            return null;
+                        }
+                    }
+                    var split = source.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                    var userName = split[2];
+                    var repoName = split[3];
+                    var response = gitHub.Repository.Get(userName, repoName);
+                    var installerManifest = InstallerManifest;
+                    response.Wait();
+                    if (response.IsCompleted && response.Result is Octokit.Repository repo && installerManifest is AddonInstallerManifest)
+                    {
+                        var releaseResponse = gitHub.Repository.Release.GetAll(repo.Id);
+                        releaseResponse.Wait();
+                        if (releaseResponse.Result is IReadOnlyList<Octokit.Release> releases)
+                        {
+                            if (releases.Count == 0) return null;
+                            if (installerManifest.Packages.Count > 0)
+                            {
+                                var latest = InstallerManifest.Packages.FirstOrDefault(p => installerManifest.Packages.All(o => o.Version <= p.Version));
+                                if (latest.PackageUrl.StartsWith($"https://github.com/{userName}/{repoName}/releases/", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var splitUrl = latest.PackageUrl.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                                    var tagName = splitUrl[6];
+                                    var fileName = splitUrl[7];
+                                    if (releases.FirstOrDefault(r => r.TagName == tagName) is Octokit.Release release &&
+                                        release.Assets.FirstOrDefault(a => a.Name == fileName) is Octokit.ReleaseAsset asset)
+                                    {
+                                        stats.latest = asset.DownloadCount;
+                                    }
+                                }
+                            }
+                            foreach (var package in installerManifest.Packages)
+                            {
+                                if (package.PackageUrl.StartsWith($"https://github.com/{userName}/{repoName}/releases/", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var splitUrl = package.PackageUrl.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                                    var tagName = splitUrl[6];
+                                    var fileName = splitUrl[7];
+                                    if (releases.FirstOrDefault(r => r.TagName == tagName) is Octokit.Release release &&
+                                        release.Assets.FirstOrDefault(a => a.Name == fileName) is Octokit.ReleaseAsset asset)
+                                    {
+                                        stats.total += asset.DownloadCount;
+                                    }
+                                }
+                            }
+                        }
+                        return stats;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SearchPlugin.logger.Debug(ex, $"Couldn't retrieve download count for {Name}");
+                }
+            }
+            return null;
+        }
+
         public class AddonUserAgreement
         {
             public DateTime Updated { get; set; }
@@ -268,6 +367,9 @@ namespace QuickSearch.SearchItems
             public string Thumbnail { get; set; }
             public string Image { get; set; }
         }
+
+        [DontSerialize]
+        public string DownloadString => GetDownloadString();
 
         public string IconUrl { get; set; }
         public List<AddonScreenshot> Screenshots { get; set; }

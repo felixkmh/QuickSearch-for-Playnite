@@ -238,5 +238,12 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        <TabItem Header="Add-ons">
+            <StackPanel Orientation="Horizontal" Margin="10" VerticalAlignment="Top">
+                <TextBlock Text="GitHub Personal Access Token:" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                <TextBox Text="{Binding GitHubAccessToken}" MinWidth="50" Margin="5,0"/>
+                <Button Content="Get Token" Click="Button_Click"/>
+            </StackPanel>
+        </TabItem>
     </TabControl>
 </UserControl>

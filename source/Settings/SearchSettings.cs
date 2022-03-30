@@ -213,6 +213,10 @@ namespace QuickSearch
         [GenericOption("LOC_QS_SwapGameActions")]
         public bool SwapGameActions { get; set; } = false;
 
+        public bool EnableInFullscreenMode { get; set; } = false;
+
+        public string GitHubAccessToken { get; set; } = null;
+
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);
         public event SettingsChangedHandler SettingsChanged;
 
