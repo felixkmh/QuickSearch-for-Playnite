@@ -92,11 +92,11 @@
     <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
-    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
-    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats">مجموع التنزيلات: {0}، الأحدث: {1}</sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation">إنشاء وسوم [QS] عند التشغيل</sys:String>
 
     <!--Tool Tips-->
-    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">إذا كانت متاحة، استخدم غطاء اللعبة بدلاً من أيقونة اللعبة.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">أضف هذه السلسلة إلى نهاية استعلام البحث لإجبار البحث مع ITAD. اتركها فارغة لتعطيل التجاوز اليدوي.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">إذا تم تفعيله، يعرض مزيدًا من التفاصيل للنتيجة المحددة بعد مهلة قصيرة، إذا كان ذلك متاحًا.</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip"></sys:String>
