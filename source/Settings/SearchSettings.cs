@@ -53,23 +53,9 @@ namespace QuickSearch
             return false;
         }
 
-        private Guid ignoreTagId;
-        public Guid IgnoreTagId
-        {
-            get
-            {
-                if (plugin != null && ignoreTagId == Guid.Empty)
-                {
-                    ignoreTagId = plugin.PlayniteApi.Database.Tags.Add("[QS] Ignored").Id;
-                }
-                else if (plugin?.PlayniteApi != null && plugin.PlayniteApi.Database.Tags.Get(ignoreTagId) == null)
-                {
-                    ignoreTagId = plugin.PlayniteApi.Database.Tags.Add("[QS] Ignored").Id;
-                }
-                return ignoreTagId;
-            }
-            set => ignoreTagId = value;
-        }
+        public bool EnableTagCreation { get; set; } = false;
+
+        public Guid IgnoreTagId { get; set; } = Guid.Empty;
 
         [GenericOption("LOC_QS_LocalHotkeyShort")]
         public Hotkey SearchShortcut { get; set; } = new Hotkey(Key.F, ModifierKeys.Control);

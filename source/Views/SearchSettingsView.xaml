@@ -97,6 +97,10 @@
                         <CheckBox  IsChecked="{Binding SwapGameActions}" Margin="5"/>
                         <TextBlock Text="{DynamicResource LOC_QS_SwapGameActions}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding EnableTagCreation}" Margin="5"/>
+                        <TextBlock Text="{DynamicResource LOC_QS_EnableTagCreation}" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                    </StackPanel>
                     <TextBlock Text="{DynamicResource LOC_QS_MinAcronmLength}" Margin="2" Foreground="{StaticResource TextBrush}">
                         <TextBlock.ToolTip>
                             <TextBlock Text="{DynamicResource LOC_QS_MinAcronmLengthTooltip}" TextWrapping="Wrap" MaxWidth="500"/>
