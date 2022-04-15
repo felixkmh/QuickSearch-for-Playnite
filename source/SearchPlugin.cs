@@ -42,7 +42,7 @@ namespace QuickSearch
 
         internal CommandItemSource simpleCommands = new CommandItemSource();
         internal Dictionary<string, ISearchItemSource<string>> searchItemSources = new Dictionary<string, ISearchItemSource<string>>();
-
+        
         public override Guid Id { get; } = Guid.Parse("6a604592-7001-4b4e-a3be-91073b459e2b");
 
         public SearchPlugin(IPlayniteAPI api) : base(api)
