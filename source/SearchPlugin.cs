@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -603,6 +604,7 @@ namespace QuickSearch
                         {
                             string name = config["Name"] as string ?? plugin.GetType().Name;
                             string icon = config["Icon"] as string;
+                            string addonId = config["Id"] as string;
                             if (name is string)
                             {
                                 var item = QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
@@ -610,6 +612,15 @@ namespace QuickSearch
                                 {
                                     item.Icon = uri;
                                 }
+                                item.Actions.Add(new CommandAction() { 
+                                    Name = ResourceProvider.GetString("LOC_QS_UserData"),
+                                    Action = () => Process.Start(plugin.GetPluginUserDataPath()) 
+                                });
+                                item.Actions.Add(new CommandAction()
+                                {
+                                    Name = ResourceProvider.GetString("LOC_QS_InstallationData"),
+                                    Action = () => Process.Start(installDir)
+                                });
                             }
                         }
                     }
