@@ -5,6 +5,8 @@ Extension for [Playnite](https://github.com/JosefNemec/Playnite) that adds a sea
 
 ![grafik](https://user-images.githubusercontent.com/24227002/166332182-8fa6e28d-078c-4c31-9d56-8d55a2028081.png)
 
+[![Crowdin](https://badges.crowdin.net/quicksearch-for-playnite/localized.svg)](https://crowdin.com/project/quicksearch-for-playnite)
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C1C6CH5IN)
 
 ## Features
