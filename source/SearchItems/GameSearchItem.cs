@@ -130,7 +130,10 @@ namespace QuickSearch.SearchItems
         {
             if (searchItem is GameSearchItem game)
             {
-                SearchPlugin.Instance.PlayniteApi.StartGame(game.game.Id);
+                Application.Current.Dispatcher.BeginInvoke(
+                    System.Windows.Threading.DispatcherPriority.Background, 
+                    (Action<Guid>)SearchPlugin.Instance.PlayniteApi.StartGame, 
+                    game.game.Id);
             }
         }
     }
