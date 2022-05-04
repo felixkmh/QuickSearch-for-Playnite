@@ -42,14 +42,18 @@ namespace QuickSearch.SearchItems
                         Commands.Pull(
                             repo,
                             new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
-                            new PullOptions()
+                            new PullOptions() { MergeOptions = new MergeOptions { MergeFileFavor = MergeFileFavor.Theirs} }
                         );
                     }
                 }
                 if (Directory.Exists(repoPath))
                 {
-                    var manifestFiles = System.IO.Directory.GetFiles(repoPath, "*.yaml", SearchOption.AllDirectories);
-                    var addonManifests = manifestFiles.AsParallel().Select(file =>
+                    var addonDir = Path.Combine(repoPath, "addons");
+                    var manifestFiles = System.IO.Directory.GetDirectories(addonDir)
+                        .AsParallel()
+                        .SelectMany(d => Directory.GetFiles(d))
+                        .Where(f => f.EndsWith(".yaml", StringComparison.InvariantCultureIgnoreCase));
+                    var addonManifests = manifestFiles.Select(file =>
                     {
                         using (var yaml = File.OpenText(file))
                         {
@@ -60,7 +64,13 @@ namespace QuickSearch.SearchItems
                             return manifest;
                         }
                     }).OfType<AddonManifestBase>();
-                    return addonManifests.OrderBy(addon => addon.Type).ThenBy(addon => addon.Name).ThenBy(addon => addon.Author).Select(addon => new AddonItem(addon));
+                    var items = addonManifests
+                        .OrderBy(addon => addon.Type)
+                        .ThenBy(addon => addon.Name)
+                        .ThenBy(addon => addon.Author)
+                        .Select(addon => new AddonItem(addon))
+                        .ToList();
+                    return items;
                 }
             }
             catch (Exception ex)

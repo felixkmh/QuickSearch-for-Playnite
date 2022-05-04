@@ -206,19 +206,37 @@ namespace QuickSearch
 
         public void QueueIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
         {
-            openedSearchTokeSource.Cancel();
+            if (!(openedSearchTokeSource?.IsCancellationRequested ?? true))
+            {
+                openedSearchTokeSource.Cancel();
+            }
             var oldSource = textChangedTokeSource;
             openedSearchTokeSource = new CancellationTokenSource();
-            var cancellationToken = textChangedTokeSource.Token;
-            backgroundTask = backgroundTask.ContinueWith((t) =>
+            var cancellationToken = openedSearchTokeSource.Token;
+            Task updateTask = Task.Run(() =>
+            {
+                var items = StartIndexUpdate(itemSources, isSubSource);
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    searchItems = items;
+                }
+            });
+            var task = Task.WhenAny(
+                updateTask,
+                Task.Run(() =>
+                {
+                    SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested || updateTask.IsCompleted || updateTask.IsFaulted);
+                })
+            );
+            backgroundTask = backgroundTask.ContinueWith(t =>
             {
                 t.Dispose();
 
-                StartIndexUpdate(itemSources, isSubSource);
+                task.Wait();
             });
         }
 
-        public void StartIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
+        public IList<ISearchItem<string>> StartIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
         {
             if (itemSources != null)
             {
@@ -230,7 +248,7 @@ namespace QuickSearch
             }
             searchItemSources = navigationStack.Peek();
 
-            searchItems = searchItemSources
+            return searchItemSources.AsParallel()
                 .Select(source => source.GetItems())
                 .Where(items => items != null)
                 .SelectMany(items => items)
@@ -305,6 +323,13 @@ namespace QuickSearch
                 if (lastInput != input)
                 {
                     textChangedTokeSource?.Cancel();
+                    if (navigationStack.Count > 1 && navigationStack.Peek().First() is ISearchSubItemSource<string> subSource2 && !input.StartsWith(subSource2.Prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!(openedSearchTokeSource?.IsCancellationRequested ?? true))
+                        {
+                            openedSearchTokeSource.Cancel();
+                        }
+                    }
                     backgroundTask = backgroundTask.ContinueWith(t =>
                     {
                         t.Dispose();
