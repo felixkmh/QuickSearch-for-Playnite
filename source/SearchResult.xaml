@@ -64,7 +64,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
-                            <TextBlock x:Name="TopLeftExpanded"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Padding="0,0,5,0" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TopLeftExpanded"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Padding="0,0,5,0" FontWeight="SemiBold"
+                                       />
                             <!--<ContentControl Content="{Binding TopLeftFormatted}" HorizontalAlignment="Left" Padding="0,0,5,0"/>-->
                             <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
                         </StackPanel>

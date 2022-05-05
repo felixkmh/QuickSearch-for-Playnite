@@ -46,61 +46,6 @@ namespace QuickSearch
         public static DependencyProperty IsLoadingResultsProperty =
             DependencyProperty.Register(nameof(IsLoadingResults), typeof(Boolean), typeof(SearchWindow), new PropertyMetadata(false));
 
-        public class Candidate : ObservableObject
-        {
-            public Candidate()
-            {
-
-            }
-
-            public Candidate(SearchItems.Candidate candidate)
-            {
-                Item = candidate.Item;
-                Score = candidate.Score;
-                Marked = candidate.Marked;
-            }
-
-            public ISearchItem<string> Item { get => item; internal set => SetValue(ref item, value); }
-            private ISearchItem<string> item;
-            public float Score { get => score; internal set => SetValue(ref score, value); }
-            private float score;
-            //public TextBlock TopLeftFormatted { get; internal set; }
-            internal bool Marked;
-            public string Query { get => query; internal set => SetValue(ref query, value); }
-            private string query;
-
-            public List<Run> GetFormattedRuns(string query)
-            {
-                var runs = new List<Run>();
-                if (Item?.TopLeft != null)
-                {
-                    var topLeft = Item.TopLeft;
-                    var lcs = LongestCommonSubstringDP(query, topLeft);
-
-                    int i = 0;
-                    while (i < topLeft.Length)
-                    {
-                        int j = i;
-                        while (j < topLeft.Length && lcs.PositionsB.Contains(i) == lcs.PositionsB.Contains(j))
-                        {
-                            ++j;
-                        }
-
-                        if (lcs.PositionsB.Contains(i))
-                        {
-                            Run run = new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.DemiBold };
-                            runs.Add(run);
-                        }
-                        else
-                        {
-                            runs.Add(new Run(topLeft.Substring(i, j - i)) { FontWeight = System.Windows.FontWeights.Normal });
-                        }
-                        i += j - i;
-                    }
-                }
-                return runs;
-            }
-        }
 
         public void Reset()
         {
@@ -110,7 +55,7 @@ namespace QuickSearch
         }
 
 
-        public ObservableCollection<Candidate> ListDataContext { get; private set; } = new ObservableCollection<Candidate>();
+        public ObservableCollection<Models.Candidate> ListDataContext { get; private set; } = new ObservableCollection<Models.Candidate>();
 
         public SearchWindow(SearchPlugin plugin)
         {
@@ -146,7 +91,7 @@ namespace QuickSearch
 
         private void SelectionChanged(System.Collections.IList addedItems, System.Collections.IList removedItems)
         {
-            if ((addedItems.Count > 0 && addedItems[0] is Candidate candidate && candidate.Item != previouslySelected)
+            if ((addedItems.Count > 0 && addedItems[0] is Models.Candidate candidate && candidate.Item != previouslySelected)
                 || ListDataContext.Count == 0
                 || (removedItems.Count > 0 && !ListDataContext.Contains(removedItems[0])))
             {
@@ -162,7 +107,7 @@ namespace QuickSearch
                 DetailsPopup.IsOpen = false;
                 DetailsBorder.Visibility = Visibility.Hidden;
             }
-            if (addedItems.Count > 0 && addedItems[0] is Candidate candidate1)
+            if (addedItems.Count > 0 && addedItems[0] is Models.Candidate candidate1)
             {
                 timer.Start();
                 if (ActionsListBox.Items.Count > 0)
@@ -184,7 +129,7 @@ namespace QuickSearch
             if (SearchPlugin.Instance.Settings.EnableDetailsView)
             {
                 timer.Stop();
-                if (SearchResults.SelectedItem is Candidate item)
+                if (SearchResults.SelectedItem is Models.Candidate item)
                 {
                     if (IsVisible && item.Item.DetailsView is FrameworkElement view)
                     {
@@ -379,7 +324,7 @@ namespace QuickSearch
                 }
                 int maxResults = 0;
                 int addedItems = 0;
-                List<Candidate> addedCandidates = new List<Candidate>();
+                List<Models.Candidate> addedCandidates = new List<Models.Candidate>();
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
                     List<ISearchItem<string>> queryDependantItems = new List<ISearchItem<string>>();
@@ -405,7 +350,7 @@ namespace QuickSearch
                         }
                     }
                     
-                    Candidate[] canditates;
+                    Models.Candidate[] canditates;
                     var prefix = searchItemSources.FirstOrDefault() is ISearchSubItemSource<string> subSource ? subSource.Prefix : string.Empty;
                     prefix = prefix.Trim();
                     var query = input;
@@ -418,13 +363,13 @@ namespace QuickSearch
                     {
                         canditates = searchItems.Concat(queryDependantItems)
                         .Where(item => !cancellationToken.IsCancellationRequested)
-                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
+                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Models.Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
                         .ToArray();
                     } else
                     {
                         canditates = searchItems.Concat(queryDependantItems).AsParallel()
                         .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
-                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
+                        .Select(item => (!cancellationToken.IsCancellationRequested) ? new Models.Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
                         .Where(candidate => (candidate?.Score ?? 0) >= searchPlugin.Settings.Threshold)
                         .ToArray();
                     }
@@ -620,7 +565,7 @@ namespace QuickSearch
 
         private readonly List<Task> allTasksList = new List<Task>();
 
-        private void InsertDelayedDependentItems(string input, IList<Candidate> addedCandidates, float threshold, int maxItems, CancellationToken cancellationToken, bool showAll = false)
+        private void InsertDelayedDependentItems(string input, IList<Models.Candidate> addedCandidates, float threshold, int maxItems, CancellationToken cancellationToken, bool showAll = false)
         {
             var queue = new ConcurrentQueue<ISearchItem<string>>();
 
@@ -727,7 +672,7 @@ namespace QuickSearch
 
                         if (insertionIdx >= 0 && (insertionIdx < maxItems || maxItems < 1))
                         {
-                            Candidate candidateItem = new Candidate() { Item = item, Score = score, Query = query };
+                            Models.Candidate candidateItem = new Models.Candidate() { Item = item, Score = score, Query = query };
                             addedCandidates.Insert(insertionIdx, candidateItem);
 
                             if (addedCandidates.Count > maxItems && maxItems > 0)
@@ -763,7 +708,7 @@ namespace QuickSearch
 
         }
 
-        private int FindMax(in IList<Candidate> canditates, in CancellationToken cancellationToken)
+        private int FindMax(in IList<Models.Candidate> canditates, in CancellationToken cancellationToken)
         {
             float maxScore = float.NegativeInfinity;
             int maxIdx = -1;
@@ -1073,7 +1018,7 @@ namespace QuickSearch
             {
                 searchPlugin.popup.IsOpen = false;
             }
-            if (SearchResults.SelectedItem is Candidate item)
+            if (SearchResults.SelectedItem is Models.Candidate item)
             {
                 if (action.CanExecute(item.Item))
                 {

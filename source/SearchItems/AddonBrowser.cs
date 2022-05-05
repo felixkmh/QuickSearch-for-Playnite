@@ -49,11 +49,8 @@ namespace QuickSearch.SearchItems
                 if (Directory.Exists(repoPath))
                 {
                     var addonDir = Path.Combine(repoPath, "addons");
-                    var manifestFiles = System.IO.Directory.GetDirectories(addonDir)
-                        .AsParallel()
-                        .SelectMany(d => Directory.GetFiles(d))
-                        .Where(f => f.EndsWith(".yaml", StringComparison.InvariantCultureIgnoreCase));
-                    var addonManifests = manifestFiles.Select(file =>
+                    var manifestFiles = System.IO.Directory.GetFiles(addonDir, "*.yaml", SearchOption.AllDirectories);
+                    var addonManifests = manifestFiles.AsParallel().Select(file =>
                     {
                         using (var yaml = File.OpenText(file))
                         {
@@ -68,8 +65,7 @@ namespace QuickSearch.SearchItems
                         .OrderBy(addon => addon.Type)
                         .ThenBy(addon => addon.Name)
                         .ThenBy(addon => addon.Author)
-                        .Select(addon => new AddonItem(addon))
-                        .ToList();
+                        .Select(addon => new AddonItem(addon));
                     return items;
                 }
             }

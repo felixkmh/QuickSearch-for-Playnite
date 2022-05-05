@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="QuickSearch.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:QuickSearch.ViewModels"
+             xmlns:m="clr-namespace:QuickSearch.Models"
+             xmlns:controls="clr-namespace:QuickSearch.Controls"
+             xmlns:conv="clr-namespace:QuickSearch.Converters"
+             xmlns:local="clr-namespace:QuickSearch.Views" xmlns:quicksearch="clr-namespace:QuickSearch"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance IsDesignTimeCreatable=False, Type={x:Type vm:SearchViewModel}}">
+    <UserControl.Resources>
+        <conv:ICollectionNullOrEmptyToBoolConverter x:Key="ICollectionNullOrEmptyToBoolConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="SearchGrid">
+        <TextBox Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="SearchBox"
+                 PreviewKeyDown="SearchBox_KeyDown"
+                 VerticalContentAlignment="Center"
+                 Padding="30,8,8,8"
+                 GotKeyboardFocus="SearchBox_GotKeyboardFocus"
+                 LostKeyboardFocus="SearchBox_LostKeyboardFocus"/>
+        <TextBlock Text="{DynamicResource LOCSearchLabel}" VerticalAlignment="Center" Padding="{Binding ElementName=SearchBox, Path=Padding}" Opacity="0.75" IsHitTestVisible="False" Margin="2,0,0,0">
+            <TextBlock.Style>
+                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                    <Setter Property="Visibility" Value="Hidden"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Input.Length}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock x:Name="SearchIcon" Text="&#xed11;"
+                       FontFamily="{DynamicResource FontIcoFont}" 
+                       HorizontalAlignment="Left" 
+                       TextAlignment="Center" 
+                       Foreground="{DynamicResource TextBrush}" 
+                       VerticalAlignment="Center" 
+                       FontSize="18"
+                       Margin="6" Padding="1"
+                       IsHitTestVisible="False"/>
+        <ListBox x:Name="ActionsListBox" HorizontalAlignment="Right"
+                     ItemsSource="{Binding ElementName=SearchResults, Path=SelectedItem.Item.Actions}"
+                     SelectionChanged="ActionsListBox_SelectionChanged"
+                     SelectionMode="Single"
+                     ScrollViewer.CanContentScroll="False"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
+                     Padding="2" Background="{x:Null}" MaxWidth="300"
+                     Visibility="{Binding ElementName=SearchBox, Path=IsFocused, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     BorderBrush="Transparent"
+                     BorderThickness="0"
+                     Focusable="False">
+            <!--<ListBox.OpacityMask>
+                    <VisualBrush Visual="{Binding ElementName=SearchBox}" AutoLayoutContent="True" Stretch="None" AlignmentX="Right" AlignmentY="Center">
+                        <VisualBrush.Transform>
+                            <ScaleTransform ScaleX="0.99" ScaleY="0.99"/>
+                        </VisualBrush.Transform>
+                    </VisualBrush>
+                </ListBox.OpacityMask>-->
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                                IsVirtualizing="True"
+                                                VirtualizationMode="Recycling"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <controls:ActionButton Click="ActionButton_Click"  ClipToBounds="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                Content="{Binding Name}"
+                                local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem.Item}"
+                                MouseEnter="ActionButton_MouseEnter"
+                                IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="1"
+                                Padding="6,0"
+                                Opacity="{Binding Converter={StaticResource OpacityBoolConverter}, RelativeSource={RelativeSource Mode=Self}, Path=IsSelected, Mode=OneWay}">
+                    </controls:ActionButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="{x:Null}"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+        <Popup StaysOpen="True" IsOpen="{Binding ElementName=SearchBox, Path=IsKeyboardFocused, Mode=OneWay}"
+               PlacementTarget="{Binding ElementName=SearchGrid}"
+               Placement="Bottom">
+            <ListBox ItemsSource="{Binding SearchResults, Mode=OneWay}" MaxHeight="310" Width="{Binding ElementName=SearchBox, Path=ActualWidth}"
+                     Background="{DynamicResource PopupBackgroundBrush}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Visibility="{Binding HasItems, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     x:Name="SearchResults"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     SelectionChanged="SearchResults_SelectionChanged"
+                     Padding="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type m:Candidate}">
+                        <quicksearch:SearchResult/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Popup>
+    </Grid>
+</UserControl>

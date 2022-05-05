@@ -7,6 +7,7 @@ using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
 using QuickSearch.Views;
+using StartPage.SDK;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ using System.Windows.Media.Imaging;
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
 {
-    public class SearchPlugin : GenericPlugin
+    public class SearchPlugin : GenericPlugin, StartPage.SDK.IStartPageExtension
     {
         internal static readonly ILogger logger = LogManager.GetLogger();
 
@@ -272,6 +273,8 @@ namespace QuickSearch
             {
                 AddonManifestBase.gitHub.Credentials = new Octokit.Credentials(Settings.GitHubAccessToken);
             }
+
+            AddPluginSettings();
 
             // searchItemSources.Add("Commands", simpleCommands);
             // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
@@ -560,10 +563,68 @@ namespace QuickSearch
         Window dummyWindow;
         bool glassActive = false;
 
-        private string GetAssemblyName(string name)
+        internal string GetAssemblyName(string name)
         {
             var sep = name.IndexOf('_');
             return name.Substring(0, sep);
+        }
+
+        private void AddPluginSettings()
+        {
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            var plugins = PlayniteApi.Addons.Plugins
+                .OfType<GenericPlugin>()
+                .Where(pl => pl?.Properties?.HasSettings ?? false)
+                .Cast<Plugin>();
+
+            plugins = plugins
+                .Concat(PlayniteApi.Addons.Plugins
+                    .OfType<LibraryPlugin>()
+                    .Where(pl => pl?.Properties?.HasSettings ?? false)
+                    .Cast<Plugin>()
+            );
+
+            plugins = plugins
+                .Concat(PlayniteApi.Addons.Plugins
+                    .OfType<MetadataPlugin>()
+                    .Where(pl => pl?.Properties?.HasSettings ?? false)
+                    .Cast<Plugin>()
+            );
+
+            foreach (var plugin in plugins)
+            {
+                var installDir = System.IO.Path.GetDirectoryName(plugin.GetType().Assembly.Location);
+                var extensionYaml = System.IO.Path.Combine(installDir, "extension.yaml");
+                if (System.IO.File.Exists(extensionYaml))
+                {
+                    var text = System.IO.File.ReadAllText(extensionYaml);
+                    var config = deserializer.Deserialize<Dictionary<string, object>>(text);
+                    if (config != null)
+                    {
+                        string name = config["Name"] as string ?? plugin.GetType().Name;
+                        string icon = config["Icon"] as string;
+                        string addonId = config["Id"] as string;
+                        if (name is string)
+                        {
+                            var item = QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                            if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
+                            {
+                                item.Icon = uri;
+                            }
+                            item.Actions.Add(new CommandAction()
+                            {
+                                Name = ResourceProvider.GetString("LOC_QS_UserData"),
+                                Action = () => Process.Start(plugin.GetPluginUserDataPath())
+                            });
+                            item.Actions.Add(new CommandAction()
+                            {
+                                Name = ResourceProvider.GetString("LOC_QS_InstallationData"),
+                                Action = () => Process.Start(installDir)
+                            });
+                        }
+                    }
+                }
+            }
         }
 
         private void ToggleSearch()
@@ -572,60 +633,6 @@ namespace QuickSearch
 
             if (popup is null)
             {
-                var deserializer = new YamlDotNet.Serialization.Deserializer();
-                var plugins = PlayniteApi.Addons.Plugins
-                    .OfType<GenericPlugin>()
-                    .Where(pl => pl?.Properties?.HasSettings ?? false)
-                    .Cast<Plugin>();
-
-                plugins = plugins
-                    .Concat(PlayniteApi.Addons.Plugins
-                        .OfType<LibraryPlugin>()
-                        .Where(pl => pl?.Properties?.HasSettings ?? false)
-                        .Cast<Plugin>()
-                );
-
-                plugins = plugins
-                    .Concat(PlayniteApi.Addons.Plugins
-                        .OfType<MetadataPlugin>()
-                        .Where(pl => pl?.Properties?.HasSettings ?? false)
-                        .Cast<Plugin>()
-                );
-
-                foreach (var plugin in plugins)
-                {
-                    var installDir = System.IO.Path.GetDirectoryName(plugin.GetType().Assembly.Location);
-                    var extensionYaml = System.IO.Path.Combine(installDir, "extension.yaml");
-                    if (System.IO.File.Exists(extensionYaml))
-                    {
-                        var text = System.IO.File.ReadAllText(extensionYaml);
-                        var config = deserializer.Deserialize<Dictionary<string, object>>(text);
-                        if (config != null)
-                        {
-                            string name = config["Name"] as string ?? plugin.GetType().Name;
-                            string icon = config["Icon"] as string;
-                            string addonId = config["Id"] as string;
-                            if (name is string)
-                            {
-                                var item = QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
-                                if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
-                                {
-                                    item.Icon = uri;
-                                }
-                                item.Actions.Add(new CommandAction() { 
-                                    Name = ResourceProvider.GetString("LOC_QS_UserData"),
-                                    Action = () => Process.Start(plugin.GetPluginUserDataPath()) 
-                                });
-                                item.Actions.Add(new CommandAction()
-                                {
-                                    Name = ResourceProvider.GetString("LOC_QS_InstallationData"),
-                                    Action = () => Process.Start(installDir)
-                                });
-                            }
-                        }
-                    }
-                }
-
                 popup = new Popup();
                 popup.Opened += (s, a) =>
                 {
@@ -835,5 +842,38 @@ namespace QuickSearch
             return new SearchSettingsView();
         }
 
+        public StartPageExtensionArgs GetAvailableStartPageViews()
+        {
+            var views = new List<StartPageViewArgsBase> {
+                new StartPageViewArgsBase
+                {
+                    Name = "Search Bar",
+                    ViewId = "SearchPopup"
+                }
+            };
+            var args = new StartPageExtensionArgs { ExtensionName = "QuickSearch", Views = views };
+
+            return args;
+        }
+
+        public object GetStartPageView(string viewId, Guid instanceId)
+        {
+            if (viewId == "SearchPopup")
+            {
+                var model = new ViewModels.SearchViewModel(this);
+                return new Views.SearchView { DataContext = model };
+            }
+            return null;
+        }
+
+        public Control GetStartPageViewSettings(string viewId, Guid instanceId)
+        {
+            return null;
+        }
+
+        public void OnViewRemoved(string viewId, Guid instanceId)
+        {
+            
+        }
     }
 }

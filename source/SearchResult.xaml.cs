@@ -68,7 +68,7 @@ namespace QuickSearch
             Seperator.Height = SearchPlugin.Instance.Settings.ShowSeperator ? 5 : 0;
             TopLeftCollapsed.Inlines.Clear();
             TopLeftExpanded.Inlines.Clear();
-            if (e.NewValue is SearchWindow.Candidate candidate)
+            if (e.NewValue is Models.Candidate candidate)
             {
                 foreach(var run in candidate.GetFormattedRuns(candidate.Query))
                 {
@@ -81,13 +81,15 @@ namespace QuickSearch
 
         private void Candidate_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SearchWindow.Candidate.Query))
+            if (e.PropertyName == nameof(Models.Candidate.Query))
             {
-                if (sender is SearchWindow.Candidate candidate)
+                if (sender is Models.Candidate candidate)
                 {
+                    List<Run> runs = candidate.GetFormattedRuns(candidate.Query);
+                        
                     TopLeftCollapsed.Inlines.Clear();
                     TopLeftExpanded.Inlines.Clear();
-                    foreach (var run in candidate.GetFormattedRuns(candidate.Query))
+                    foreach (var run in runs)
                     {
                         TopLeftCollapsed.Inlines.Add(new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations });
                         TopLeftExpanded.Inlines.Add(run);
