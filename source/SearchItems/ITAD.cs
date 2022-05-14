@@ -127,25 +127,28 @@ namespace QuickSearch.SearchItems
             {
                 return null;
             }
+            var input = query;
+            bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.Settings.ITADThreshold;
+            bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.Settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.Settings.ITADOverride);
+            if (!isBelowThreshold && overrideStringPresent)
+            {
+                input = query.Substring(0, query.Length - SearchPlugin.Instance.Settings.ITADOverride.Length);
+            }
+
+            if (!isBelowThreshold && !overrideStringPresent || string.IsNullOrWhiteSpace(query))
+            {
+                return null;
+            }
+           
+            var deals = new List<ISearchItem<string>>();
+
             return Task.Run(() => 
             {
                 if (region == null)
                 {
                     GetRegion();
                 }
-                bool isBelowThreshold = (addedItems.FirstOrDefault()?.Score ?? 0f) < SearchPlugin.Instance.Settings.ITADThreshold;
-                bool overrideStringPresent = !string.IsNullOrWhiteSpace(SearchPlugin.Instance.Settings.ITADOverride) && query.EndsWith(SearchPlugin.Instance.Settings.ITADOverride);
-                if (!isBelowThreshold && !overrideStringPresent || string.IsNullOrWhiteSpace(query))
-                {
-                    return null;
-                }
-                var input = query;
-                var deals = new List<ISearchItem<string>>();
-                if (!isBelowThreshold && overrideStringPresent)
-                {
-                    input = query.Substring(0, query.Length - SearchPlugin.Instance.Settings.ITADOverride.Length);
-                }
-
+                
                 using (var client = new HttpClient())
                 {
                     try
