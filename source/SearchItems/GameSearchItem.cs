@@ -213,85 +213,190 @@ namespace QuickSearch.SearchItems
         {
             return Task.Run(() => 
             {
-                List<ISearchItem<string>> items = new List<ISearchItem<string>>();
-                if (query.Contains("quote"))
+#if DEBUG
+                try
                 {
-                    if (quote == null)
+#endif
+                    List<ISearchItem<string>> items = new List<ISearchItem<string>>();
+                    if (query.Contains("quote"))
                     {
+                        if (quote == null)
+                        {
+                            using (var client = new System.Net.Http.HttpClient())
+                            {
+                                client.GetStringAsync("https://zenquotes.io/api/today").ContinueWith(t => { 
+                                    dynamic json = Newtonsoft.Json.Linq.JArray.Parse(t.Result);
+                                    quote = (string)json[0]["q"] + " - " + (string)json[0]["a"];
+                                    t.Dispose();
+                                }, TaskContinuationOptions.OnlyOnRanToCompletion).Wait(10000);
+                            }
+                        }
+                        items.Add(new CommandItem("Quote of the Day", () => Process.Start("https://zenquotes.io"), quote, "Go to Url") 
+                        { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = ''});
+
+                        string random = null;
                         using (var client = new System.Net.Http.HttpClient())
                         {
-                            client.GetStringAsync("https://zenquotes.io/api/today").ContinueWith(t => { 
+                            client.GetStringAsync("https://zenquotes.io/api/random").ContinueWith(t => {
                                 dynamic json = Newtonsoft.Json.Linq.JArray.Parse(t.Result);
-                                quote = (string)json[0]["q"] + " - " + (string)json[0]["a"];
+                                random = (string)json[0]["q"] + " - " + (string)json[0]["a"];
                                 t.Dispose();
                             }, TaskContinuationOptions.OnlyOnRanToCompletion).Wait(10000);
                         }
+                        if (random is string)
+                        {
+                            items.Add(new CommandItem("Random Quote", () => Process.Start("https://zenquotes.io"), random, "Go to Url")
+                            { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = '' });
+                        }
                     }
-                    items.Add(new CommandItem("Quote of the Day", () => Process.Start("https://zenquotes.io"), quote, "Go to Url") 
-                    { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = ''});
-
-                    string random = null;
-                    using (var client = new System.Net.Http.HttpClient())
-                    {
-                        client.GetStringAsync("https://zenquotes.io/api/random").ContinueWith(t => {
-                            dynamic json = Newtonsoft.Json.Linq.JArray.Parse(t.Result);
-                            random = (string)json[0]["q"] + " - " + (string)json[0]["a"];
-                            t.Dispose();
-                        }, TaskContinuationOptions.OnlyOnRanToCompletion).Wait(10000);
-                    }
-                    if (random is string)
-                    {
-                        items.Add(new CommandItem("Random Quote", () => Process.Start("https://zenquotes.io"), random, "Go to Url")
-                        { TopRight = "Inspirational quotes provided by https://zenquotes.io/ ZenQuotes API", IconChar = '' });
-                    }
+                    return items.AsEnumerable();
+#if DEBUG
                 }
-                return items.AsEnumerable();
+                catch (Exception ex)
+                {
+                    SearchPlugin.logger.Error(ex, "Failed to create game search items task.");
+                    return null;
+                }
+#endif
             });
+
         }
+
+        private Dictionary<Guid, ISearchItem<string>> cachedItems = null;
 
         public IEnumerable<ISearchItem<string>> GetItems()
         {
-            GameActions.Clear();
-            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+#if DEBUG
+            try
             {
-                foreach (var item in QuickSearchSDK.gameActions)
-                {
-                    var extracted = GetAssemblyName(item.Key);
-                    var assembly = extracted.Item1;
-                    var name = extracted.Item2;
-                    if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
-                    {
-                        GameActions.Add(new GameAction() { Name = name, Action = item.Value });
-                    }
-                }
-            }
-
-            var items = SearchPlugin.Instance.PlayniteApi.Database.Games
-                .Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
-                .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
-                .Select(g =>
-            {
-                var item = new GameSearchItem(g);
+#endif
+                GameActions.Clear();
                 if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
                 {
-                    foreach (var action in GameActions)
+                    foreach (var item in QuickSearchSDK.gameActions)
                     {
-                        item.Actions.Add(action);
+                        var extracted = GetAssemblyName(item.Key);
+                        var assembly = extracted.Item1;
+                        var name = extracted.Item2;
+                        if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
+                        {
+                            GameActions.Add(new GameAction() { Name = name, Action = item.Value });
+                        }
                     }
                 }
-                return item;
-            }).Concat(new ISearchItem<string>[] {
-                new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
-                    new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
-                    "Favorites") {IconChar = QuickSearch.IconChars.Star },
-                new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
-                        new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new RecentlyPlayedSource()},
-                        "Recently Played") {IconChar = '\uEEDC' }});
-            if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
+
+                var gameItems = cachedItems?.Values.AsEnumerable();
+                if (gameItems == null)
+                {
+                    gameItems = SearchPlugin.Instance.PlayniteApi.Database.Games
+                        .AsParallel()
+                        .Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                        .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                        .Select(g =>
+                        {
+                            var item = new GameSearchItem(g);
+                            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                            {
+                                foreach (var action in GameActions)
+                                {
+                                    item.Actions.Add(action);
+                                }
+                            }
+                            return item;
+                        });
+
+                    cachedItems = gameItems.OfType<GameSearchItem>().ToDictionary(item => item.Game.Id, item => item as ISearchItem<string>);
+
+                    SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
+                    SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+                    SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
+                } 
+                    var items = gameItems.Concat(new ISearchItem<string>[] {
+                    new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
+                        new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
+                        "Favorites") {IconChar = QuickSearch.IconChars.Star },
+                    new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
+                            new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new RecentlyPlayedSource()},
+                            "Recently Played") {IconChar = '\uEEDC' }});
+                    if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
+                    {
+                        items = items.Concat(GetFilterItems(new GameFilter()));
+                    }
+                    
+                return items;
+#if DEBUG
+            } catch (Exception ex)
             {
-                items = items.Concat(GetFilterItems(new GameFilter()));
+                SearchPlugin.logger.Error(ex, "Failed to create game search items.");
+                return null;
             }
-            return items;
+#endif
+        }
+
+        private void Settings_SettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
+        {
+            cachedItems = null;
+            SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged -= Games_ItemCollectionChanged;
+            SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated -= Games_ItemUpdated;
+            SearchPlugin.Instance.Settings.SettingsChanged -= Settings_SettingsChanged;
+        }
+
+        private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
+        {
+            if (cachedItems != null)
+            {
+                foreach(var item in e.UpdatedItems)
+                {
+                    cachedItems.Remove(item.OldData.Id);
+                }
+                var updated = e.UpdatedItems.Select(i => i.NewData).Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                    .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                    .Select(g =>
+                    {
+                        var item = new GameSearchItem(g);
+                        if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                        {
+                            foreach (var action in GameActions)
+                            {
+                                item.Actions.Add(action);
+                            }
+                        }
+                        return item;
+                    });
+                foreach(var item in updated)
+                {
+                    cachedItems[item.Game.Id] = item;
+                }
+            }
+        }
+
+        private void Games_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs<Game> e)
+        {
+            if (cachedItems != null)
+            {
+                foreach(var removed in e.RemovedItems)
+                {
+                    cachedItems.Remove(removed.Id);
+                }
+                var added = e.AddedItems.Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                    .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                    .Select(g =>
+                    {
+                        var item = new GameSearchItem(g);
+                        if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                        {
+                            foreach (var action in GameActions)
+                            {
+                                item.Actions.Add(action);
+                            }
+                        }
+                        return item;
+                    });
+                foreach(var addedGame in added)
+                {
+                    cachedItems[addedGame.Game.Id] = addedGame;
+                }
+            }
         }
 
         public static IEnumerable<ISearchItem<string>> GetFilterItems(GameFilter previousFilter, GameFilter.Mode mode = GameFilter.Mode.Or, string seperator = null, string previousName = null)
@@ -649,8 +754,8 @@ namespace QuickSearch.SearchItems
             }
             if (!string.IsNullOrEmpty(game.Name) && CleanNameKey.regex.IsMatch(game.Name))
                 keys.Add(new CleanNameKey(game));
-            if (game.Roms?.Count > 0)
-                keys.Add(new RomKey { game = game });
+            //if (game.Roms?.Count > 0)
+            //    keys.Add(new RomKey { game = game });
         }
 
         public Game game;
