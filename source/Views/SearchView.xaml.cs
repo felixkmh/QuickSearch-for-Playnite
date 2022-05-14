@@ -79,7 +79,7 @@ namespace QuickSearch.Views
 
         private void ExecuteAction(ISearchAction<string> action)
         {
-            if (DataContext is SearchViewModel model)
+            if (DataContext is LuceneSearchViewModel model)
             {
                 if (action is ISubItemsAction<string> subItemsAction)
                 {
@@ -242,7 +242,7 @@ namespace QuickSearch.Views
 
         private void SearchBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (DataContext is SearchViewModel viewModel)
+            if (DataContext is LuceneSearchViewModel viewModel)
             {
                 viewModel.OpenSearch();
             }
@@ -250,7 +250,7 @@ namespace QuickSearch.Views
 
         private void SearchBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (DataContext is SearchViewModel viewModel)
+            if (DataContext is LuceneSearchViewModel viewModel)
             {
                 viewModel.CloseSearch();
             }

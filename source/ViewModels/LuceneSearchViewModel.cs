@@ -12,12 +12,51 @@ using System.Windows.Threading;
 using QuickSearch.Models;
 using static QuickSearch.Matching;
 using System.Collections.Concurrent;
+using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Documents;
+using Lucene.Net.Index;
+using Lucene.Net.Search;
+using Lucene.Net.Store;
+using Lucene.Net.Util;
+using LuceneDirectory = Lucene.Net.Store.Directory;
+using System.IO;
+using Lucene.Net.QueryParsers;
+using Lucene.Net.Search.Similar;
+using Lucene.Net.Analysis.Snowball;
+using Lucene.Net.Analysis.Ext;
+using Lucene.Net.Analysis.NGram;
+using Lucene.Net.Analysis.Position;
+using SpellChecker.Net.Search.Spell;
+using Lucene.Net.Search.Spans;
 
 namespace QuickSearch.ViewModels
 {
-    public class SearchViewModel : ObservableObject, StartPage.SDK.IStartPageControl
+    public class LuceneSearchViewModel : ObservableObject, StartPage.SDK.IStartPageControl
     {
-        public SearchViewModel(SearchPlugin plugin)
+        public class CustomAnalyzer : Analyzer
+        {
+            public override TokenStream TokenStream(string fieldName, TextReader reader)
+            {
+                TokenStream t = null;
+                t = new WhitespaceTokenizer(reader);
+                t = new ASCIIFoldingFilter(t);
+                t = new LowerCaseFilter(t);
+                t = new NGramTokenFilter(t, 1, 10);
+
+                return t;
+            }
+        }
+
+        const Lucene.Net.Util.Version luceneVersion = Lucene.Net.Util.Version.LUCENE_30;
+
+        Analyzer analyzer;
+
+        LuceneDirectory indexDir = null;
+
+        List<ISearchItem<string>> cachedItems = new List<ISearchItem<string>>();
+
+        public LuceneSearchViewModel(SearchPlugin plugin)
         {
             searchPlugin = plugin;
 
@@ -40,6 +79,10 @@ namespace QuickSearch.ViewModels
             }
 
             SearchResults.CollectionChanged += SearchResults_CollectionChanged;
+
+            analyzer = new CustomAnalyzer();
+            
+            indexDir = new RAMDirectory();
         }
 
         private void SearchResults_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -57,7 +100,7 @@ namespace QuickSearch.ViewModels
         private IList<ISearchItem<string>> searchItems = new List<ISearchItem<string>>();
         public IList<ISearchItem<string>> SearchItems { get => searchItems; set => SetValue(ref searchItems, value); }
 
-        private Stack<IEnumerable<ISearchItemSource<string>>> navigationStack = new Stack<IEnumerable<ISearchItemSource<string>>>();
+        internal Stack<IEnumerable<ISearchItemSource<string>>> navigationStack = new Stack<IEnumerable<ISearchItemSource<string>>>();
         private IEnumerable<ISearchItemSource<string>> searchItemSources = new List<ISearchItemSource<string>>();
 
         private bool isSearching = false;
@@ -70,7 +113,7 @@ namespace QuickSearch.ViewModels
         public bool IsLoadingResults { get => isLoadingResults; set => SetValue(ref isLoadingResults, value); }
 
         private string lastInput = string.Empty;
-        public string LastInput { get => lastInput; set => SetValue(ref lastInput, value);}
+        public string LastInput { get => lastInput; set => SetValue(ref lastInput, value); }
 
         private Models.Candidate selectedItem = null;
         public Models.Candidate SelectedItem { get => selectedItem; set => SetValue(ref selectedItem, value); }
@@ -82,12 +125,14 @@ namespace QuickSearch.ViewModels
         public int ActionIndex { get => actionIndex; set { if (value > 0) SetValue(ref actionIndex, value); } }
 
         private string input = string.Empty;
-        public string Input {
+        public string Input
+        {
             get => input;
-            set { 
+            set
+            {
                 OnInputChanged(input, value);
                 SetValue(ref input, value);
-            } 
+            }
         }
 
         private readonly List<Task> allTasksList = new List<Task>();
@@ -159,6 +204,8 @@ namespace QuickSearch.ViewModels
                 .ToList();
         }
 
+        private int maxFields = 0;
+
         public void QueueIndexUpdate(IEnumerable<ISearchItemSource<string>> itemSources = null, bool isSubSource = false)
         {
             if (!(openedSearchTokenSource?.IsCancellationRequested ?? true))
@@ -169,17 +216,58 @@ namespace QuickSearch.ViewModels
             var cancellationToken = openedSearchTokenSource.Token;
             Task updateTask = Task.Run(() =>
             {
+#if DEBUG
+                var sw = Stopwatch.StartNew();
+#endif
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IsLoadingResults = true;
+                });
+
                 var items = StartIndexUpdate(itemSources, isSubSource);
                 if (!cancellationToken.IsCancellationRequested)
                 {
                     SearchItems = items;
+                    using (var writer = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+                    {
+                        writer.DeleteAll();
+                        cachedItems.Clear();
+                        maxFields = 0;
+                        foreach (var item in items)
+                        {
+                            var doc = new Document();
+                            doc.Add(new Field("itemId", cachedItems.Count.ToString(), Field.Store.YES, Field.Index.NO));
+                            cachedItems.Add(item);
+                            int i = 0;
+                            foreach (var key in item.Keys)
+                            {
+                                if (!string.IsNullOrWhiteSpace(key.Key))
+                                {
+                                    Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                    field.Boost = key.Weight;
+                                    doc.Add(field);
+                                }
+                            }
+                            maxFields = Math.Max(maxFields, i);
+                            writer.AddDocument(doc);
+                        }
+                        writer.Commit();
+                    }
                 }
+#if DEBUG
+                sw.Stop();
+                Debug.WriteLine($"Updated index in {sw.Elapsed.TotalSeconds}s");
+#endif
             });
             var task = Task.WhenAny(
                 updateTask,
                 Task.Run(() =>
                 {
                     SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested || updateTask.IsCompleted || updateTask.IsFaulted);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        IsLoadingResults = false;
+                    });
                 })
             );
             backgroundTask = backgroundTask.ContinueWith(t =>
@@ -260,10 +348,22 @@ namespace QuickSearch.ViewModels
                 }
                 int maxResults = 0;
                 int addedItems = 0;
+                var passes = 0;
+
+                var prefix = searchItemSources.FirstOrDefault() is ISearchSubItemSource<string> subSource ? subSource.Prefix : string.Empty;
+                prefix = prefix.Trim();
+                var query = input;
+                if (query.StartsWith(prefix))
+                {
+                    query = query.Substring(prefix.Length);
+                    query = query.Trim();
+                }
+
                 List<Models.Candidate> addedCandidates = new List<Models.Candidate>();
+                List<ISearchItem<string>> queryDependantItems = new List<ISearchItem<string>>();
                 if (!string.IsNullOrEmpty(input) || showAll)
                 {
-                    List<ISearchItem<string>> queryDependantItems = new List<ISearchItem<string>>();
+                    var canditates = new List<Models.Candidate>();
 
                     foreach (var source in sources)
                     {
@@ -286,31 +386,93 @@ namespace QuickSearch.ViewModels
                         }
                     }
 
-                    Models.Candidate[] canditates;
-                    var prefix = searchItemSources.FirstOrDefault() is ISearchSubItemSource<string> subSource ? subSource.Prefix : string.Empty;
-                    prefix = prefix.Trim();
-                    var query = input;
-                    if (query.StartsWith(prefix))
-                    {
-                        query = query.Substring(prefix.Length);
-                        query = query.Trim();
-                    }
                     if (showAll)
                     {
-                        canditates = searchItems.Concat(queryDependantItems)
+                        canditates = queryDependantItems
                         .Where(item => !cancellationToken.IsCancellationRequested)
                         .Select(item => (!cancellationToken.IsCancellationRequested) ? new Models.Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
-                        .ToArray();
+                        .ToList();
                     }
                     else
                     {
-                        canditates = searchItems.Concat(queryDependantItems).AsParallel()
+                        canditates = queryDependantItems.AsParallel()
                         .Where(item => !cancellationToken.IsCancellationRequested && ComputePreliminaryScore(item, input) >= searchPlugin.Settings.Threshold)
                         .Select(item => (!cancellationToken.IsCancellationRequested) ? new Models.Candidate { Marked = false, Item = item, Score = ComputeScore(item, input), Query = query } : null)
                         .Where(candidate => (candidate?.Score ?? 0) >= searchPlugin.Settings.Threshold)
-                        .ToArray();
+                        .ToList();
                     }
 
+                    using (var writer = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED)) 
+                    {
+                        using (var reader = writer.GetReader())
+                        {
+                            var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            IndexSearcher searcher = new IndexSearcher(reader);
+
+                            List<Query> queries = new List<Query>();
+
+                            var specChars = new[] { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~*", "?", ":" };
+
+                            var escapedInput = query;
+
+                            foreach (var specChar in specChars)
+                            {
+                                escapedInput = escapedInput.Replace(specChar, "\\" + specChar);
+                            }
+
+                            var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (!string.IsNullOrWhiteSpace(escapedInput))
+                            {
+                                var fieldQuery = new List<Query>();
+                                for(int i = 0; i < maxFields; i++)
+                                {
+                                    var boolQuery = new BooleanQuery();
+                                    var pos = 0;
+                                    foreach (var term in terms)
+                                    {
+                                        var queryTerm = new Term($"key{i}", term);
+                                        var fuzzy = new FuzzyQuery(queryTerm);
+                                        fuzzy.Boost = 5;
+                                        boolQuery.Add(fuzzy, Occur.SHOULD);
+                                        boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
+                                    }
+                                    fieldQuery.Add(boolQuery);
+                                }
+
+                                var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
+                                TopDocs topDocs = searcher.Search(disjunction, 100);
+    #if DEBUG
+                                Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
+    #endif
+
+                                for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
+                                {
+                                    if (i == 0)
+                                    {
+                                        Debug.WriteLine(searcher.Explain(disjunction, topDocs.ScoreDocs[i].Doc));
+                                    }
+                                    var resultDoc = searcher.Doc(topDocs.ScoreDocs[i].Doc);
+                                    var id = int.Parse(resultDoc.Get("itemId"));
+                                    if (cachedItems.Count > id)
+                                    {
+                                        var item = cachedItems[id];
+                                        var score = ComputeScore(item, input);
+                                        if (score >= searchPlugin.Settings.Threshold)
+                                        {
+                                            canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
+                                        }
+                                    }
+                                }
+                            }
+                            else if (showAll)
+                            {
+                                canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
+                            }
+
+                        }
+                    }
                     if (cancellationToken.IsCancellationRequested)
                     {
                         searchSw.Stop();
@@ -342,7 +504,7 @@ namespace QuickSearch.ViewModels
 
                     var sw = new Stopwatch();
                     bool done = false;
-                    var passes = 0;
+                    
 
                     while (addedItems < maxResults && !done)
                     {
@@ -360,7 +522,7 @@ namespace QuickSearch.ViewModels
                             do
                             {
                                 sw.Start();
-                                var maxIdx = showAll ? addedItems : FindMax(canditates, cancellationToken);
+                                var maxIdx = FindMax(canditates, cancellationToken);
 
                                 if (maxIdx >= 0)
                                 {
@@ -385,7 +547,8 @@ namespace QuickSearch.ViewModels
                                             SearchResults[addedItems].Score = canditates[maxIdx].Score;
                                             SearchResults[addedItems].Query = canditates[maxIdx].Query;
                                             SearchResults[addedItems].Marked = canditates[maxIdx].Marked;
-                                        } else
+                                        }
+                                        else
                                         {
                                             SearchResults[addedItems] = canditates[maxIdx];
                                         }
@@ -412,7 +575,6 @@ namespace QuickSearch.ViewModels
                                     {
                                         SearchResults.Add(canditates[maxIdx]);
                                     }
-
                                     if (SearchResults.Count > 0 && addedItems == 0)
                                     {
                                         SelectedIndex = 0;
@@ -615,7 +777,7 @@ namespace QuickSearch.ViewModels
                                 }
                                 else
                                 {
-                                    var selected =SelectedIndex;
+                                    var selected = SelectedIndex;
                                     SelectedIndex = -1;
                                     SelectedIndex = selected;
                                 }
@@ -840,7 +1002,7 @@ namespace QuickSearch.ViewModels
 
         public void OnDayChanged(DateTime newTime)
         {
-            
+
         }
     }
 }

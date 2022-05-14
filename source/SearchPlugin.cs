@@ -6,6 +6,7 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
+using QuickSearch.ViewModels;
 using QuickSearch.Views;
 using StartPage.SDK;
 using System;
@@ -558,6 +559,7 @@ namespace QuickSearch
 
         public Popup popup;
         internal SearchWindow searchWindow;
+        internal LuceneSearchViewModel luceneSearchViewModel;
         private UIElement placementTarget;
         VisualBrush brush;
         Window dummyWindow;
@@ -636,43 +638,60 @@ namespace QuickSearch
                 popup = new Popup();
                 popup.Opened += (s, a) =>
                 {
-                    searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
-                    searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
-                    searchWindow.SearchResults.Items.Refresh();
-                    foreach (var assembly in QuickSearchSDK.registeredAssemblies)
+#if DEBUG
+                    try
                     {
-                        if (!Settings.EnabledAssemblies.ContainsKey(assembly))
+#endif
+                        searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
+                        searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
+                        searchWindow.SearchResults.Items.Refresh();
+                        foreach (var assembly in QuickSearchSDK.registeredAssemblies)
                         {
-                            Settings.EnabledAssemblies.Add(assembly, new AssemblyOptions());
+                            if (!Settings.EnabledAssemblies.ContainsKey(assembly))
+                            {
+                                Settings.EnabledAssemblies.Add(assembly, new AssemblyOptions());
+                            }
                         }
-                    }
 
-                    UpdateBorder(Settings.OuterBorderThickness);
+                        UpdateBorder(Settings.OuterBorderThickness);
 
-                    var sources = searchItemSources.Values.AsEnumerable();
+                        var sources = searchItemSources.Values.AsEnumerable();
 
-                    if (Settings.EnableExternalItems)
+                        if (Settings.EnableExternalItems)
+                        {
+                            sources = sources.Concat(QuickSearchSDK.searchItemSources
+                            .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
+                            .Select(e => e.Value));
+                        }
+
+#if DEBUG
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+#endif
+
+                        if (luceneSearchViewModel.navigationStack.Count <= 1)
+                        {
+                            luceneSearchViewModel.QueueIndexUpdate(sources);
+                        }
+                        else
+                        {
+                            luceneSearchViewModel.QueueIndexUpdate();
+                        }
+                        searchWindow.SearchBox.SelectAll();
+                        searchWindow.SearchBox.Focus();
+
+#if DEBUG
+                        logger.Info($"Updated Index in {stopwatch.ElapsedMilliseconds / 1000.0} seconds.");
+                        stopwatch.Stop();
+                    } catch (Exception ex)
                     {
-                        sources = sources.Concat(QuickSearchSDK.searchItemSources
-                        .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
-                        .Select(e => e.Value));
+                        logger.Error(ex, "Failed to initialize search.");
                     }
-
-                    if (searchWindow.navigationStack.Count <= 1)
-                    {
-                        searchWindow.QueueIndexUpdate(sources);
-                    }
-                    else
-                    {
-                        searchWindow.QueueIndexUpdate();
-                    }
-                    searchWindow.SearchBox.SelectAll();
-                    searchWindow.SearchBox.Focus();
+#endif
                 };
 
                 popup.Closed += (s, e) =>
                 {
-                    searchWindow.QueueIndexClear();
+                    luceneSearchViewModel.QueueIndexClear();
                     dummyWindow.Hide();
                 };
 
@@ -681,13 +700,11 @@ namespace QuickSearch
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
                 popup.PlacementTarget = placementTarget;
-                searchWindow = new SearchWindow(this);
-
-                
+                luceneSearchViewModel = new LuceneSearchViewModel(this);
+                searchWindow = new SearchWindow(this, luceneSearchViewModel) { DataContext = luceneSearchViewModel };
 
                 searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
                 searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;
-                searchWindow.DataContext = searchWindow;
                 popup.Child = searchWindow;
                 popup.InputBindings.Add(HotkeyBinding);
                 if (Settings.EnableGlassEffect)
@@ -860,7 +877,7 @@ namespace QuickSearch
         {
             if (viewId == "SearchPopup")
             {
-                var model = new ViewModels.SearchViewModel(this);
+                var model = new ViewModels.LuceneSearchViewModel(this);
                 return new Views.SearchView { DataContext = model };
             }
             return null;

@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuickSearch"
              xmlns:controls="clr-namespace:QuickSearch.Controls"
+             xmlns:vm="clr-namespace:QuickSearch.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="25"
              Effect="{DynamicResource DropShadow}"
-             IsVisibleChanged="UserControl_IsVisibleChanged">
+             IsVisibleChanged="UserControl_IsVisibleChanged"
+             d:DataContext="{d:DesignInstance IsDesignTimeCreatable=False, Type={x:Type vm:LuceneSearchViewModel}}">
     <UserControl.CacheMode>
         <BitmapCache EnableClearType="False" 
                      RenderAtScale="1" 
@@ -181,12 +183,29 @@
                 <RowDefinition Height="Auto" x:Name="WindowGridResultsRow"/>
             </Grid.RowDefinitions>
 
-            <TextBox x:Name="SearchBox" Grid.Row="0" Padding="30,11,11,11" TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_KeyDown"
-                 TextAlignment="Left" VerticalContentAlignment="Center" Background="Transparent" MaxHeight="50">
+            <TextBox x:Name="SearchBox" Grid.Row="0" Padding="30,11,11,11" Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     PreviewKeyDown="SearchBox_KeyDown"
+                     TextAlignment="Left" VerticalContentAlignment="Center" Background="Transparent" MaxHeight="50">
             </TextBox>
-            <TextBox x:Name="PlaceholderText" Grid.Row="0" Padding="{Binding Padding, ElementName=SearchBox}" IsReadOnly="True" IsHitTestVisible="False" BorderBrush="Transparent"
+            <!--<TextBox x:Name="PlaceholderText" Grid.Row="0" Padding="{Binding Padding, ElementName=SearchBox}" IsReadOnly="True" IsHitTestVisible="False" BorderBrush="Transparent"
                      Background="Transparent" TextAlignment="Left" VerticalContentAlignment="Center" 
-                     Text="{DynamicResource LOCSearchLabel}" Opacity="0.4"/>
+                     Text="{DynamicResource LOCSearchLabel}" Opacity="0.4"/>-->
+            <TextBox Text="{DynamicResource LOCSearchLabel}" 
+                       Grid.Row="0" Background="Transparent"
+                       TextAlignment="Left" 
+                       VerticalAlignment="Center" Padding="{Binding ElementName=SearchBox, Path=Padding}" Opacity="0.4" IsHitTestVisible="False">
+                <TextBox.Style>
+                    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                        <Setter Property="Visibility" Value="Hidden"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Input.Length}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
             <TextBlock x:Name="SearchIcon" Text="&#xed11;" Visibility="{Binding IsLoadingResults, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                        FontFamily="{DynamicResource FontIcoFont}" 
                        HorizontalAlignment="Left" 
@@ -278,7 +297,9 @@
                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                      VirtualizingPanel.IsVirtualizing="True"
                      VirtualizingPanel.VirtualizationMode="Recycling"
-                     ItemsSource="{Binding ListDataContext}"
+                     ItemsSource="{Binding SearchResults, Mode=OneWay}"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     SelectionChanged="SearchResults_SelectionChanged"
                      ScrollViewer.CanContentScroll="True"
                      Visibility="Collapsed"
                      Background="Transparent"
