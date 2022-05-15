@@ -243,23 +243,25 @@ namespace QuickSearch.ViewModels
                         maxFields = 0;
                         foreach (var item in items)
                         {
-                            if (!(item is GameSearchItem))
+
+                            var doc = new Document();
+                            doc.Add(new Field("itemId", cachedItems.Count.ToString(), Field.Store.YES, Field.Index.NO));
+                            cachedItems.Add(item);
+                            int i = 0;
+                            foreach (var key in item.Keys)
                             {
-                                var doc = new Document();
-                                doc.Add(new Field("itemId", cachedItems.Count.ToString(), Field.Store.YES, Field.Index.NO));
-                                cachedItems.Add(item);
-                                int i = 0;
-                                foreach (var key in item.Keys)
+                                if (!string.IsNullOrWhiteSpace(key.Key))
                                 {
-                                    if (!string.IsNullOrWhiteSpace(key.Key))
-                                    {
-                                        Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-                                        field.Boost = key.Weight;
-                                        doc.Add(field);
-                                    }
+                                    Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                    field.Boost = key.Weight;
+                                    doc.Add(field);
                                 }
-                                maxFields = Math.Max(maxFields, i);
-                                writer.AddDocument(doc);
+                            }
+                            maxFields = Math.Max(maxFields, i);
+                            writer.AddDocument(doc);
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                break;
                             }
                         }
                         writer.Commit();
@@ -454,6 +456,11 @@ namespace QuickSearch.ViewModels
 
                     var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        goto Cancelled;
+                    }
+
                     if (!string.IsNullOrWhiteSpace(escapedInput))
                     {
                         var fieldQuery = new List<Query>();
@@ -473,6 +480,12 @@ namespace QuickSearch.ViewModels
                         }
 
                         var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            goto Cancelled;
+                        }
+
                         TopDocs topDocs = multiSearcher.Search(disjunction, 100);
 #if DEBUG
                         Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
@@ -485,6 +498,10 @@ namespace QuickSearch.ViewModels
 
                         for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
                         {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                goto Cancelled;
+                            }
 #if DEBUG                   
                             if (i == 0)
                             {
@@ -522,6 +539,7 @@ namespace QuickSearch.ViewModels
                         canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
                     }
 
+                    Cancelled:
 
                     foreach (var searcher in searchers)
                     {
