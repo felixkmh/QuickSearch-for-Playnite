@@ -197,13 +197,7 @@ namespace QuickSearch.ViewModels
             }
             searchItemSources = navigationStack.Peek();
 
-            if (searchItemSources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource)
-            {
-                gameSource.GetItems();
-            }
-
             return searchItemSources
-                .Where(s => !(s is GameSearchSource))
                 .AsParallel()
                 .Select(source => source.GetItems())
                 .Where(items => items != null)

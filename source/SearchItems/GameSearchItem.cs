@@ -361,13 +361,13 @@ namespace QuickSearch.SearchItems
                     SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
                     SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
                 } 
-                    var items = gameItems.Concat(new ISearchItem<string>[] {
+                    IEnumerable<ISearchItem<string>> items = new ISearchItem<string>[] {
                     new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
                         new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
                         "Favorites") {IconChar = QuickSearch.IconChars.Star },
                     new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
                             new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new RecentlyPlayedSource()},
-                            "Recently Played") {IconChar = '\uEEDC' }});
+                            "Recently Played") {IconChar = '\uEEDC' }};
                     if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
                     {
                         items = items.Concat(GetFilterItems(new GameFilter()));
