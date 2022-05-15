@@ -137,6 +137,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\Candidate.cs" />
     <Compile Include="Models\CheapShark.cs" />
+    <Compile Include="MultiDisposer.cs" />
     <Compile Include="MultiFilter.cs" />
     <Compile Include="SearchItems\AddonBrowser.cs" />
     <Compile Include="SearchItems\CheapShark.cs" />

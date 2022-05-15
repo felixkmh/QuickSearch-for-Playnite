@@ -440,118 +440,106 @@ namespace QuickSearch.ViewModels
 
                     MultiSearcher multiSearcher = new MultiSearcher(searchers.ToArray());
 
-
-                    var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            
-                    List<Query> queries = new List<Query>();
-
-                    var specChars = new[] { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~*", "?", ":" };
-
-                    var escapedInput = query;
-
-                    foreach (var specChar in specChars)
+                    using (var disposer = new MultiDisposer(searchers, readers, writers, new[] { multiSearcher }))
                     {
-                        escapedInput = escapedInput.Replace(specChar, "\\" + specChar);
-                    }
+                        var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        List<Query> queries = new List<Query>();
 
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        goto Cancelled;
-                    }
+                        var specChars = new[] { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~*", "?", ":" };
 
-                    if (!string.IsNullOrWhiteSpace(escapedInput))
-                    {
-                        var fieldQuery = new List<Query>();
-                        for(int i = 0; i < maxFields; i++)
+                        var escapedInput = query;
+
+                        foreach (var specChar in specChars)
                         {
-                            var boolQuery = new BooleanQuery();
-                            var pos = 0;
-                            foreach (var term in terms)
-                            {
-                                var queryTerm = new Term($"key{i}", term);
-                                var fuzzy = new FuzzyQuery(queryTerm);
-                                fuzzy.Boost = 5;
-                                boolQuery.Add(fuzzy, Occur.SHOULD);
-                                boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
-                            }
-                            fieldQuery.Add(boolQuery);
+                            escapedInput = escapedInput.Replace(specChar, "\\" + specChar);
                         }
 
-                        var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
+                        var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            goto Cancelled;
+                            return;
                         }
 
-                        TopDocs topDocs = multiSearcher.Search(disjunction, 100);
+                        if (!string.IsNullOrWhiteSpace(escapedInput))
+                        {
+                            var fieldQuery = new List<Query>();
+                            for (int i = 0; i < maxFields; i++)
+                            {
+                                var boolQuery = new BooleanQuery();
+                                var pos = 0;
+                                foreach (var term in terms)
+                                {
+                                    var queryTerm = new Term($"key{i}", term);
+                                    var fuzzy = new FuzzyQuery(queryTerm);
+                                    fuzzy.Boost = 5;
+                                    boolQuery.Add(fuzzy, Occur.SHOULD);
+                                    boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
+                                }
+                                fieldQuery.Add(boolQuery);
+                            }
+
+                            var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
+
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return;
+                            }
+
+                            TopDocs topDocs = multiSearcher.Search(disjunction, 100);
 #if DEBUG
                         Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
 #endif
-                        Dictionary<Guid, ISearchItem<string>> gameItems = null;
-                        if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource1)
-                        {
-                            gameItems = gameSource1.CachedItems;
-                        }
-
-                        for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
-                        {
-                            if (cancellationToken.IsCancellationRequested)
+                            Dictionary<Guid, ISearchItem<string>> gameItems = null;
+                            if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource1)
                             {
-                                goto Cancelled;
+                                gameItems = gameSource1.CachedItems;
                             }
-#if DEBUG                   
+
+                            for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return;
+                                }
+#if DEBUG
                             if (i == 0)
                             {
                                 Debug.WriteLine(multiSearcher.Explain(disjunction, topDocs.ScoreDocs[i].Doc));
                             }
 #endif
-                            ISearchItem<string> item = null;
-                            var resultDoc = multiSearcher.Doc(topDocs.ScoreDocs[i].Doc);
+                                ISearchItem<string> item = null;
+                                var resultDoc = multiSearcher.Doc(topDocs.ScoreDocs[i].Doc);
 
-                            if (resultDoc.Get("gameId") is string gameIdString 
-                                && Guid.TryParse(gameIdString, out var gameId)
-                                && gameItems != null)
-                            {
-                                item = gameItems[gameId];
-                            } else
-                            {
-                                var id = int.Parse(resultDoc.Get("itemId"));
-                                if (cachedItems.Count > id)
+                                if (resultDoc.Get("gameId") is string gameIdString
+                                    && Guid.TryParse(gameIdString, out var gameId)
+                                    && gameItems != null)
                                 {
-                                    item = cachedItems[id];
+                                    item = gameItems[gameId];
                                 }
-                            }
-                            if (item != null)
-                            {
-                                var score = ComputeScore(item, input);
-                                if (score >= searchPlugin.Settings.Threshold)
+                                else
                                 {
-                                    canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
+                                    var id = int.Parse(resultDoc.Get("itemId"));
+                                    if (cachedItems.Count > id)
+                                    {
+                                        item = cachedItems[id];
+                                    }
+                                }
+                                if (item != null)
+                                {
+                                    var score = ComputeScore(item, input);
+                                    if (score >= searchPlugin.Settings.Threshold)
+                                    {
+                                        canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
+                                    }
                                 }
                             }
                         }
-                    }
-                    else if (showAll)
-                    {
-                        canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
-                    }
-
-                    Cancelled:
-
-                    foreach (var searcher in searchers)
-                    {
-                        searcher.Dispose();
-                    }
-                    foreach (var reader in readers)
-                    {
-                        reader.Dispose();
-                    }
-                    foreach(var writer in writers)
-                    {
-                        writer.Dispose();
+                        else if (showAll)
+                        {
+                            canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
+                        }
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -671,7 +659,7 @@ namespace QuickSearch.ViewModels
                                 sw.Stop();
                             } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds <= 8);
                             sw.Stop();
-                        }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal, cancellationToken);
+                        }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
                     }
                     sw.Reset();
                 }
