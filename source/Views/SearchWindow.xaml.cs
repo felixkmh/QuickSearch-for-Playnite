@@ -329,7 +329,8 @@ namespace QuickSearch
                 }
                 else if (action.CloseAfterExecute)
                 {
-                    //searchPlugin.popup.IsOpen = false;
+                    DetailsPopup.IsOpen = false;
+                    searchPlugin.popup.IsOpen = false;
                 }
                 if (SearchResults.SelectedItem is Models.Candidate item)
                 {
