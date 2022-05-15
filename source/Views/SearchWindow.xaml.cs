@@ -361,6 +361,30 @@ namespace QuickSearch
             }
         }
 
+        int lastSelectedAction = -1;
+
+        private void ActionsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ActionsListBox.Items.Count > 0 && ActionsListBox.SelectedIndex == -1)
+            {
+                if (SearchResults.SelectedItem is Models.Candidate candidate2)
+                {
+                    if (candidate2.Item == previouslySelected)
+                    {
+                        ActionsListBox.Dispatcher.BeginInvoke((Action<int>)SelectActionButton, DispatcherPriority.Normal, lastSelectedAction);
+                    }
+                    else
+                    {
+                        ActionsListBox.Dispatcher.BeginInvoke((Action<int>)SelectActionButton, DispatcherPriority.Normal, 0);
+                    }
+                }
+            }
+            if (ActionsListBox.SelectedIndex > -1)
+            {
+                lastSelectedAction = ActionsListBox.SelectedIndex;
+            }
+        }
+
         private void ActionsListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             Decorator border = VisualTreeHelper.GetChild(ActionsListBox, 0) as Decorator;

@@ -234,7 +234,7 @@ namespace QuickSearch.Views
                     }
                 }
             }
-            if (lastSelectedAction > -1)
+            if (ActionsListBox.SelectedIndex > -1)
             {
                 lastSelectedAction = ActionsListBox.SelectedIndex;
             }

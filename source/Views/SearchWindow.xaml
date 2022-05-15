@@ -245,6 +245,7 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
                      PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
+                     SelectionChanged="ActionsListBox_SelectionChanged"
                      Padding="2" Background="{x:Null}" MaxWidth="300"
                      Visibility="Hidden"
                      BorderBrush="Transparent"
