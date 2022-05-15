@@ -1,6 +1,11 @@
-﻿using Playnite.SDK;
+﻿using Lucene.Net.Analysis;
+using Lucene.Net.Documents;
+using Lucene.Net.Index;
+using Lucene.Net.Store;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using QuickSearch.Controls;
+using QuickSearch.ViewModels;
 using QuickSearch.Views;
 using System;
 using System.Collections.Generic;
@@ -18,6 +23,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TheArtOfDev.HtmlRenderer.WPF;
+using LuceneDirectory = Lucene.Net.Store.Directory;
+
 
 namespace QuickSearch.SearchItems
 {
@@ -194,6 +201,21 @@ namespace QuickSearch.SearchItems
 
     public class GameSearchSource : ISearchItemSource<string>
     {
+        public GameSearchSource()
+        {
+            var path = SearchPlugin.Instance.GetPluginUserDataPath();
+            path = Path.Combine(path, "GameIndex");
+            indexDir = FSDirectory.Open(path);
+        }
+
+        Analyzer analyzer = new LuceneSearchViewModel.CustomAnalyzer();
+
+        LuceneDirectory indexDir;
+        public LuceneDirectory LuceneDirectory => indexDir;
+
+        private int maxFields = 0;
+        public int MaxFields => maxFields;
+
         private static Tuple<string, string> GetAssemblyName(string name)
         {
             var sep = name.IndexOf('_');
@@ -263,6 +285,7 @@ namespace QuickSearch.SearchItems
         }
 
         private Dictionary<Guid, ISearchItem<string>> cachedItems = null;
+        public Dictionary<Guid, ISearchItem<string>> CachedItems => cachedItems;
 
         public IEnumerable<ISearchItem<string>> GetItems()
         {
@@ -307,6 +330,33 @@ namespace QuickSearch.SearchItems
 
                     cachedItems = gameItems.OfType<GameSearchItem>().ToDictionary(item => item.Game.Id, item => item as ISearchItem<string>);
 
+                    using (var writer = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+                    {
+                        writer.DeleteAll();
+                        maxFields = 0;
+                        int idx = 0;
+                        foreach (GameSearchItem item in gameItems)
+                        {
+                            var doc = new Document();
+                            doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
+                            doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                            int i = 0;
+                            foreach (var key in item.Keys)
+                            {
+                                if (!string.IsNullOrWhiteSpace(key.Key))
+                                {
+                                    Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                    field.Boost = key.Weight;
+                                    doc.Add(field);
+                                }
+                            }
+                            maxFields = Math.Max(maxFields, i);
+                            writer.AddDocument(doc);
+                        }
+                        writer.Commit();
+                        writer.Optimize();
+                    }
+
                     SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
                     SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
                     SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
@@ -345,27 +395,48 @@ namespace QuickSearch.SearchItems
         {
             if (cachedItems != null)
             {
-                foreach(var item in e.UpdatedItems)
+                using (var writer = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
                 {
-                    cachedItems.Remove(item.OldData.Id);
-                }
-                var updated = e.UpdatedItems.Select(i => i.NewData).Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
-                    .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
-                    .Select(g =>
+                    foreach (var item in e.UpdatedItems)
                     {
-                        var item = new GameSearchItem(g);
-                        if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                        cachedItems.Remove(item.OldData.Id);
+                        writer.DeleteDocuments(new Term("gameId", item.OldData.Id.ToString()));
+                    }
+                    var updated = e.UpdatedItems.Select(i => i.NewData).Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                        .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                        .Select(g =>
                         {
-                            foreach (var action in GameActions)
+                            var item = new GameSearchItem(g);
+                            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
                             {
-                                item.Actions.Add(action);
+                                foreach (var action in GameActions)
+                                {
+                                    item.Actions.Add(action);
+                                }
+                            }
+                            return item;
+                        });
+                    var idx = 0;
+                    foreach (var item in updated)
+                    {
+                        cachedItems[item.Game.Id] = item;
+                        var doc = new Document();
+                        doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
+                        doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                        int i = 0;
+                        foreach (var key in item.Keys)
+                        {
+                            if (!string.IsNullOrWhiteSpace(key.Key))
+                            {
+                                Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                field.Boost = key.Weight;
+                                doc.Add(field);
                             }
                         }
-                        return item;
-                    });
-                foreach(var item in updated)
-                {
-                    cachedItems[item.Game.Id] = item;
+                        maxFields = Math.Max(maxFields, i);
+                        writer.AddDocument(doc);
+                    }
+                    writer.Commit();
                 }
             }
         }
@@ -374,27 +445,48 @@ namespace QuickSearch.SearchItems
         {
             if (cachedItems != null)
             {
-                foreach(var removed in e.RemovedItems)
+                using (var writer = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
                 {
-                    cachedItems.Remove(removed.Id);
-                }
-                var added = e.AddedItems.Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
-                    .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
-                    .Select(g =>
+                    foreach(var removed in e.RemovedItems)
                     {
-                        var item = new GameSearchItem(g);
-                        if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                        cachedItems.Remove(removed.Id);
+                        writer.DeleteDocuments(new Term("gameId", removed.Id.ToString()));
+                    }
+                    var added = e.AddedItems.Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                        .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                        .Select(g =>
                         {
-                            foreach (var action in GameActions)
+                            var item = new GameSearchItem(g);
+                            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
                             {
-                                item.Actions.Add(action);
+                                foreach (var action in GameActions)
+                                {
+                                    item.Actions.Add(action);
+                                }
+                            }
+                            return item;
+                        });
+                    var idx = 0;
+                    foreach(var addedGame in added)
+                    {
+                        cachedItems[addedGame.Game.Id] = addedGame;
+                        var doc = new Document();
+                        doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
+                        doc.Add(new Field("gameId", addedGame.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                        int i = 0;
+                        foreach (var key in addedGame.Keys)
+                        {
+                            if (!string.IsNullOrWhiteSpace(key.Key))
+                            {
+                                Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                field.Boost = key.Weight;
+                                doc.Add(field);
                             }
                         }
-                        return item;
-                    });
-                foreach(var addedGame in added)
-                {
-                    cachedItems[addedGame.Game.Id] = addedGame;
+                        maxFields = Math.Max(maxFields, i);
+                        writer.AddDocument(doc);
+                    }
+                    writer.Commit();
                 }
             }
         }

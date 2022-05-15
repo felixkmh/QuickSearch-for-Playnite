@@ -197,7 +197,14 @@ namespace QuickSearch.ViewModels
             }
             searchItemSources = navigationStack.Peek();
 
-            return searchItemSources.AsParallel()
+            if (searchItemSources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource)
+            {
+                gameSource.GetItems();
+            }
+
+            return searchItemSources
+                .Where(s => !(s is GameSearchSource))
+                .AsParallel()
                 .Select(source => source.GetItems())
                 .Where(items => items != null)
                 .SelectMany(items => items)
@@ -225,9 +232,10 @@ namespace QuickSearch.ViewModels
                 });
 
                 var items = StartIndexUpdate(itemSources, isSubSource);
+
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    SearchItems = items;
+                    // SearchItems = items;
                     using (var writer = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
                     {
                         writer.DeleteAll();
@@ -235,21 +243,24 @@ namespace QuickSearch.ViewModels
                         maxFields = 0;
                         foreach (var item in items)
                         {
-                            var doc = new Document();
-                            doc.Add(new Field("itemId", cachedItems.Count.ToString(), Field.Store.YES, Field.Index.NO));
-                            cachedItems.Add(item);
-                            int i = 0;
-                            foreach (var key in item.Keys)
+                            if (!(item is GameSearchItem))
                             {
-                                if (!string.IsNullOrWhiteSpace(key.Key))
+                                var doc = new Document();
+                                doc.Add(new Field("itemId", cachedItems.Count.ToString(), Field.Store.YES, Field.Index.NO));
+                                cachedItems.Add(item);
+                                int i = 0;
+                                foreach (var key in item.Keys)
                                 {
-                                    Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-                                    field.Boost = key.Weight;
-                                    doc.Add(field);
+                                    if (!string.IsNullOrWhiteSpace(key.Key))
+                                    {
+                                        Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                        field.Boost = key.Weight;
+                                        doc.Add(field);
+                                    }
                                 }
+                                maxFields = Math.Max(maxFields, i);
+                                writer.AddDocument(doc);
                             }
-                            maxFields = Math.Max(maxFields, i);
-                            writer.AddDocument(doc);
                         }
                         writer.Commit();
                     }
@@ -264,7 +275,7 @@ namespace QuickSearch.ViewModels
                 Task.Run(() =>
                 {
                     SpinWait.SpinUntil(() => cancellationToken.IsCancellationRequested || updateTask.IsCompleted || updateTask.IsFaulted);
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current?.Dispatcher?.Invoke(() =>
                     {
                         IsLoadingResults = false;
                     });
@@ -402,77 +413,129 @@ namespace QuickSearch.ViewModels
                         .ToList();
                     }
 
-                    using (var writer = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED)) 
+                    var maxNumFields = maxFields;
+
+                    var writers = new List<IndexWriter>();
+                    var readers = new List<IndexReader>();
+                    var searchers = new List<Searcher>();
+                    if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource)
                     {
-                        using (var reader = writer.GetReader())
+                        var writer = new IndexWriter(gameSource.LuceneDirectory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+                        writers.Add(writer);
+                        var reader = writer.GetReader();
+                        readers.Add(reader);
+                        var searcher = new IndexSearcher(reader);
+                        searchers.Add(searcher);
+                        maxNumFields = Math.Max(maxNumFields, gameSource.MaxFields);
+                    }
+
+                    var defaultWriter = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+                    writers.Add(defaultWriter);
+                    var defaultReader = defaultWriter.GetReader();
+                    readers.Add(defaultReader);
+                    var defaultSearcher = new IndexSearcher(defaultReader);
+                    searchers.Add(defaultSearcher);
+
+                    MultiSearcher multiSearcher = new MultiSearcher(searchers.ToArray());
+
+
+                    var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            
+                    List<Query> queries = new List<Query>();
+
+                    var specChars = new[] { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~*", "?", ":" };
+
+                    var escapedInput = query;
+
+                    foreach (var specChar in specChars)
+                    {
+                        escapedInput = escapedInput.Replace(specChar, "\\" + specChar);
+                    }
+
+                    var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (!string.IsNullOrWhiteSpace(escapedInput))
+                    {
+                        var fieldQuery = new List<Query>();
+                        for(int i = 0; i < maxFields; i++)
                         {
-                            var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                            IndexSearcher searcher = new IndexSearcher(reader);
-
-                            List<Query> queries = new List<Query>();
-
-                            var specChars = new[] { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~*", "?", ":" };
-
-                            var escapedInput = query;
-
-                            foreach (var specChar in specChars)
+                            var boolQuery = new BooleanQuery();
+                            var pos = 0;
+                            foreach (var term in terms)
                             {
-                                escapedInput = escapedInput.Replace(specChar, "\\" + specChar);
+                                var queryTerm = new Term($"key{i}", term);
+                                var fuzzy = new FuzzyQuery(queryTerm);
+                                fuzzy.Boost = 5;
+                                boolQuery.Add(fuzzy, Occur.SHOULD);
+                                boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
                             }
+                            fieldQuery.Add(boolQuery);
+                        }
 
-                            var terms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
+                        TopDocs topDocs = multiSearcher.Search(disjunction, 100);
+#if DEBUG
+                        Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
+#endif
+                        Dictionary<Guid, ISearchItem<string>> gameItems = null;
+                        if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource1)
+                        {
+                            gameItems = gameSource1.CachedItems;
+                        }
 
-                            if (!string.IsNullOrWhiteSpace(escapedInput))
+                        for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
+                        {
+#if DEBUG                   
+                            if (i == 0)
                             {
-                                var fieldQuery = new List<Query>();
-                                for(int i = 0; i < maxFields; i++)
-                                {
-                                    var boolQuery = new BooleanQuery();
-                                    var pos = 0;
-                                    foreach (var term in terms)
-                                    {
-                                        var queryTerm = new Term($"key{i}", term);
-                                        var fuzzy = new FuzzyQuery(queryTerm);
-                                        fuzzy.Boost = 5;
-                                        boolQuery.Add(fuzzy, Occur.SHOULD);
-                                        boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
-                                    }
-                                    fieldQuery.Add(boolQuery);
-                                }
+                                Debug.WriteLine(multiSearcher.Explain(disjunction, topDocs.ScoreDocs[i].Doc));
+                            }
+#endif
+                            ISearchItem<string> item = null;
+                            var resultDoc = multiSearcher.Doc(topDocs.ScoreDocs[i].Doc);
 
-                                var disjunction = new DisjunctionMaxQuery(fieldQuery, 0.9f);
-                                TopDocs topDocs = searcher.Search(disjunction, 100);
-    #if DEBUG
-                                Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
-    #endif
-
-                                for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
+                            if (resultDoc.Get("gameId") is string gameIdString 
+                                && Guid.TryParse(gameIdString, out var gameId)
+                                && gameItems != null)
+                            {
+                                item = gameItems[gameId];
+                            } else
+                            {
+                                var id = int.Parse(resultDoc.Get("itemId"));
+                                if (cachedItems.Count > id)
                                 {
-                                    if (i == 0)
-                                    {
-                                        Debug.WriteLine(searcher.Explain(disjunction, topDocs.ScoreDocs[i].Doc));
-                                    }
-                                    var resultDoc = searcher.Doc(topDocs.ScoreDocs[i].Doc);
-                                    var id = int.Parse(resultDoc.Get("itemId"));
-                                    if (cachedItems.Count > id)
-                                    {
-                                        var item = cachedItems[id];
-                                        var score = ComputeScore(item, input);
-                                        if (score >= searchPlugin.Settings.Threshold)
-                                        {
-                                            canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
-                                        }
-                                    }
+                                    item = cachedItems[id];
                                 }
                             }
-                            else if (showAll)
+                            if (item != null)
                             {
-                                canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
+                                var score = ComputeScore(item, input);
+                                if (score >= searchPlugin.Settings.Threshold)
+                                {
+                                    canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
+                                }
                             }
-
                         }
                     }
+                    else if (showAll)
+                    {
+                        canditates = canditates.Concat(cachedItems.Select(item => new Models.Candidate { Item = item, Query = input })).ToList();
+                    }
+
+
+                    foreach (var searcher in searchers)
+                    {
+                        searcher.Dispose();
+                    }
+                    foreach (var reader in readers)
+                    {
+                        reader.Dispose();
+                    }
+                    foreach(var writer in writers)
+                    {
+                        writer.Dispose();
+                    }
+
                     if (cancellationToken.IsCancellationRequested)
                     {
                         searchSw.Stop();
@@ -522,7 +585,7 @@ namespace QuickSearch.ViewModels
                             do
                             {
                                 sw.Start();
-                                var maxIdx = FindMax(canditates, cancellationToken);
+                                var maxIdx = showAll ? addedItems : FindMax(canditates, cancellationToken);
 
                                 if (maxIdx >= 0)
                                 {
