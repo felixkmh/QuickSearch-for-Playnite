@@ -461,7 +461,7 @@ namespace QuickSearch.ViewModels
                                 foreach (var term in terms)
                                 {
                                     var queryTerm = new Term($"key{i}", term);
-                                    var fuzzy = new FuzzyQuery(queryTerm);
+                                    var fuzzy = new FuzzyQuery(queryTerm, 0.4f, 0);
                                     fuzzy.Boost = 5;
                                     boolQuery.Add(fuzzy, Occur.SHOULD);
                                     boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
@@ -476,7 +476,7 @@ namespace QuickSearch.ViewModels
                                 return;
                             }
 
-                            TopDocs topDocs = multiSearcher.Search(disjunction, 100);
+                            TopDocs topDocs = multiSearcher.Search(disjunction, 111);
 #if DEBUG
                         Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
 #endif
