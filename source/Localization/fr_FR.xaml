@@ -94,12 +94,14 @@
     <sys:String x:Key="LOC_QS_UpdateLibraryX">Mettre à jour la bibliothèque {0}</sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats">Total de téléchargements : {0}, dernier : {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">Créer des tags [QS] au lancement</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Permet d'afficher les couvertures des jeux à la place de leurs icônes lorsqu'elles existent.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Ajouter cette chaine à la fin d'une requête de recherche pour forcer la recherche via &quot;ITAD&quot;. Laisser le champ vide pour désactiver la commande manuelle.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">Activer cette option permet à la fenêtre de recherche, après un bref délai, d'afficher les informations détaillées disponibles pour l'élément sélectionné.</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">Indique le nombre minimal de mots nécessaires pour qu'un jeu se voit assigné un acronyme. Les acronymes sont générés en utilisant la première lettre de chaque mot tandis que les chiffres, y compris romains, sont retenus dans leur intégralité. Une valeur de 0 désactive la génération d'acronymes.</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">Créer un raccourci</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Appuyer sur la touche (+ son modifieur)</sys:String>
