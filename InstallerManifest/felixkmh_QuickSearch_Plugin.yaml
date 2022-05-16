@@ -1,5 +1,11 @@
 AddonId: felixkmh_QuickSearch_Plugin
-Packages:  
+Packages:    
+  - Version: 2.20.1
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-05-17
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.20.1/felixkmh_QuickSearch_Plugin_2_20_1.pext
+    Changelog:
+      - fixed index not being created when switching from fullscreen to desktop mode
   - Version: 2.20.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2022-05-17
