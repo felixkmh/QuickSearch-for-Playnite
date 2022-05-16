@@ -1,6 +1,7 @@
 ﻿using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -339,7 +340,7 @@ namespace QuickSearch.SearchItems
                         {
                             var doc = new Document();
                             doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
-                            doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                            doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
                             int i = 0;
                             foreach (var key in item.Keys)
                             {
@@ -422,7 +423,7 @@ namespace QuickSearch.SearchItems
                         cachedItems[item.Game.Id] = item;
                         var doc = new Document();
                         doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
-                        doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                        doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
                         int i = 0;
                         foreach (var key in item.Keys)
                         {
@@ -472,7 +473,7 @@ namespace QuickSearch.SearchItems
                         cachedItems[addedGame.Game.Id] = addedGame;
                         var doc = new Document();
                         doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
-                        doc.Add(new Field("gameId", addedGame.Game.Id.ToString(), Field.Store.YES, Field.Index.NO));
+                        doc.Add(new Field("gameId", addedGame.Game.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
                         int i = 0;
                         foreach (var key in addedGame.Keys)
                         {
