@@ -56,15 +56,6 @@ namespace QuickSearch
             UpdateUsedFields(api);
             api.Database.Games.ItemUpdated += Games_ItemUpdated;
             api.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
-
-            // create tags
-            if (Settings.EnableTagCreation)
-            {
-                if (Settings.IgnoreTagId == Guid.Empty || PlayniteApi.Database.Tags.Get(Settings.IgnoreTagId) == null)
-                {
-                    Settings.IgnoreTagId = PlayniteApi.Database.Tags.Add("[QS] Ignored").Id;
-                }
-            }
         }
 
         private void UpdateUsedFields(IPlayniteAPI api)
@@ -273,6 +264,15 @@ namespace QuickSearch
             if (!string.IsNullOrWhiteSpace(Settings.GitHubAccessToken))
             {
                 AddonManifestBase.gitHub.Credentials = new Octokit.Credentials(Settings.GitHubAccessToken);
+            }
+
+            // create tags
+            if (Settings.EnableTagCreation)
+            {
+                if (Settings.IgnoreTagId == Guid.Empty || PlayniteApi.Database.Tags.Get(Settings.IgnoreTagId) == null)
+                {
+                    Settings.IgnoreTagId = PlayniteApi.Database.Tags.Add("[QS] Ignored").Id;
+                }
             }
 
             AddPluginSettings();
