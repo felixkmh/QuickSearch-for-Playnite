@@ -411,30 +411,25 @@ namespace QuickSearch.ViewModels
 
                     var maxNumFields = maxFields;
 
-                    var writers = new List<IndexWriter>();
                     var readers = new List<IndexReader>();
                     var searchers = new List<Searcher>();
                     if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource)
                     {
-                        var writer = new IndexWriter(gameSource.LuceneDirectory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-                        writers.Add(writer);
-                        var reader = writer.GetReader();
+                        var reader = IndexReader.Open(gameSource.LuceneDirectory, true);
                         readers.Add(reader);
                         var searcher = new IndexSearcher(reader);
                         searchers.Add(searcher);
                         maxNumFields = Math.Max(maxNumFields, gameSource.MaxFields);
                     }
 
-                    var defaultWriter = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-                    writers.Add(defaultWriter);
-                    var defaultReader = defaultWriter.GetReader();
+                    var defaultReader = IndexReader.Open(indexDir, true);
                     readers.Add(defaultReader);
                     var defaultSearcher = new IndexSearcher(defaultReader);
                     searchers.Add(defaultSearcher);
 
                     MultiSearcher multiSearcher = new MultiSearcher(searchers.ToArray());
 
-                    using (var disposer = new MultiDisposer(searchers, readers, writers, new[] { multiSearcher }))
+                    using (var disposer = new MultiDisposer(searchers, readers, new[] { multiSearcher }))
                     {
                         var words = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
