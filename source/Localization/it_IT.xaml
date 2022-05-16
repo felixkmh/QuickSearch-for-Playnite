@@ -94,12 +94,14 @@
     <sys:String x:Key="LOC_QS_UpdateLibraryX">Aggiorna libreria {0}</sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats">Totale download: {0}, Ultimi: {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">Creare i tag [QS] al momento del lancio</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Se disponibile, utilizzare l'immagine di copertina del gioco invece dell'icona del gioco come icona per i risultati delle partite.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Aggiungere questa stringa alla fine della query di ricerca per forzare la ricerca con ITAD. Lasciare vuoto per disabilitare l'override manuale.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">Se abilitato, mostra ulteriori dettagli per il risultato selezionato dopo un breve ritardo, se disponibile.</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">Numero minimo di parole di cui ha bisogno il nome di un gioco per ottenere un acronimo. Impostando il valore a 0 si disabilitano gli acronimi. Gli acronimi vengono creati utilizzando la lettera iniziale di ogni parola. I numeri, sia romani che decimali, vengono mantenuti completamente.</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">Imposta HotKey</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Premere ora il tasto di scelta rapida (+ modifiche)</sys:String>
