@@ -94,12 +94,14 @@
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">若可用，使用游戏封面艺术而非游戏图标作为游戏结果的图标。</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">将此字符串添加到搜索查询的最后，以强制使用有折扣吗搜索。留空则禁用手动覆盖。</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">若启用且可用，则在短暂延迟后为所选结果显示更多细节。</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">游戏名称缩写所需的最小字数。设为 0 可禁用缩写。缩写由每个词的首字母组合而成。数字，无论是罗马数字还是小数位，都应完全保留。</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">设置热键</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">现在按热键（+修饰键）</sys:String>
