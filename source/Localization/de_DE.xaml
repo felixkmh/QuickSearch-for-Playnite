@@ -94,12 +94,16 @@
     <sys:String x:Key="LOC_QS_UpdateLibraryX">{0} Bibliothek aktualisieren</sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats">Downloads gesamt: {0}, Neueste: {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">Erstelle [QS] Schlagwörter beim Start</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemory">Spielindex im Speicher behalten</sys:String>
 
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Falls verfügbar, nutze Cover-Art statt Spiele-Icon.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Hänge diese Zeichenfolge ans Ende der Suchanfrage um mit ITAD zu suchen. Freilassen um das manuelle Überschreiben zu deaktivieren.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">Falls aktiviert, werden nach einer kurzen Verzögerung weitere Details für das ausgewählte Ergebnis angezeigt, falls verfügbar.</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">Minimale Anzahl von Wörtern, die ein Spielname benötigt, um ein Akronym zu erhalten. Bei einem Wert von 0 werden Akronyme deaktiviert. Akronyme werden mit dem Anfangsbuchstaben eines jeden Wortes gebildet. Zahlen, entweder römische Ziffern oder Dezimalzahlen, werden vollständig beibehalten.</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve">Wenn aktiviert, wird der Suchindex für Spiele vollständig im Speicher gehalten (schnellere Suche, höherer Speicherverbrauch). 
+Andernfalls wird der Index auf der Festplatte gespeichert und nur teilweise im Speicher zwischengespeichert (langsamere Suche, geringerer Speicherverbrauch).
+Playnite muss bei Änderung neu gestartet werden, damit sie wirksam wird.</sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">Setze Hotkey</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">Jetzt Hotkey (+ Modifiers) drücken</sys:String>
