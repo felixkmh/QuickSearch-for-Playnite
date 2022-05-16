@@ -1,5 +1,15 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:  
+  - Version: 2.20.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-05-17
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.20.0/felixkmh_QuickSearch_Plugin_2_20_0.pext
+    Changelog:
+      - using Lucene.NET search engine to speed up searching
+      - added option to keep game search index in memory or on disk
+      - cache game search items to speed up index creation
+      - fixed crash when tag creation is enabled
+      - localization updates
   - Version: 2.19.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2022-05-06
