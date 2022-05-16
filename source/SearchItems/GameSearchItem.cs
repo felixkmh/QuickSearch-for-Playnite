@@ -204,9 +204,15 @@ namespace QuickSearch.SearchItems
     {
         public GameSearchSource()
         {
-            var path = SearchPlugin.Instance.GetPluginUserDataPath();
-            path = Path.Combine(path, "GameIndex");
-            indexDir = FSDirectory.Open(path);
+            if (SearchPlugin.Instance.Settings.KeepGamesInMemory)
+            {
+                indexDir = new RAMDirectory();
+            } else
+            {
+                var path = SearchPlugin.Instance.GetPluginUserDataPath();
+                path = Path.Combine(path, "GameIndex");
+                indexDir = FSDirectory.Open(path);
+            }
         }
 
         Analyzer analyzer = new LuceneSearchViewModel.CustomAnalyzer();
