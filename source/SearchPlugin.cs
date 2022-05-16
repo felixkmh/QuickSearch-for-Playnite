@@ -839,6 +839,12 @@ namespace QuickSearch
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
+            var gameSearchSource = searchItemSources?.OfType<GameSearchSource>().FirstOrDefault();
+
+            gameSearchSource?.LuceneDirectory?.Dispose();
+            luceneSearchViewModel?.indexDir?.Dispose();
+            startPageSearchViewModel?.indexDir?.Dispose();
+
             // Add code to be executed when Playnite is shutting down.
             HotkeyHelper.UnregisterHotKey(mainWindowHandle, HOTKEY_ID);
             SavePluginSettings(Settings);
@@ -873,12 +879,17 @@ namespace QuickSearch
             return args;
         }
 
+        LuceneSearchViewModel startPageSearchViewModel = null;
+
         public object GetStartPageView(string viewId, Guid instanceId)
         {
             if (viewId == "SearchPopup")
             {
-                var model = new ViewModels.LuceneSearchViewModel(this);
-                return new Views.SearchView { DataContext = model };
+                if (startPageSearchViewModel == null)
+                {
+                    startPageSearchViewModel = new ViewModels.LuceneSearchViewModel(this);
+                }
+                return new Views.SearchView { DataContext = startPageSearchViewModel };
             }
             return null;
         }
@@ -890,7 +901,11 @@ namespace QuickSearch
 
         public void OnViewRemoved(string viewId, Guid instanceId)
         {
-            
+            if (viewId == "SearchPopup")
+            {
+                startPageSearchViewModel?.indexDir?.Dispose();
+                startPageSearchViewModel = null;
+            }
         }
     }
 }

@@ -52,7 +52,7 @@ namespace QuickSearch.ViewModels
 
         Analyzer analyzer;
 
-        LuceneDirectory indexDir = null;
+        internal LuceneDirectory indexDir = null;
 
         List<ISearchItem<string>> cachedItems = new List<ISearchItem<string>>();
 
