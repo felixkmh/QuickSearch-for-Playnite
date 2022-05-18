@@ -202,6 +202,9 @@ namespace QuickSearch
         [GenericOption("LOC_QS_KeepIndexInMemory")]
         public bool KeepGamesInMemory { get; set; } = false;
 
+        [GenericOption("LOC_QS_PersistantGameIndex")]
+        public bool PersistantGameIndex { get; set; } = true;
+
         public bool EnableInFullscreenMode { get; set; } = false;
 
         public string GitHubAccessToken { get; set; } = null;

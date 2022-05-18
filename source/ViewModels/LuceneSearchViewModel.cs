@@ -60,24 +60,6 @@ namespace QuickSearch.ViewModels
         {
             searchPlugin = plugin;
 
-            var sources = plugin.searchItemSources.Values.AsEnumerable();
-
-            if (plugin.Settings.EnableExternalItems)
-            {
-                sources = sources.Concat(QuickSearchSDK.searchItemSources
-                .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[plugin.GetAssemblyName(e.Key)].Items)
-                .Select(e => e.Value));
-            }
-
-            if (navigationStack.Count <= 1)
-            {
-                QueueIndexUpdate(sources);
-            }
-            else
-            {
-                QueueIndexUpdate();
-            }
-
             SearchResults.CollectionChanged += SearchResults_CollectionChanged;
 
             analyzer = new CustomAnalyzer();
@@ -263,7 +245,8 @@ namespace QuickSearch.ViewModels
                 }
 #if DEBUG
                 sw.Stop();
-                Debug.WriteLine($"Updated index in {sw.Elapsed.TotalSeconds}s");
+                //Debug.WriteLine($"Updated index in {sw.Elapsed.TotalSeconds}s");
+                SearchPlugin.logger.Info($"Updated Index in {sw.ElapsedMilliseconds / 1000.0} seconds.");
 #endif
             });
             var task = Task.WhenAny(
@@ -480,10 +463,10 @@ namespace QuickSearch.ViewModels
 #if DEBUG
                         Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
 #endif
-                            Dictionary<Guid, ISearchItem<string>> gameItems = null;
-                            if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource gameSource1)
+                            GameSearchSource gameSource1 = null;
+                            if (sources.OfType<GameSearchSource>().FirstOrDefault() is GameSearchSource s)
                             {
-                                gameItems = gameSource1.CachedItems;
+                                gameSource1 = s;
                             }
 
                             for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
@@ -503,9 +486,9 @@ namespace QuickSearch.ViewModels
 
                                 if (resultDoc.Get("gameId") is string gameIdString
                                     && Guid.TryParse(gameIdString, out var gameId)
-                                    && gameItems != null)
+                                    && gameSource1 != null)
                                 {
-                                    item = gameItems[gameId];
+                                    item = gameSource1.GetGameSearchItem(gameId);
                                 }
                                 else
                                 {

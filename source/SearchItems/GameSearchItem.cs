@@ -294,80 +294,138 @@ namespace QuickSearch.SearchItems
         private Dictionary<Guid, ISearchItem<string>> cachedItems = null;
         public Dictionary<Guid, ISearchItem<string>> CachedItems => cachedItems;
 
+        public ISearchItem<string> GetGameSearchItem(Guid guid)
+        {
+            if (cachedItems == null)
+            {
+                cachedItems = new Dictionary<Guid, ISearchItem<string>>();
+            }
+            if (cachedItems.TryGetValue(guid, out ISearchItem<string> item))
+            {
+                return item;
+            } else
+            {
+                var gameItem = new GameSearchItem(SearchPlugin.Instance.PlayniteApi.Database.Games.Get(guid));
+                if (gameItem != null)
+                {
+                    cachedItems[guid] = gameItem;
+                }
+                return gameItem;
+            }
+        }
+
+        private static Mutex getItemsMutex = new Mutex();
+
         public IEnumerable<ISearchItem<string>> GetItems()
         {
-#if DEBUG
-            try
+            lock (getItemsMutex)
             {
+#if DEBUG
+                SearchPlugin.logger.Info($"Start of GameSearchSource.GetItems().");
+                Stopwatch sw = Stopwatch.StartNew();
+                Stopwatch total = Stopwatch.StartNew();
+                try
+                {
 #endif
-                GameActions.Clear();
-                if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
-                {
-                    foreach (var item in QuickSearchSDK.gameActions)
+                    GameActions.Clear();
+                    if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
                     {
-                        var extracted = GetAssemblyName(item.Key);
-                        var assembly = extracted.Item1;
-                        var name = extracted.Item2;
-                        if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
+                        foreach (var item in QuickSearchSDK.gameActions)
                         {
-                            GameActions.Add(new GameAction() { Name = name, Action = item.Value });
+                            var extracted = GetAssemblyName(item.Key);
+                            var assembly = extracted.Item1;
+                            var name = extracted.Item2;
+                            if (SearchPlugin.Instance.Settings.EnabledAssemblies[assembly].Actions)
+                            {
+                                GameActions.Add(new GameAction() { Name = name, Action = item.Value });
+                            }
                         }
                     }
-                }
+#if DEBUG
+                    SearchPlugin.logger.Info($"Retrieved game actions in {sw.ElapsedMilliseconds}ms.");
+                    sw.Restart();
+#endif
 
-                var gameItems = cachedItems?.Values.AsEnumerable();
-                if (gameItems == null)
-                {
-                    gameItems = SearchPlugin.Instance.PlayniteApi.Database.Games
-                        .AsParallel()
-                        .Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
-                        .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
-                        .Select(g =>
-                        {
-                            var item = new GameSearchItem(g);
-                            if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
-                            {
-                                foreach (var action in GameActions)
-                                {
-                                    item.Actions.Add(action);
-                                }
-                            }
-                            return item;
-                        });
-
-                    cachedItems = gameItems.OfType<GameSearchItem>().ToDictionary(item => item.Game.Id, item => item as ISearchItem<string>);
-
-                    using (var writer = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+                    var gameItems = cachedItems?.Values.AsEnumerable();
+                    if (gameItems == null)
                     {
-                        writer.DeleteAll();
-                        maxFields = 0;
-                        int idx = 0;
-                        foreach (GameSearchItem item in gameItems)
+                        cachedItems = new Dictionary<Guid, ISearchItem<string>>();
+
+                        IndexWriter indexWriter = null;
+                        if (SearchPlugin.Instance.Settings.PersistantGameIndex && !SearchPlugin.Instance.Settings.KeepGamesInMemory)
                         {
-                            var doc = new Document();
-                            doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
-                            doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                            int i = 0;
-                            foreach (var key in item.Keys)
+                            indexWriter = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+                        }
+                        else
+                        {
+                            indexWriter = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+                        }
+
+                        using (var writer = indexWriter)
+                        {
+                            if (writer.NumDocs() == 0)
                             {
-                                if (!string.IsNullOrWhiteSpace(key.Key))
+                                gameItems = SearchPlugin.Instance.PlayniteApi.Database.Games
+                                    .AsParallel()
+                                    .Where(g => !g.Hidden || !SearchPlugin.Instance.Settings.IgnoreHiddenGames)
+                                    .Where(g => (!g.TagIds?.Contains(SearchPlugin.Instance.Settings.IgnoreTagId)) ?? true)
+                                    .Select(g =>
+                                    {
+                                        var item = new GameSearchItem(g);
+                                        if (SearchPlugin.Instance.Settings.EnableExternalGameActions)
+                                        {
+                                            foreach (var action in GameActions)
+                                            {
+                                                item.Actions.Add(action);
+                                            }
+                                        }
+                                        return item;
+                                    }).ToList();
+
+#if DEBUG
+                                SearchPlugin.logger.Info($"Created {gameItems.Count()} GameSearchItems in {sw.ElapsedMilliseconds}ms.");
+                                sw.Restart();
+#endif
+
+                                cachedItems = gameItems.AsParallel().OfType<GameSearchItem>().ToDictionary(item => item.Game.Id, item => item as ISearchItem<string>);
+                                maxFields = 0;
+                                int idx = 0;
+                                foreach (GameSearchItem item in gameItems)
                                 {
-                                    Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-                                    field.Boost = key.Weight;
-                                    doc.Add(field);
+                                    var doc = new Document();
+                                    doc.Add(new Field("itemId", idx++.ToString(), Field.Store.YES, Field.Index.NO));
+                                    doc.Add(new Field("gameId", item.Game.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+                                    int i = 0;
+                                    foreach (var key in item.Keys)
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(key.Key))
+                                        {
+                                            Field field = new Field($"key{i++}", false, key.Key, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+                                            field.Boost = key.Weight;
+                                            doc.Add(field);
+                                        }
+                                    }
+                                    maxFields = Math.Max(maxFields, i);
+                                    writer.AddDocument(doc);
                                 }
                             }
-                            maxFields = Math.Max(maxFields, i);
-                            writer.AddDocument(doc);
-                        }
-                        writer.Commit();
-                        writer.Optimize();
-                    }
+                            else
+                            {
+                                maxFields = 3;
+                            }
 
-                    SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
-                    SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
-                    SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
-                } 
+                            writer.Commit();
+                        }
+
+#if DEBUG
+                        SearchPlugin.logger.Info($"Build game index in {sw.ElapsedMilliseconds}ms.");
+                        sw.Restart();
+#endif
+
+                        SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
+                        SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+                        SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
+                    }
                     IEnumerable<ISearchItem<string>> items = new ISearchItem<string>[] {
                     new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
                         new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
@@ -377,22 +435,38 @@ namespace QuickSearch.SearchItems
                             "Recently Played") {IconChar = '\uEEDC' }};
                     if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
                     {
-                        items = items.Concat(GetFilterItems(new GameFilter()));
-                    }
-                    
-                return items;
+                        List<ISearchItem<string>> filters = GetFilterItems(new GameFilter()).ToList();
+                        items = items.Concat(filters);
 #if DEBUG
-            } catch (Exception ex)
-            {
-                SearchPlugin.logger.Error(ex, "Failed to create game search items.");
-                return null;
-            }
+                        SearchPlugin.logger.Info($"Created Game {filters.Count} filters in {sw.ElapsedMilliseconds}ms.");
+                        sw.Stop();
 #endif
+                    }
+
+#if DEBUG
+                    SearchPlugin.logger.Info($"End of GameSearchSource.GetItems() reached after {total.ElapsedMilliseconds}ms.");
+                    total.Stop();
+#endif
+                    return items;
+#if DEBUG
+                }
+                catch (Exception ex)
+                {
+                    SearchPlugin.logger.Error(ex, "Failed to create game search items.");
+                    return null;
+                }
+#endif
+            }
         }
 
         private void Settings_SettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)
         {
             cachedItems = null;
+            using (var writer = new IndexWriter(indexDir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+            {
+                writer.DeleteAll();
+                writer.Commit();
+            }
             SearchPlugin.Instance.PlayniteApi.Database.Games.ItemCollectionChanged -= Games_ItemCollectionChanged;
             SearchPlugin.Instance.PlayniteApi.Database.Games.ItemUpdated -= Games_ItemUpdated;
             SearchPlugin.Instance.Settings.SettingsChanged -= Settings_SettingsChanged;
@@ -505,51 +579,49 @@ namespace QuickSearch.SearchItems
             {
                 prefix = $"{previousName}{seperator}";
             }
-            var games = SearchPlugin.Instance.PlayniteApi.Database.Games.AsParallel();
+            string libraryLabel = ResourceProvider.GetString("LOC_QS_Library");
             IEnumerable<ISearchItem<string>> items = SearchPlugin.Instance.UsedSources
-                //.Where(s => previousFilter.IsEmpty || games.AsParallel().Any(previousFilter.CopyAndAdd(g => g.Source == s, mode).Eval))
                 .Select(s =>
                 {
                     var source = s;
                     GameFilter filter = new GameFilter(g => g.Source == source, previousFilter, mode);
-                    var item = new FilterItem(s.Name, prefix, ResourceProvider.GetString("LOC_QS_Library"), filter, seperator);
+                    var item = new FilterItem(s.Name, prefix, libraryLabel, filter, seperator);
                     return item;
                 });
+            string platformLabel = ResourceProvider.GetString("LOC_QS_Platform");
             items = items.Concat(SearchPlugin.Instance.UsedPlatforms
-                //.Where(p => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.Platforms?.FirstOrDefault() == p, mode).Eval))
                 .Select(p =>
                 {
                     var platform = p;
                     GameFilter filter = new GameFilter(g => g.Platforms?.FirstOrDefault() == platform, previousFilter, mode);
-                    var item = new FilterItem(p.Name, prefix, ResourceProvider.GetString("LOC_QS_Platform"), filter, seperator);
+                    var item = new FilterItem(p.Name, prefix, platformLabel, filter, seperator);
                     return item;
                 }));
+            string genresLabel = ResourceProvider.GetString("LOC_QS_Genre");
             items = items.Concat(SearchPlugin.Instance.UsedGenres
-                //.Where(gr => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.Genres?.Contains(gr) ?? false, mode).Eval))
                 .Select(gr =>
                 {
                     GameFilter filter = new GameFilter(g => g.Genres?.Contains(gr) ?? false, previousFilter, mode);
-                    var item = new FilterItem(gr.Name, prefix, ResourceProvider.GetString("LOC_QS_Genre"), filter, seperator);
+                    var item = new FilterItem(gr.Name, prefix, genresLabel, filter, seperator);
                     return item;
                 }));
+            string categoryLabel = ResourceProvider.GetString("LOC_QS_Category");
             items = items.Concat(SearchPlugin.Instance.UsedCategories
-                //.Where(c => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.Categories?.Contains(c) ?? false, mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => g.Categories?.Contains(c) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOC_QS_Category"), filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, categoryLabel, filter, seperator);
                     return item;
                 }));
+            string companyLabel = ResourceProvider.GetString("LOC_QS_Company");
             items = items.Concat(SearchPlugin.Instance.UsedCompanies
-                //.Where(c => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOC_QS_Company"), filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, companyLabel, filter, seperator);
                     return item;
                 }));
             items = items.Concat((new[] { true, false })
-                //.Where(c => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.IsInstalled == c, mode).Eval))
                 .Select(c =>
                 {
                     var name = c ? ResourceProvider.GetString("LOC_QS_Installed") : ResourceProvider.GetString("LOC_QS_Uninstalled");
@@ -557,20 +629,20 @@ namespace QuickSearch.SearchItems
                     var item = new FilterItem(name, prefix, ResourceProvider.GetString("LOC_QS_InstallationStatus"), filter, seperator);
                     return item;
                 }));
+            string tagLabel = ResourceProvider.GetString("LOCTagLabel");
             items = items.Concat(SearchPlugin.Instance.UsedTags
-                //.Where(c => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.TagIds?.Contains(c.Id) ?? false, mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => g.TagIds?.Contains(c.Id) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOCTagLabel"), filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, tagLabel, filter, seperator);
                     return item;
                 }));
+            string featureLabel = ResourceProvider.GetString("LOCFeatureLabel");
             items = items.Concat(SearchPlugin.Instance.UsedFeatures
-                //.Where(c => previousFilter.IsEmpty || games.Any(previousFilter.CopyAndAdd(g => g.FeatureIds?.Contains(c.Id) ?? false, mode).Eval))
                 .Select(c =>
                 {
                     GameFilter filter = new GameFilter(g => g.FeatureIds?.Contains(c.Id) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, ResourceProvider.GetString("LOCFeatureLabel"), filter, seperator);
+                    var item = new FilterItem(c.Name, prefix, featureLabel, filter, seperator);
                     return item;
                 }));
             return items.AsParallel();
