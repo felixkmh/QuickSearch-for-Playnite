@@ -53,7 +53,6 @@ namespace QuickSearch
             Settings = new SearchSettings(this);
             instance = this;
             Properties = new GenericPluginProperties { HasSettings = true };
-            UpdateUsedFields(api);
             api.Database.Games.ItemUpdated += Games_ItemUpdated;
             api.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
         }
@@ -258,6 +257,7 @@ namespace QuickSearch
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            UpdateUsedFields(PlayniteApi);
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
 
@@ -655,33 +655,11 @@ namespace QuickSearch
 
                         UpdateBorder(Settings.OuterBorderThickness);
 
-                        var sources = searchItemSources.Values.AsEnumerable();
-
-                        if (Settings.EnableExternalItems)
-                        {
-                            sources = sources.Concat(QuickSearchSDK.searchItemSources
-                            .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
-                            .Select(e => e.Value));
-                        }
-
-#if DEBUG
-                        Stopwatch stopwatch = Stopwatch.StartNew();
-#endif
-
-                        if (luceneSearchViewModel.navigationStack.Count <= 1)
-                        {
-                            luceneSearchViewModel.QueueIndexUpdate(sources);
-                        }
-                        else
-                        {
-                            luceneSearchViewModel.QueueIndexUpdate();
-                        }
+                        
                         searchWindow.SearchBox.SelectAll();
                         searchWindow.SearchBox.Focus();
 
 #if DEBUG
-                        logger.Info($"Updated Index in {stopwatch.ElapsedMilliseconds / 1000.0} seconds.");
-                        stopwatch.Stop();
                     } catch (Exception ex)
                     {
                         logger.Error(ex, "Failed to initialize search.");
@@ -720,6 +698,26 @@ namespace QuickSearch
                     Width = 0,
                     Height = 0,
                 };
+            } 
+            if (!popup.IsOpen)
+            {
+                var sources = searchItemSources.Values.AsEnumerable();
+
+                if (Settings.EnableExternalItems)
+                {
+                    sources = sources.Concat(QuickSearchSDK.searchItemSources
+                    .Where(e => SearchPlugin.Instance.Settings.EnabledAssemblies[GetAssemblyName(e.Key)].Items)
+                    .Select(e => e.Value));
+                }
+
+                if (luceneSearchViewModel.navigationStack.Count <= 1)
+                {
+                    luceneSearchViewModel.QueueIndexUpdate(sources);
+                }
+                else
+                {
+                    luceneSearchViewModel.QueueIndexUpdate();
+                }
             }
             if (mainWindow.IsActive && mainWindow.WindowState != WindowState.Minimized)
             {
