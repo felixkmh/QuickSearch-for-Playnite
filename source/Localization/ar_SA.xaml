@@ -95,8 +95,10 @@
     <sys:String x:Key="LOC_QS_DownloadStats">مجموع التنزيلات: {0}، الأحدث: {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">إنشاء وسوم [QS] عند التشغيل</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
 
     <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">إذا كانت متاحة، استخدم غطاء اللعبة بدلاً من أيقونة اللعبة.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">أضف هذه السلسلة إلى نهاية استعلام البحث لإجبار البحث مع ITAD. اتركها فارغة لتعطيل التجاوز اليدوي.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">إذا تم تفعيله، يعرض مزيدًا من التفاصيل للنتيجة المحددة بعد مهلة قصيرة، إذا كان ذلك متاحًا.</sys:String>
