@@ -95,8 +95,10 @@
     <sys:String x:Key="LOC_QS_DownloadStats">Total de téléchargements : {0}, dernier : {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">Créer des tags [QS] au lancement</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
 
     <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Permet d'afficher les couvertures des jeux à la place de leurs icônes lorsqu'elles existent.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Ajouter cette chaine à la fin d'une requête de recherche pour forcer la recherche via &quot;ITAD&quot;. Laisser le champ vide pour désactiver la commande manuelle.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">Activer cette option permet à la fenêtre de recherche, après un bref délai, d'afficher les informations détaillées disponibles pour l'élément sélectionné.</sys:String>

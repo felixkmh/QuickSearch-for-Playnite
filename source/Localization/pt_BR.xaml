@@ -95,8 +95,10 @@
     <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
 
     <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Se disponível, use a arte da capa do jogo em vez do ícone do jogo como o ícone para os resultados do jogo.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Adicione esta string ao final da busca para forçar a busca com ITAD. Deixe em branco para desativar a sobreescrita manual.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">Se ativado, mostrar mais detalhes para o resultado selecionado após um curto atraso, se disponível.</sys:String>
