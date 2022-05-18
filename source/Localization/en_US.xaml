@@ -95,8 +95,10 @@
     <sys:String x:Key="LOC_QS_DownloadStats">Total Downloads: {0}, Latest: {1}</sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation">Create [QS] tags on launch</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory">Keep game index in memory</sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex">Use persistant game index</sys:String>
 
     <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">If enabled, the game search index is stored on disk, and re-used the next time Playnite starts. Otherwise, it will be created from scratch each time Playnite starts.</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">Add this string to the end of the search query to force searching with ITAD. Leave empty to disable manual overriding.</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">If enabled, show more details for the selected result after a short delay, if available.</sys:String>
