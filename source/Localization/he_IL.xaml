@@ -95,8 +95,10 @@
     <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
     <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
 
     <!--Tool Tips-->
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip"></sys:String>
