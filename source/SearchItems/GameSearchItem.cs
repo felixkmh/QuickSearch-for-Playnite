@@ -427,27 +427,28 @@ namespace QuickSearch.SearchItems
                         SearchPlugin.Instance.Settings.SettingsChanged += Settings_SettingsChanged;
                     }
                     IEnumerable<ISearchItem<string>> items = new ISearchItem<string>[] {
-                    new CommandItem(Application.Current.FindResource("LOCQuickFilterFavorites") as string,
+                    new CommandItem(ResourceProvider.GetString("LOCQuickFilterFavorites"),
                         new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new FavoritesSource()},
                         "Favorites") {IconChar = QuickSearch.IconChars.Star },
-                    new CommandItem(Application.Current.FindResource("LOCQuickFilterRecentlyPlayed") as string,
+                    new CommandItem(ResourceProvider.GetString("LOCQuickFilterRecentlyPlayed"),
                             new SubItemsAction() { CloseAfterExecute = false, Name = ResourceProvider.GetString("LOC_QS_ShowAction"), SubItemSource = new RecentlyPlayedSource()},
                             "Recently Played") {IconChar = '\uEEDC' }};
                     if (SearchPlugin.Instance.Settings.EnableFilterSubSources)
                     {
-                        List<ISearchItem<string>> filters = GetFilterItems(new GameFilter()).ToList();
+                        var filters = GetFilterItems(new GameFilter());
                         items = items.Concat(filters);
 #if DEBUG
-                        SearchPlugin.logger.Info($"Created Game {filters.Count} filters in {sw.ElapsedMilliseconds}ms.");
+                        var filterCount = filters.Count();
+                        SearchPlugin.logger.Info($"Created Game {filterCount} filters in {sw.ElapsedMilliseconds}ms.");
                         sw.Stop();
 #endif
-                    }
+                }
 
 #if DEBUG
                     SearchPlugin.logger.Info($"End of GameSearchSource.GetItems() reached after {total.ElapsedMilliseconds}ms.");
                     total.Stop();
 #endif
-                    return items;
+                return items;
 #if DEBUG
                 }
                 catch (Exception ex)
@@ -579,73 +580,67 @@ namespace QuickSearch.SearchItems
             {
                 prefix = $"{previousName}{seperator}";
             }
+            var searchItems = new List<ISearchItem<string>>();
             string libraryLabel = ResourceProvider.GetString("LOC_QS_Library");
-            IEnumerable<ISearchItem<string>> items = SearchPlugin.Instance.UsedSources
-                .Select(s =>
-                {
-                    var source = s;
-                    GameFilter filter = new GameFilter(g => g.Source == source, previousFilter, mode);
-                    var item = new FilterItem(s.Name, prefix, libraryLabel, filter, seperator);
-                    return item;
-                });
+            foreach (var s in SearchPlugin.Instance.UsedSources.Keys)
+            {
+                var source = s;
+                GameFilter filter = new GameFilter(g => g.Source == source, previousFilter, mode);
+                var item = new FilterItem(s.Name, prefix, libraryLabel, filter, seperator);
+                searchItems.Add(item);
+            }
             string platformLabel = ResourceProvider.GetString("LOC_QS_Platform");
-            items = items.Concat(SearchPlugin.Instance.UsedPlatforms
-                .Select(p =>
-                {
-                    var platform = p;
-                    GameFilter filter = new GameFilter(g => g.Platforms?.FirstOrDefault() == platform, previousFilter, mode);
-                    var item = new FilterItem(p.Name, prefix, platformLabel, filter, seperator);
-                    return item;
-                }));
+            foreach(var p in SearchPlugin.Instance.UsedPlatforms.Keys)
+            {
+                var platform = p;
+                GameFilter filter = new GameFilter(g => g.Platforms?.FirstOrDefault() == platform, previousFilter, mode);
+                var item = new FilterItem(p.Name, prefix, platformLabel, filter, seperator);
+                searchItems.Add(item);
+            }
+
             string genresLabel = ResourceProvider.GetString("LOC_QS_Genre");
-            items = items.Concat(SearchPlugin.Instance.UsedGenres
-                .Select(gr =>
-                {
-                    GameFilter filter = new GameFilter(g => g.Genres?.Contains(gr) ?? false, previousFilter, mode);
-                    var item = new FilterItem(gr.Name, prefix, genresLabel, filter, seperator);
-                    return item;
-                }));
+            foreach(var gr in SearchPlugin.Instance.UsedGenres.Keys)   
+            {
+                GameFilter filter = new GameFilter(g => g.Genres?.Contains(gr) ?? false, previousFilter, mode);
+                var item = new FilterItem(gr.Name, prefix, genresLabel, filter, seperator);
+                searchItems.Add(item);
+            }
             string categoryLabel = ResourceProvider.GetString("LOC_QS_Category");
-            items = items.Concat(SearchPlugin.Instance.UsedCategories
-                .Select(c =>
-                {
-                    GameFilter filter = new GameFilter(g => g.Categories?.Contains(c) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, categoryLabel, filter, seperator);
-                    return item;
-                }));
+            foreach(var c in SearchPlugin.Instance.UsedCategories.Keys)
+            {
+                GameFilter filter = new GameFilter(g => g.Categories?.Contains(c) ?? false, previousFilter, mode);
+                var item = new FilterItem(c.Name, prefix, categoryLabel, filter, seperator);
+                searchItems.Add(item);
+            }
             string companyLabel = ResourceProvider.GetString("LOC_QS_Company");
-            items = items.Concat(SearchPlugin.Instance.UsedCompanies
-                .Select(c =>
-                {
-                    GameFilter filter = new GameFilter(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, companyLabel, filter, seperator);
-                    return item;
-                }));
-            items = items.Concat((new[] { true, false })
-                .Select(c =>
-                {
-                    var name = c ? ResourceProvider.GetString("LOC_QS_Installed") : ResourceProvider.GetString("LOC_QS_Uninstalled");
-                    GameFilter filter = new GameFilter(g => g.IsInstalled == c, previousFilter, mode);
-                    var item = new FilterItem(name, prefix, ResourceProvider.GetString("LOC_QS_InstallationStatus"), filter, seperator);
-                    return item;
-                }));
+            foreach (var c in SearchPlugin.Instance.UsedCompanies.Keys)
+            {
+                GameFilter filter = new GameFilter(g => (g.PublisherIds?.Contains(c.Id) ?? false) || (g.DeveloperIds?.Contains(c.Id) ?? false), previousFilter, mode);
+                var item = new FilterItem(c.Name, prefix, companyLabel, filter, seperator);
+                searchItems.Add(item);
+            }   
+            foreach (var c in (new[] { true, false }))
+            {
+                var name = c ? ResourceProvider.GetString("LOC_QS_Installed") : ResourceProvider.GetString("LOC_QS_Uninstalled");
+                GameFilter filter = new GameFilter(g => g.IsInstalled == c, previousFilter, mode);
+                var item = new FilterItem(name, prefix, ResourceProvider.GetString("LOC_QS_InstallationStatus"), filter, seperator);
+                searchItems.Add(item);
+            }   
             string tagLabel = ResourceProvider.GetString("LOCTagLabel");
-            items = items.Concat(SearchPlugin.Instance.UsedTags
-                .Select(c =>
-                {
-                    GameFilter filter = new GameFilter(g => g.TagIds?.Contains(c.Id) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, tagLabel, filter, seperator);
-                    return item;
-                }));
+            foreach(var c in SearchPlugin.Instance.UsedTags.Keys)
+            {
+                GameFilter filter = new GameFilter(g => g.TagIds?.Contains(c.Id) ?? false, previousFilter, mode);
+                var item = new FilterItem(c.Name, prefix, tagLabel, filter, seperator);
+                searchItems.Add(item);
+            }
             string featureLabel = ResourceProvider.GetString("LOCFeatureLabel");
-            items = items.Concat(SearchPlugin.Instance.UsedFeatures
-                .Select(c =>
-                {
-                    GameFilter filter = new GameFilter(g => g.FeatureIds?.Contains(c.Id) ?? false, previousFilter, mode);
-                    var item = new FilterItem(c.Name, prefix, featureLabel, filter, seperator);
-                    return item;
-                }));
-            return items.AsParallel();
+            foreach(var c in SearchPlugin.Instance.UsedFeatures.Keys)
+            {
+                GameFilter filter = new GameFilter(g => g.FeatureIds?.Contains(c.Id) ?? false, previousFilter, mode);
+                var item = new FilterItem(c.Name, prefix, featureLabel, filter, seperator);
+                searchItems.Add(item);
+            }
+            return searchItems;
         }
     }
 
@@ -887,7 +882,7 @@ namespace QuickSearch.SearchItems
 
         public string TopLeft => name;
 
-        public string TopRight => SearchPlugin.Instance.PlayniteApi.Database.Games.Count(filter.Eval).ToString();
+        public string TopRight { get; set; } = null;
 
         public string BottomLeft => string.Format(ResourceProvider.GetString("LOC_QS_XFilter"), kind);
 

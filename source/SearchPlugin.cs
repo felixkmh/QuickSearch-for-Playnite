@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -57,30 +59,77 @@ namespace QuickSearch
             api.Database.Games.ItemCollectionChanged += Games_ItemCollectionChanged;
         }
 
-        private void UpdateUsedFields(IPlayniteAPI api)
+        private void InitializeUsedFields(IPlayniteAPI api)
         {
-            UsedSources = api.Database.Sources.Where(p => api.Database.Games.Any(g => g.SourceId == p.Id));
-            UsedGenres = api.Database.Genres.Where(p => api.Database.Games.Any(g => g.GenreIds?.Contains(p.Id) ?? false));
-            UsedFeatures = api.Database.Features.Where(p => api.Database.Games.Any(g => g.FeatureIds?.Contains(p.Id) ?? false));
-            UsedPlatforms = api.Database.Platforms.Where(p => api.Database.Games.Any(g => g.PlatformIds?.Contains(p.Id) ?? false));
-            UsedTags = api.Database.Tags.Where(p => api.Database.Games.Any(g => g.TagIds?.Contains(p.Id) ?? false));
-            UsedCategories = api.Database.Categories.Where(p => api.Database.Games.Any(g => g.TagIds?.Contains(p.Id) ?? false));
-            UsedCompanies = api.Database.Companies.Where(p => api.Database.Games.Any(g => (g.DeveloperIds?.Contains(p.Id) ?? false) || (g.PublisherIds?.Contains(p.Id) ?? false)));
+            Task.Run(() =>
+            {
+                UsedSources.Clear();
+                UsedGenres.Clear();
+                UsedFeatures.Clear();
+                UsedPlatforms.Clear();
+                UsedTags.Clear();
+                UsedCategories.Clear();
+                UsedCompanies.Clear();
+                foreach (var game in api.Database.Games)
+                {
+                    if (game.Source is GameSource source) { if (UsedSources.ContainsKey(source)) { UsedSources[source]++; } else { UsedSources[source] = 1; } }
+                    game.Genres?.ForEach(g => { if (UsedGenres.ContainsKey(g)) { UsedGenres[g]++; } else { UsedGenres[g] = 1; } });
+                    game.Features?.ForEach(f => { if (UsedFeatures.ContainsKey(f)) { UsedFeatures[f]++; } else { UsedFeatures[f] = 1; } });
+                    game.Platforms?.ForEach(p => { if (UsedPlatforms.ContainsKey(p)) { UsedPlatforms[p]++; } else { UsedPlatforms[p] = 1; } });
+                    game.Tags?.ForEach(p => { if (UsedTags.ContainsKey(p)) { UsedTags[p]++; } else { UsedTags[p] = 1; } });
+                    game.Categories?.ForEach(c => { if (UsedCategories.ContainsKey(c)) { UsedCategories[c]++; } else { UsedCategories[c] = 1; } });
+                    game.Developers?.ForEach(d => { if (UsedCompanies.ContainsKey(d)) { UsedCompanies[d]++; } else { UsedCompanies[d] = 1; } });
+                    game.Publishers?.ForEach(p => { if (UsedCompanies.ContainsKey(p)) { UsedCompanies[p]++; } else { UsedCompanies[p] = 1; } });
+                }
+            });
         }
 
-        public IEnumerable<GameSource> UsedSources { get; private set; }
-        public IEnumerable<Genre> UsedGenres { get; private set; }
-        public IEnumerable<GameFeature> UsedFeatures { get; private set; }
-        public IEnumerable<Platform> UsedPlatforms { get; private set; }
-        public IEnumerable<Tag> UsedTags { get; private set; }
-        public IEnumerable<Category> UsedCategories { get; private set; }
-        public IEnumerable<Company> UsedCompanies { get; private set; }
+        private void UpdateUsedFields (IPlayniteAPI api, IEnumerable<Game> added, IEnumerable<Game> removed)
+        {
+            foreach (var game in removed)
+            {
+                if (game.Source is GameSource source) { if (UsedSources.ContainsKey(source)) { UsedSources[source]--; } }
+                game.Genres?.ForEach(g => { if (UsedGenres.ContainsKey(g)) { UsedGenres[g]--; } });
+                game.Features?.ForEach(f => { if (UsedFeatures.ContainsKey(f)) { UsedFeatures[f]--; } });
+                game.Platforms?.ForEach(p => { if (UsedPlatforms.ContainsKey(p)) { UsedPlatforms[p]--; } });
+                game.Tags?.ForEach(p => { if (UsedTags.ContainsKey(p)) { UsedTags[p]--; } });
+                game.Categories?.ForEach(c => { if (UsedCategories.ContainsKey(c)) { UsedCategories[c]--; } });
+                game.Developers?.ForEach(d => { if (UsedCompanies.ContainsKey(d)) { UsedCompanies[d]--; } });
+                game.Publishers?.ForEach(p => { if (UsedCompanies.ContainsKey(p)) { UsedCompanies[p]--; } });
+            }
+            foreach (var game in added)
+            {
+                if (game.Source is GameSource source) { if (UsedSources.ContainsKey(source)) { UsedSources[source]++; } else { UsedSources[source] = 1; } }
+                game.Genres?.ForEach(g => { if (UsedGenres.ContainsKey(g)) { UsedGenres[g]++; } else { UsedGenres[g] = 1; } });
+                game.Features?.ForEach(f => { if (UsedFeatures.ContainsKey(f)) { UsedFeatures[f]++; } else { UsedFeatures[f] = 1; } });
+                game.Platforms?.ForEach(p => { if (UsedPlatforms.ContainsKey(p)) { UsedPlatforms[p]++; } else { UsedPlatforms[p] = 1; } });
+                game.Tags?.ForEach(p => { if (UsedTags.ContainsKey(p)) { UsedTags[p]++; } else { UsedTags[p] = 1; } });
+                game.Categories?.ForEach(c => { if (UsedCategories.ContainsKey(c)) { UsedCategories[c]++; } else { UsedCategories[c] = 1; } });
+                game.Developers?.ForEach(d => { if (UsedCompanies.ContainsKey(d)) { UsedCompanies[d]++; } else { UsedCompanies[d] = 1; } });
+                game.Publishers?.ForEach(p => { if (UsedCompanies.ContainsKey(p)) { UsedCompanies[p]++; } else { UsedCompanies[p] = 1; } });
+            }
+            UsedSources.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedSources.Remove(i));
+            UsedGenres.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedGenres.Remove(i));
+            UsedFeatures.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedFeatures.Remove(i));
+            UsedPlatforms.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedPlatforms.Remove(i));
+            UsedTags.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedTags.Remove(i));
+            UsedCategories.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedCategories.Remove(i));
+            UsedCompanies.AsParallel().Where(p => p.Value <= 0).Select(p => p.Key).ToList().ForEach(i => UsedCompanies.Remove(i));
+        }
+
+        public Dictionary<GameSource, int> UsedSources { get; private set; } = new Dictionary<GameSource, int>();
+        public Dictionary<Genre, int> UsedGenres { get; private set; } = new Dictionary<Genre, int>();
+        public Dictionary<GameFeature, int> UsedFeatures { get; private set; } = new Dictionary<GameFeature, int>();
+        public Dictionary<Platform, int> UsedPlatforms { get; private set; } = new Dictionary<Platform, int>();
+        public Dictionary<Tag, int> UsedTags { get; private set; } = new Dictionary<Tag, int>();
+        public Dictionary<Category, int> UsedCategories { get; private set; } = new Dictionary<Category, int>();
+        public Dictionary<Company, int> UsedCompanies { get; private set; } = new Dictionary<Company, int>();
 
         private void Games_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs<Game> e)
         {
             if (PlayniteApi is IPlayniteAPI api)
             {
-                UpdateUsedFields(api);
+                UpdateUsedFields(api, e.AddedItems, e.RemovedItems);
             }
         }
 
@@ -88,7 +137,7 @@ namespace QuickSearch
         {
             if (PlayniteApi is IPlayniteAPI api)
             {
-                UpdateUsedFields(api);
+                UpdateUsedFields(api, e.UpdatedItems.Select(i => i.NewData), e.UpdatedItems.Select(i => i.OldData));
             }
         }
 
@@ -257,7 +306,7 @@ namespace QuickSearch
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-            UpdateUsedFields(PlayniteApi);
+            InitializeUsedFields(PlayniteApi);
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
 

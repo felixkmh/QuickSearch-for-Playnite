@@ -571,9 +571,13 @@ namespace QuickSearch.ViewModels
 
                                     if (canditates[maxIdx].Item is FilterItem filterItem && !filterItem.filter.IsEmpty)
                                     {
-                                        if (!SearchPlugin.Instance.PlayniteApi.Database.Games.AsParallel().Any(filterItem.filter.Eval))
+                                        var matches = SearchPlugin.Instance.PlayniteApi.Database.Games.AsParallel().Count(filterItem.filter.Eval);
+                                        if (matches == 0)
                                         {
                                             continue;
+                                        } else
+                                        {
+                                            filterItem.TopRight = matches.ToString();
                                         }
                                     }
 
