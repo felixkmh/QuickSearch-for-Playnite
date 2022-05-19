@@ -61,27 +61,24 @@ namespace QuickSearch
 
         private void InitializeUsedFields(IPlayniteAPI api)
         {
-            Task.Run(() =>
+            UsedSources.Clear();
+            UsedGenres.Clear();
+            UsedFeatures.Clear();
+            UsedPlatforms.Clear();
+            UsedTags.Clear();
+            UsedCategories.Clear();
+            UsedCompanies.Clear();
+            foreach (var game in api.Database.Games)
             {
-                UsedSources.Clear();
-                UsedGenres.Clear();
-                UsedFeatures.Clear();
-                UsedPlatforms.Clear();
-                UsedTags.Clear();
-                UsedCategories.Clear();
-                UsedCompanies.Clear();
-                foreach (var game in api.Database.Games)
-                {
-                    if (game.Source is GameSource source) { if (UsedSources.ContainsKey(source)) { UsedSources[source]++; } else { UsedSources[source] = 1; } }
-                    game.Genres?.ForEach(g => { if (UsedGenres.ContainsKey(g)) { UsedGenres[g]++; } else { UsedGenres[g] = 1; } });
-                    game.Features?.ForEach(f => { if (UsedFeatures.ContainsKey(f)) { UsedFeatures[f]++; } else { UsedFeatures[f] = 1; } });
-                    game.Platforms?.ForEach(p => { if (UsedPlatforms.ContainsKey(p)) { UsedPlatforms[p]++; } else { UsedPlatforms[p] = 1; } });
-                    game.Tags?.ForEach(p => { if (UsedTags.ContainsKey(p)) { UsedTags[p]++; } else { UsedTags[p] = 1; } });
-                    game.Categories?.ForEach(c => { if (UsedCategories.ContainsKey(c)) { UsedCategories[c]++; } else { UsedCategories[c] = 1; } });
-                    game.Developers?.ForEach(d => { if (UsedCompanies.ContainsKey(d)) { UsedCompanies[d]++; } else { UsedCompanies[d] = 1; } });
-                    game.Publishers?.ForEach(p => { if (UsedCompanies.ContainsKey(p)) { UsedCompanies[p]++; } else { UsedCompanies[p] = 1; } });
-                }
-            });
+                if (game.Source is GameSource source) { if (UsedSources.ContainsKey(source)) { UsedSources[source]++; } else { UsedSources[source] = 1; } }
+                game.Genres?.ForEach(g => { if (UsedGenres.ContainsKey(g)) { UsedGenres[g]++; } else { UsedGenres[g] = 1; } });
+                game.Features?.ForEach(f => { if (UsedFeatures.ContainsKey(f)) { UsedFeatures[f]++; } else { UsedFeatures[f] = 1; } });
+                game.Platforms?.ForEach(p => { if (UsedPlatforms.ContainsKey(p)) { UsedPlatforms[p]++; } else { UsedPlatforms[p] = 1; } });
+                game.Tags?.ForEach(p => { if (UsedTags.ContainsKey(p)) { UsedTags[p]++; } else { UsedTags[p] = 1; } });
+                game.Categories?.ForEach(c => { if (UsedCategories.ContainsKey(c)) { UsedCategories[c]++; } else { UsedCategories[c] = 1; } });
+                game.Developers?.ForEach(d => { if (UsedCompanies.ContainsKey(d)) { UsedCompanies[d]++; } else { UsedCompanies[d] = 1; } });
+                game.Publishers?.ForEach(p => { if (UsedCompanies.ContainsKey(p)) { UsedCompanies[p]++; } else { UsedCompanies[p] = 1; } });
+            }
         }
 
         private void UpdateUsedFields (IPlayniteAPI api, IEnumerable<Game> added, IEnumerable<Game> removed)
