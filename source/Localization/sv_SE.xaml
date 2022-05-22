@@ -6,7 +6,7 @@
     <sys:String x:Key="LOC_QS_RunAction">Kör</sys:String>
     <sys:String x:Key="LOC_QS_ApplyAction">Verkställ</sys:String>
     <sys:String x:Key="LOC_QS_SearchAction">Sök</sys:String>
-    <sys:String x:Key="LOC_QS_OpenAction"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenAction">Öppna</sys:String>
     <sys:String x:Key="LOC_QS_ShowAction">Visa</sys:String>
     <sys:String x:Key="LOC_QS_ToggleAction"></sys:String>
     <sys:String x:Key="LOC_QS_SetAction"></sys:String>
