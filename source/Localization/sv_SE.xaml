@@ -11,28 +11,28 @@
     <sys:String x:Key="LOC_QS_ToggleAction"></sys:String>
     <sys:String x:Key="LOC_QS_SetAction"></sys:String>
     <sys:String x:Key="LOC_QS_SetToAction"></sys:String>
-    <sys:String x:Key="LOC_QS_UpdateAction"></sys:String>
-    <sys:String x:Key="LOC_QS_UpdateAllLibraries"></sys:String>
+    <sys:String x:Key="LOC_QS_UpdateAction">Uppdatera</sys:String>
+    <sys:String x:Key="LOC_QS_UpdateAllLibraries">Uppdatera alla bibliotek</sys:String>
     <sys:String x:Key="LOC_QS_DownloadMetaData"></sys:String>
-    <sys:String x:Key="LOC_QS_Addons"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenAddons"></sys:String>
+    <sys:String x:Key="LOC_QS_Addons">Tillägg</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAddons">Öppna tilläggsfönstret</sys:String>
     <sys:String x:Key="LOC_QS_SwitchAction"></sys:String>
-    <sys:String x:Key="LOC_QS_ConfigureAction"></sys:String>
+    <sys:String x:Key="LOC_QS_ConfigureAction">Konfigurera</sys:String>
     <sys:String x:Key="LOC_QS_SearchOnAction"></sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
-	<sys:String x:Key="LOC_QS_CommonTab"></sys:String>
-	<sys:String x:Key="LOC_QS_AppearanceTab"></sys:String>
-    <sys:String x:Key="LOC_QS_ExternalTab"></sys:String>
+	<sys:String x:Key="LOC_QS_CommonTab">Allmänt</sys:String>
+	<sys:String x:Key="LOC_QS_AppearanceTab">Utseende</sys:String>
+    <sys:String x:Key="LOC_QS_ExternalTab">Extern</sys:String>
     <sys:String x:Key="LOC_QS_ITADTab"></sys:String>
 
 	<!--Labels-->
-    <sys:String x:Key="LOC_QS_LocalHotkey"></sys:String>
-    <sys:String x:Key="LOC_QS_LocalHotkeyShort"></sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey"></sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkeyShort"></sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkeyToggle"></sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkey">Snabbtangent för att öppna sökfönstret:</sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkeyShort">Snabbtangent för sökning</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey">Global snabbtangent för att öppna sökfönstret:</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyShort">Snabbtangent för global sökning</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">Aktivera global snabbtangent</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold"></sys:String>
     <sys:String x:Key="LOC_QS_SearchThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelay"></sys:String>
