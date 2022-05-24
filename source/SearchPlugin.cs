@@ -382,10 +382,11 @@ namespace QuickSearch
                                 {
                                     Action action1 = () => libraryPlugin.Client?.Open();
                                     var openCommand = QuickSearchSDK.AddCommand(
-                                        string.Format(ResourceProvider.GetString("LOC_QS_OpenClient"), libraryPlugin.Name),
+                                        libraryPlugin.Name,
                                         action1,
-                                        iconPath: icon,
-                                        actionName: ResourceProvider.GetString("LOC_QS_OpenAction")
+                                        iconPath: libraryPlugin.Client?.Icon,
+                                        actionName: ResourceProvider.GetString("LOC_QS_OpenAction"),
+                                        descripton: string.Format(ResourceProvider.GetString("LOC_QS_OpenClient"), libraryPlugin.Name)
                                         );
                                     openCommand.IconChar = '';
                                 }
