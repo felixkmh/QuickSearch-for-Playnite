@@ -19,6 +19,7 @@
     <sys:String x:Key="LOC_QS_SwitchAction">تبديل</sys:String>
     <sys:String x:Key="LOC_QS_ConfigureAction">ضبط</sys:String>
     <sys:String x:Key="LOC_QS_SearchOnAction">البحث في {0}</sys:String>
+    <sys:String x:Key="LOC_QS_OpenClient"></sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
