@@ -97,10 +97,10 @@
     <sys:String x:Key="LOC_QS_EnableTagCreation">Erstelle [QS] Schlagwörter beim Start</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory">Spielindex im Speicher behalten</sys:String>
     <sys:String x:Key="LOC_QS_PersistantGameIndex">Persistenten Spielindex verwenden</sys:String>
-    <sys:String x:Key="LOC_QS_PlayniteLog"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
-    <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_PlayniteLog">Playnite-Log</sys:String>
+    <sys:String x:Key="LOC_QS_OpenPlayniteLog">Öffne Playnite-Log</sys:String>
+    <sys:String x:Key="LOC_QS_ExtensionLog">Erweiterungs-Log</sys:String>
+    <sys:String x:Key="LOC_QS_OpenExtensionLog">Öffne Erweiterungs-Log</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">Wenn aktiviert, wird der Spielesuchindex auf der Festplatte gespeichert und beim nächsten Start von Playnite wiederverwendet. Andernfalls wird er bei jedem Start von Playnite von Grund auf neu erstellt.</sys:String>
