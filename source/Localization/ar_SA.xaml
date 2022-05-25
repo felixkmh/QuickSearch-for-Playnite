@@ -97,7 +97,11 @@
     <sys:String x:Key="LOC_QS_EnableTagCreation">إنشاء وسوم [QS] عند التشغيل</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
     <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
-
+    <sys:String x:Key="LOC_QS_PlayniteLog"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
+    <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">إذا كانت متاحة، استخدم غطاء اللعبة بدلاً من أيقونة اللعبة.</sys:String>
