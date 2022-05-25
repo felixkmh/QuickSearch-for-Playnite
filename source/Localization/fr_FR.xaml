@@ -97,7 +97,11 @@
     <sys:String x:Key="LOC_QS_EnableTagCreation">Créer des tags [QS] au lancement</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
     <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
-
+    <sys:String x:Key="LOC_QS_PlayniteLog"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
+    <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">Permet d'afficher les couvertures des jeux à la place de leurs icônes lorsqu'elles existent.</sys:String>
