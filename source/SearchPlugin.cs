@@ -639,7 +639,7 @@ namespace QuickSearch
             // Open logs
             string logPath = System.IO.Path.Combine(PlayniteApi.Paths.ConfigurationPath, "playnite.log");
             Action openPlayniteLogAction = () => Process.Start(logPath);
-            string extensionLogPath = System.IO.Path.Combine(PlayniteApi.Paths.ConfigurationPath, "playnite.log");
+            string extensionLogPath = System.IO.Path.Combine(PlayniteApi.Paths.ConfigurationPath, "extensions.log");
             Action openExtensionLogAction = () => Process.Start(extensionLogPath);
             var openPlayniteLogCommand = QuickSearchSDK.AddCommand(
                 name: ResourceProvider.GetString("LOC_QS_PlayniteLog"),
@@ -650,7 +650,7 @@ namespace QuickSearch
             //openPlayniteLogCommand.DetailsView = new TextFileView { DataContext = new TextFileViewModel(logPath) };
             var openExtensionLogCommand = QuickSearchSDK.AddCommand(
                 name: ResourceProvider.GetString("LOC_QS_ExtensionLog"),
-                action: openPlayniteLogAction,
+                action: openExtensionLogAction,
                 descripton: ResourceProvider.GetString("LOC_QS_OpenExtensionLog"),
                 actionName: ResourceProvider.GetString("LOC_QS_OpenAction"));
             openExtensionLogCommand.IconChar = '\ueb2a';
