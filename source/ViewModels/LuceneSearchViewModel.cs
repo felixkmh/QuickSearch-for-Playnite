@@ -459,7 +459,7 @@ namespace QuickSearch.ViewModels
                                 return;
                             }
 
-                            TopDocs topDocs = multiSearcher.Search(disjunction, 111);
+                            TopDocs topDocs = multiSearcher.Search(disjunction, 150);
 #if DEBUG
                         Debug.WriteLine($"Query answered in {searchSw.ElapsedMilliseconds}ms.");
 #endif

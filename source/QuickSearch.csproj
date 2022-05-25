@@ -164,6 +164,7 @@
     <Compile Include="UiHelper.cs" />
     <Compile Include="ViewModels\LuceneSearchViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
+    <Compile Include="ViewModels\TextFileViewModel.cs" />
     <Compile Include="Views\AddonDetailsView.xaml.cs">
       <DependentUpon>AddonDetailsView.xaml</DependentUpon>
     </Compile>
@@ -182,6 +183,9 @@
     </Compile>
     <Compile Include="Views\SearchWindow.xaml.cs">
       <DependentUpon>SearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TextFileView.xaml.cs">
+      <DependentUpon>TextFileView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +229,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SearchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TextFileView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

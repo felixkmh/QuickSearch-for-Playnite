@@ -97,7 +97,11 @@
     <sys:String x:Key="LOC_QS_EnableTagCreation">Create [QS] tags on launch</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory">Keep game index in memory</sys:String>
     <sys:String x:Key="LOC_QS_PersistantGameIndex">Use persistant game index</sys:String>
-
+    <sys:String x:Key="LOC_QS_PlayniteLog">Playnite log</sys:String>
+    <sys:String x:Key="LOC_QS_OpenPlayniteLog">Open Playnite log</sys:String>
+    <sys:String x:Key="LOC_QS_ExtensionLog">Extension log</sys:String>
+    <sys:String x:Key="LOC_QS_OpenExtensionLog">Open extension log</sys:String>
+    
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">If enabled, the game search index is stored on disk, and re-used the next time Playnite starts. Otherwise, it will be created from scratch each time Playnite starts.</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">If available, use the game cover art instead of the game icon as the icon for game results.</sys:String>

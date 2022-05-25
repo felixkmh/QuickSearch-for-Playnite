@@ -359,6 +359,8 @@ namespace QuickSearch
                 IconChar = IconChars.GameConsole
             };
 
+
+            // Library Commands
             try 
             {
                 var mainMenuBorder = Helper.UiHelper.FindVisualChildren<Border>(mainWindow, "PART_ElemMainMenu").FirstOrDefault();
@@ -409,11 +411,12 @@ namespace QuickSearch
             }
 
 
-
+            // Turn keyboard shortcuts into commands
             foreach (InputBinding binding in mainWindow.InputBindings)
             {
                 if (binding.Gesture is KeyGesture keyGesture)
                 {
+                    // Add-on Browser
                     if (keyGesture.Key == Key.F9 && keyGesture.Modifiers == ModifierKeys.None)
                     {
                         string name = (string)Application.Current.FindResource("LOC_QS_Addons");
@@ -433,6 +436,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Playnite settings
                     if (keyGesture.Key == Key.F4 && keyGesture.Modifiers == ModifierKeys.None)
                     {
                         string name = (string)Application.Current.FindResource("LOCSettingsWindowTitle");
@@ -452,6 +456,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Update all libraries
                     if (keyGesture.Key == Key.F5 && keyGesture.Modifiers == ModifierKeys.None)
                     {
                         string name = ResourceProvider.GetString("LOC_QS_UpdateAllLibraries");
@@ -471,6 +476,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Exit Playnite
                     if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Alt)
                     {
                         string name = (string)Application.Current.FindResource("LOCExitPlaynite");
@@ -490,6 +496,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Toggle fullscreen
                     if (keyGesture.Key == Key.F11 && keyGesture.Modifiers == ModifierKeys.None)
                     {
                         string name = (string)Application.Current.FindResource("LOCMenuOpenFullscreen");
@@ -509,14 +516,17 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Add game manually
                     if (keyGesture.Key == Key.Insert && keyGesture.Modifiers == ModifierKeys.None)
                     {
                         addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameManual")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
                     }
+                    // Add emulated game
                     if (keyGesture.Key == Key.Q && keyGesture.Modifiers == ModifierKeys.Control)
                     {
                         addGameCommand.Actions.Add(new CommandAction() { Name = ((string)Application.Current.FindResource("LOCMenuAddGameEmulated")).Replace("…", ""), Action = () => binding.Command.Execute(binding.CommandParameter) });
                     }
+                    // Library manager
                     if (keyGesture.Key == Key.W && keyGesture.Modifiers == ModifierKeys.Control)
                     {
                         string name = (string)Application.Current.FindResource("LOCMenuLibraryManagerTitle");
@@ -537,6 +547,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Emulation config
                     if (keyGesture.Key == Key.T && keyGesture.Modifiers == ModifierKeys.Control)
                     {
                         string name = (string)Application.Current.FindResource("LOCEmulatorsWindowTitle");
@@ -557,6 +568,7 @@ namespace QuickSearch
                             item.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
                         }
                     }
+                    // Download metadata
                     if (keyGesture.Key == Key.D && keyGesture.Modifiers == ModifierKeys.Control)
                     {
                         string name = (string)Application.Current.FindResource("LOCMenuDownloadMetadata");
@@ -614,6 +626,26 @@ namespace QuickSearch
             addonItem.Keys.Add(new CommandItemKey { Key = "Addon Browser" });
             addonItem.Actions.Add(addonSubItemAction);
             QuickSearchSDK.AddCommand(addonItem);
+
+            // Open logs
+            string logPath = System.IO.Path.Combine(PlayniteApi.Paths.ConfigurationPath, "playnite.log");
+            Action openPlayniteLogAction = () => Process.Start(logPath);
+            string extensionLogPath = System.IO.Path.Combine(PlayniteApi.Paths.ConfigurationPath, "playnite.log");
+            Action openExtensionLogAction = () => Process.Start(extensionLogPath);
+            var openPlayniteLogCommand = QuickSearchSDK.AddCommand(
+                name: ResourceProvider.GetString("LOC_QS_PlayniteLog"),
+                action: openPlayniteLogAction,
+                descripton: ResourceProvider.GetString("LOC_QS_OpenPlayniteLog"), 
+                actionName: ResourceProvider.GetString("LOC_QS_OpenAction"));
+            openPlayniteLogCommand.IconChar = '\ueb2a';
+            //openPlayniteLogCommand.DetailsView = new TextFileView { DataContext = new TextFileViewModel(logPath) };
+            var openExtensionLogCommand = QuickSearchSDK.AddCommand(
+                name: ResourceProvider.GetString("LOC_QS_ExtensionLog"),
+                action: openPlayniteLogAction,
+                descripton: ResourceProvider.GetString("LOC_QS_OpenExtensionLog"),
+                actionName: ResourceProvider.GetString("LOC_QS_OpenAction"));
+            openExtensionLogCommand.IconChar = '\ueb2a';
+            //openExtensionLogCommand.DetailsView = new TextFileView { DataContext = new TextFileViewModel(extensionLogPath) };
         }
 
         public Popup popup;
