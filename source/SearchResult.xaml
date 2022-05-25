@@ -134,7 +134,7 @@
                                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ActualWidth, ElementName=SelectedImage}" Value="0">
-                                        <Setter Property="FontSize" Value="40"/>
+                                        <Setter Property="FontSize" Value="38"/>
                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </DataTrigger>
