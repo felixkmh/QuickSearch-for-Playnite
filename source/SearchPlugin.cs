@@ -382,7 +382,16 @@ namespace QuickSearch
                                 Action action = () => libraryUpdateItem.Command.Execute(libraryUpdateItem.CommandParameter);
                                 if (libraryPlugin.Client?.IsInstalled ?? false)
                                 {
-                                    Action action1 = () => libraryPlugin.Client?.Open();
+                                    Action action1 = () => 
+                                    { 
+                                        try 
+                                        { 
+                                            libraryPlugin.Client?.Open();
+                                        } catch (Exception ex) 
+                                        {
+                                            logger.Error(ex, $"Failed to open {libraryPlugin.Name} client."); 
+                                        } 
+                                    };
                                     var openCommand = QuickSearchSDK.AddCommand(
                                         libraryPlugin.Name,
                                         action1,
