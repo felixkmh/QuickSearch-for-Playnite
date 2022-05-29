@@ -204,13 +204,18 @@ namespace QuickSearch.SearchItems
     {
         public GameSearchSource()
         {
+            var path = SearchPlugin.Instance.GetPluginUserDataPath();
+            path = Path.Combine(path, "GameIndex");
             if (SearchPlugin.Instance.Settings.KeepGamesInMemory)
             {
+                using (var dir = FSDirectory.Open(path))
+                using (var writer = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+                {
+                    writer.DeleteAll();
+                }
                 indexDir = new RAMDirectory();
             } else
             {
-                var path = SearchPlugin.Instance.GetPluginUserDataPath();
-                path = Path.Combine(path, "GameIndex");
                 indexDir = FSDirectory.Open(path);
             }
         }
