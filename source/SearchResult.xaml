@@ -44,7 +44,7 @@
                 <!--<ContentControl Content="{Binding TopLeftFormatted}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,3,5,3"/>-->
                 <TextBlock x:Name="TopLeftCollapsed" Grid.Column="2" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Margin="0,3,5,3" FontWeight="SemiBold"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="3" x:Name="PlatformStack" Opacity="{StaticResource DetailsOpacity}">
-                    <TextBlock Text="{Binding Item.TopRight, IsAsync=True}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Item.TopRight, IsAsync=False}" HorizontalAlignment="Right" Margin="0,3,0,3" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Grid>
             <Grid x:Name="SelectedView" Visibility="Collapsed" Margin="0,2,2,2" ClipToBounds="False">
@@ -70,7 +70,7 @@
                             <!--<TextBlock x:Name="Score" Margin="3,0,0,0"/>-->
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Opacity="{StaticResource DetailsOpacity}">
-                            <TextBlock Text="{Binding Item.TopRight, IsAsync=True}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Item.TopRight, IsAsync=False}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Row="1" Opacity="{StaticResource DetailsOpacity}">
@@ -84,11 +84,11 @@
                                                    HorizontalScrollBarVisibility="Hidden" 
                                                    VerticalScrollBarVisibility="Disabled" 
                                                    MaxWidth="{Binding ElementName=ExpandendUpper, Path=ActualWidth, Mode=OneWay}">
-                            <TextBlock Text="{Binding Item.BottomLeft, IsAsync=True}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
+                            <TextBlock Text="{Binding Item.BottomLeft, IsAsync=False}" Margin="0,0,15,0" VerticalAlignment="Bottom" />
                         </controls:AutoScrollViewer>
-                        <TextBlock Text="{Binding Item.BottomCenter, IsAsync=True}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="{Binding Item.BottomCenter, IsAsync=False}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Bottom"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="2" Margin="15,0,0,0">
-                            <TextBlock Text="{Binding Item.BottomRight, IsAsync=True}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Item.BottomRight, IsAsync=False}" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

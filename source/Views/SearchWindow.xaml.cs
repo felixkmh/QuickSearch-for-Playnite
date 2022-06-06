@@ -89,14 +89,20 @@ namespace QuickSearch
             {
                 if (timer == null)
                 {
-                    timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+                    timer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher);
                     timer.Interval = TimeSpan.FromSeconds(0.3333);
                     timer.Tick += Timer_Tick;
                 }
                 timer.Stop();
                 DetailsPopup.PopupAnimation = PopupAnimation.None;
-                DetailsScrollViewer.Content = null;
-                DetailsPopup.IsOpen = false;
+                if (DetailsPopup.IsOpen)
+                {
+                    DetailsPopup.IsOpen = false;
+                }
+                if (DetailsScrollViewer.Content != null)
+                {
+                    DetailsScrollViewer.Content = null;
+                }
                 DetailsBorder.Visibility = Visibility.Hidden;
             }
             if (addedItems.Count > 0 && addedItems[0] is Models.Candidate candidate1)
@@ -141,12 +147,27 @@ namespace QuickSearch
             return name.Substring(0, sep);
         }
 
+        private ScrollViewer scrollViewer = null;
+
         internal void UpdateListBox(int items, bool refresh = false)
         {
             if (refresh)
             {
                 heightSelected = double.NaN;
                 heightNotSelected = double.NaN;
+            }
+            if (scrollViewer == null)
+            {
+                var childCount = VisualTreeHelper.GetChildrenCount(SearchResults);
+                if (childCount > 0)
+                {
+                    Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
+                    scrollViewer = border.Child as ScrollViewer;
+                }
+            }
+            if (scrollViewer is null)
+            {
+                return;
             }
             if (SearchResults.Items.Count > 1)
             {
@@ -169,8 +190,6 @@ namespace QuickSearch
                     availableHeight -= heightSelected;
                     var maxItems = Math.Floor(availableHeight / heightNotSelected);
                     var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
-                    Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
-                    ScrollViewer scrollViewer = border.Child as ScrollViewer;
                     if (maxItems + 1 >= items)
                     {
                         var margin = SearchResults.Margin;
@@ -185,15 +204,16 @@ namespace QuickSearch
                         SearchResults.Margin = margin;
                         scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
                     }
-                    SearchResults.MaxHeight = maxHeight;
+                    if (SearchResults.MaxHeight != maxHeight)
+                    {
+                        SearchResults.MaxHeight = maxHeight;
+                    }
                 }
             }
             else
             {
-                if (VisualTreeHelper.GetChildrenCount(SearchResults) > 0)
+                if (SearchResults.Items.Count > 0)
                 {
-                    Decorator border = VisualTreeHelper.GetChild(SearchResults, 0) as Decorator;
-                    ScrollViewer scrollViewer = border.Child as ScrollViewer;
                     var margin = SearchResults.Margin;
                     margin.Right = items > 5 ? -SystemParameters.VerticalScrollBarWidth : 0;
                     SearchResults.Margin = margin;

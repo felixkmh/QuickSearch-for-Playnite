@@ -469,18 +469,15 @@ namespace QuickSearch.ViewModels
                                 gameSource1 = s;
                             }
 
-                            for (int i = 0; i < topDocs.ScoreDocs.Length; i++)
+                            Models.Candidate[] addedCandidatets = new Models.Candidate[topDocs.ScoreDocs.Length];
+
+                            Parallel.For(0, addedCandidatets.Length, i =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
                                 {
                                     return;
                                 }
-#if DEBUG
-                            if (i == 0)
-                            {
-                                Debug.WriteLine(multiSearcher.Explain(disjunction, topDocs.ScoreDocs[i].Doc));
-                            }
-#endif
+
                                 ISearchItem<string> item = null;
                                 var resultDoc = multiSearcher.Doc(topDocs.ScoreDocs[i].Doc);
 
@@ -503,10 +500,12 @@ namespace QuickSearch.ViewModels
                                     var score = ComputeScore(item, input);
                                     if (score >= searchPlugin.Settings.Threshold)
                                     {
-                                        canditates.Add(new Models.Candidate { Item = item, Query = input, Score = score });
+                                        addedCandidatets[i] = new Models.Candidate { Item = item, Query = input, Score = score };
                                     }
                                 }
-                            }
+                            });
+
+                            addedCandidatets.OfType<Models.Candidate>().ForEach(c => canditates.Add(c));
                         }
                         else if (showAll)
                         {
@@ -633,7 +632,7 @@ namespace QuickSearch.ViewModels
                                     break;
                                 }
                                 sw.Stop();
-                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds <= 8);
+                            } while (addedItems < maxResults && !cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds <= 12);
                             sw.Stop();
                         }, searchPlugin.Settings.IncrementalUpdate ? DispatcherPriority.Background : DispatcherPriority.Normal);
                     }
