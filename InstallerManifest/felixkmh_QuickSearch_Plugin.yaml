@@ -1,5 +1,11 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:    
+  - Version: 2.22.2
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-06-07
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.22.2/felixkmh_QuickSearch_Plugin_2_22_2.pext
+    Changelog:
+      - fixed search popup not being centered correctly
   - Version: 2.22.1
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2022-06-06
