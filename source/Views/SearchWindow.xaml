@@ -144,7 +144,9 @@
         </Popup>
         <Border CornerRadius="15" x:Name="OutsideBorder" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Border.Background>
-                <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="SearchResultsBackground">
+                <VisualBrush Stretch="None" RenderOptions.CachingHint="Cache" ViewportUnits="Absolute" x:Name="SearchResultsBackground"
+                             AutoLayoutContent="True"
+                             AlignmentX="Center" AlignmentY="Center">
                     <VisualBrush.Visual>
                         <Grid>
                             <Border Background="{DynamicResource WindowBackgourndBrush}" Visibility="{Binding ElementName=GlassTint, Path=Visibility, Mode=OneWay}"/>

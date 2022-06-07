@@ -773,7 +773,9 @@ namespace QuickSearch
                     dummyWindow.Hide();
                 };
 
-                placementTarget = Helper.UiHelper.FindVisualChildren(Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Name == "WindowMain"), "PART_ContentView").FirstOrDefault();
+                FrameworkElement mainWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Name == "WindowMain");
+                placementTarget = Helper.UiHelper.FindVisualChildren(mainWindow, "PART_ContentView").FirstOrDefault();
+                placementTarget = mainWindow;
                 var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
                 popup.StaysOpen = false;
@@ -892,8 +894,10 @@ namespace QuickSearch
                 {
                     Stretch = Stretch.None,
                     Visual = placementTarget,
-                    AutoLayoutContent = false,
-                    TileMode = TileMode.None
+                    AutoLayoutContent = true,
+                    TileMode = TileMode.None,
+                    AlignmentX = AlignmentX.Center,
+                    AlignmentY = AlignmentY.Center,
                 };
 
                 searchWindow.BackgroundBorder.Background = brush;
@@ -905,7 +909,10 @@ namespace QuickSearch
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
 
                 int radius = 80;
-                searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance };
+                var sidebar = Helper.UiHelper.FindVisualChildren(placementTarget, "PART_Sidebar").FirstOrDefault();
+                var backgroundMargin = new Thickness() { Left = radius + sidebar?.ActualWidth ?? 0 };
+                searchWindow.BackgroundBorder.Margin = backgroundMargin;
+                searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance, KernelType = KernelType.Gaussian };
                 searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right + (2 * radius) + (2 * searchWindow.DetailsBorder.Width);
                 searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom + (2 * radius);
                 glassActive = true;
@@ -928,6 +935,8 @@ namespace QuickSearch
                 ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
                 searchWindow.BackgroundBorder.Effect = null;
+                var backgroundMargin = new Thickness();
+                searchWindow.BackgroundBorder.Margin = backgroundMargin;
                 searchWindow.BackgroundBorder.Width = searchWindow.WindowGrid.Width + searchWindow.WindowGrid.Margin.Left + searchWindow.WindowGrid.Margin.Right;
                 searchWindow.BackgroundBorder.Height = searchWindow.WindowGrid.Height + searchWindow.WindowGrid.Margin.Top + searchWindow.WindowGrid.Margin.Bottom;
                 searchWindow.DetailsBackgroundBorderFallback.Visibility = Visibility.Visible;
