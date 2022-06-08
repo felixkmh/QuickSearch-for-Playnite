@@ -70,11 +70,9 @@ namespace QuickSearch
             TopLeftExpanded.Inlines.Clear();
             if (e.NewValue is Models.Candidate candidate)
             {
-                foreach(var run in candidate.GetFormattedRuns(candidate.Query))
-                {
-                    TopLeftCollapsed.Inlines.Add(new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations });
-                    TopLeftExpanded.Inlines.Add(run);
-                }
+                List<Run> runs = candidate.GetFormattedRuns(candidate.Query);
+                TopLeftExpanded.Inlines.AddRange(runs);
+                TopLeftCollapsed.Inlines.AddRange(runs.Select(run => new Run(run.Text) { FontWeight = run.FontWeight, TextDecorations = run.TextDecorations }));
                 candidate.PropertyChanged += Candidate_PropertyChanged;
             }
         }
