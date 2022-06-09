@@ -24,6 +24,8 @@ namespace QuickSearch.SearchItems
 
         public bool DisplayAllIfQueryIsEmpty => true;
 
+        List<AddonItem> cachedItems = null;
+
         public IEnumerable<ISearchItem<string>> GetItems()
         {
             try
@@ -39,34 +41,45 @@ namespace QuickSearch.SearchItems
                     var repo = new LibGit2Sharp.Repository(repoPath);
                     if (repo is LibGit2Sharp.Repository)
                     {
-                        Commands.Pull(
+                        var mergeResult = Commands.Pull(
                             repo,
                             new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
                             new PullOptions() { MergeOptions = new MergeOptions { MergeFileFavor = MergeFileFavor.Theirs} }
                         );
+                        if (mergeResult.Status != MergeStatus.UpToDate)
+                        {
+                            cachedItems = null;
+                        }
                     }
                 }
                 if (Directory.Exists(repoPath))
                 {
-                    var addonDir = Path.Combine(repoPath, "addons");
-                    var manifestFiles = System.IO.Directory.GetFiles(addonDir, "*.yaml", SearchOption.AllDirectories);
-                    var addonManifests = manifestFiles.AsParallel().Select(file =>
+                    if (cachedItems == null)
                     {
-                        using (var yaml = File.OpenText(file))
+                        var addonDir = Path.Combine(repoPath, "addons");
+                        var manifestFiles = System.IO.Directory.GetFiles(addonDir, "*.yaml", SearchOption.AllDirectories);
+                        var addonManifests = manifestFiles.AsParallel().Select(file =>
                         {
-                            IDeserializer deserializer = new DeserializerBuilder()
-                                .IgnoreUnmatchedProperties()
-                                .Build();
-                            var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
-                            return manifest;
-                        }
-                    }).OfType<AddonManifestBase>();
-                    var items = addonManifests
-                        .OrderBy(addon => addon.Type)
-                        .ThenBy(addon => addon.Name)
-                        .ThenBy(addon => addon.Author)
-                        .Select(addon => new AddonItem(addon));
-                    return items;
+                            using (var yaml = File.OpenText(file))
+                            {
+                                IDeserializer deserializer = new DeserializerBuilder()
+                                    .IgnoreUnmatchedProperties()
+                                    .Build();
+                                var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
+                                return manifest;
+                            }
+                        }).OfType<AddonManifestBase>();
+                        var items = addonManifests
+                            .OrderBy(addon => addon.Type)
+                            .ThenBy(addon => addon.Name)
+                            .ThenBy(addon => addon.Author)
+                            .Select(addon => new AddonItem(addon));
+                        cachedItems = items.ToList();
+                    } else
+                    {
+                        Parallel.ForEach(cachedItems, v => v.addon.Reset());
+                    }
+                    return cachedItems;
                 }
             }
             catch (Exception ex)
@@ -89,7 +102,7 @@ namespace QuickSearch.SearchItems
 
     public class AddonItem : ISearchItem<string>
     {
-        AddonManifestBase addon;
+        internal AddonManifestBase addon;
         static AddonDetailsView detailsView = null;
 
         private string AddonTypeToString(AddonType type)
@@ -271,6 +284,12 @@ namespace QuickSearch.SearchItems
         }
         internal static Octokit.GitHubClient gitHub = GetGithubClient();
 
+        public void Reset()
+        {
+            downloadStats = null;
+            installerManifest = null;
+        }
+
         private DownloadStats downloadStats = null;
 
         private string GetDownloadString()
@@ -381,6 +400,7 @@ namespace QuickSearch.SearchItems
             return null;
         }
 
+
         public class AddonUserAgreement
         {
             public DateTime Updated { get; set; }
@@ -430,6 +450,9 @@ namespace QuickSearch.SearchItems
                 {
                     try
                     {
+                        var deserializer = new DeserializerBuilder()
+                            .IgnoreUnmatchedProperties()
+                            .Build();
                         using (var client = new System.Net.Http.HttpClient())
                         {
                             using (var response = client.GetStringAsync(InstallerManifestUrl))
@@ -438,7 +461,6 @@ namespace QuickSearch.SearchItems
                                 if (!response.IsFaulted)
                                 {
                                     var yaml = response.Result;
-                                    var deserializer = new YamlDotNet.Serialization.Deserializer();
                                     var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
                                     installerManifest = manifest;
                                     installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
