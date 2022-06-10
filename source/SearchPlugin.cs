@@ -709,6 +709,7 @@ namespace QuickSearch
                         if (name is string)
                         {
                             var item = QuickSearchSDK.AddPluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                            item.TopRight = config["Version"] as string;
                             if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
                             {
                                 item.Icon = uri;
