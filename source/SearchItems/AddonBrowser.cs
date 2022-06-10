@@ -1,92 +1,86 @@
-﻿using Playnite.SDK;
+﻿using LibGit2Sharp;
+using Playnite.SDK;
+using Playnite.SDK.Data;
+using Playnite.SDK.Models;
+using QuickSearch.Views;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LibGit2Sharp;
-using System.IO;
 using System.Diagnostics;
-using QuickSearch.Views;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using System.Runtime.CompilerServices;
 using YamlDotNet.Serialization;
-using Playnite.SDK.Models;
-using Playnite.SDK.Data;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
+
 namespace QuickSearch.SearchItems
 {
+    // see https://github.com/JosefNemec/Playnite/blob/master/source/Playnite/Manifests/AddonManifests.cs for following types
+    public enum AddonType
+    {
+        GameLibrary,
+        MetadataProvider,
+        Generic,
+        ThemeDesktop,
+        ThemeFullscreen
+    }
+
+    public enum ExtensionType
+    {
+        GenericPlugin,
+        GameLibrary,
+        Script,
+        MetadataProvider
+    }
+
     public class AddonBrowser : ISearchSubItemSource<string>
     {
-        public string Prefix => ResourceProvider.GetString("LOC_QS_Addons");
+        private Lazy<List<AddonItem>> cachedItems = null;
 
+        public AddonBrowser()
+        {
+            cachedItems = new Lazy<List<AddonItem>>(InitAddonItems);
+        }
+
+        public string DataPath => Path.Combine(SearchPlugin.Instance.GetPluginUserDataPath());
         public bool DisplayAllIfQueryIsEmpty => true;
-
-        List<AddonItem> cachedItems = null;
+        public string Prefix => ResourceProvider.GetString("LOC_QS_Addons");
+        public string RepoPath => Path.Combine(DataPath, "PlayniteAddonDatabase");
 
         public IEnumerable<ISearchItem<string>> GetItems()
         {
-            try
+            if (cachedItems.IsValueCreated)
             {
-                var dataPath = Path.Combine(SearchPlugin.Instance.GetPluginUserDataPath());
-                var repoPath = Path.Combine(dataPath, "PlayniteAddonDatabase");
-                if (!Directory.Exists(repoPath))
+                if (UpdateRepository() is RepoUpdate repoUpdate)
                 {
-                    LibGit2Sharp.Repository.Clone("https://github.com/JosefNemec/PlayniteAddonDatabase.git", repoPath);
-                }
-                else
-                {
-                    var repo = new LibGit2Sharp.Repository(repoPath);
-                    if (repo is LibGit2Sharp.Repository)
+                    //SearchPlugin.Instance.PlayniteApi.Dialogs
+                    //    .ShowMessage($"Removed:\n{string.Join("\n", repoUpdate.OldPaths)}\nAdded:\n{string.Join("\n", repoUpdate.NewPaths)}", "AddonDatabase-Updates");
+                    try
                     {
-                        var mergeResult = Commands.Pull(
-                            repo,
-                            new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
-                            new PullOptions() { MergeOptions = new MergeOptions { MergeFileFavor = MergeFileFavor.Theirs} }
-                        );
-                        if (mergeResult.Status != MergeStatus.UpToDate)
-                        {
-                            cachedItems = null;
-                        }
+                        Comparison<AddonItem> comparison = (a, b) =>
+                                                {
+                                                    var byType = a.addon.Type.CompareTo(b.addon.Type);
+                                                    if (byType != 0) return byType;
+                                                    var byName = a.addon.Name.CompareTo(b.addon.Name);
+                                                    if (byName != 0) return byName;
+                                                    return a.addon.Author.CompareTo(b.addon.Author);
+                                                };
+                        cachedItems.Value.RemoveAll(item => repoUpdate.OldPaths.Contains(item.addon.LocalPath));
+                        var toAdd = DeserializeManifests(repoUpdate.NewPaths).ToList();
+                        cachedItems.Value.InsertRangeSorted(toAdd, comparison);
+                    }
+                    catch (Exception ex)
+                    {
+                        //SearchPlugin.Instance.PlayniteApi.Dialogs
+                        //    .ShowMessage($"{ex.Message}\n{ex.StackTrace}", "AddonDatabase-Update Errors");
                     }
                 }
-                if (Directory.Exists(repoPath))
-                {
-                    if (cachedItems == null)
-                    {
-                        var addonDir = Path.Combine(repoPath, "addons");
-                        var manifestFiles = System.IO.Directory.GetFiles(addonDir, "*.yaml", SearchOption.AllDirectories);
-                        var addonManifests = manifestFiles.AsParallel().Select(file =>
-                        {
-                            using (var yaml = File.OpenText(file))
-                            {
-                                IDeserializer deserializer = new DeserializerBuilder()
-                                    .IgnoreUnmatchedProperties()
-                                    .Build();
-                                var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
-                                return manifest;
-                            }
-                        }).OfType<AddonManifestBase>();
-                        var items = addonManifests
-                            .OrderBy(addon => addon.Type)
-                            .ThenBy(addon => addon.Name)
-                            .ThenBy(addon => addon.Author)
-                            .Select(addon => new AddonItem(addon));
-                        cachedItems = items.ToList();
-                    } else
-                    {
-                        Parallel.ForEach(cachedItems, v => v.addon.Reset());
-                    }
-                    return cachedItems;
-                }
+                cachedItems.Value.AsParallel().ForEach(item => item.addon.Reset());
             }
-            catch (Exception ex)
-            {
-                SearchPlugin.logger.Error(ex, "Could not Update Addon Database");
-            }
-            return null;
+            return cachedItems.Value;
         }
 
         public IEnumerable<ISearchItem<string>> GetItems(string query)
@@ -98,31 +92,157 @@ namespace QuickSearch.SearchItems
         {
             return null;
         }
+
+        private List<AddonItem> InitAddonItems()
+        {
+            try
+            {
+                if (!Directory.Exists(RepoPath))
+                {
+                    LibGit2Sharp.Repository.Clone("https://github.com/JosefNemec/PlayniteAddonDatabase.git", RepoPath);
+                }
+                else
+                {
+                    UpdateRepository();
+                }
+                if (Directory.Exists(RepoPath))
+                {
+                    var addonDir = Path.Combine(RepoPath, "addons");
+                    var manifestFiles = System.IO.Directory.GetFiles(addonDir, "*.yaml", SearchOption.AllDirectories);
+                    var items = DeserializeManifests(manifestFiles);
+                    return items.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                SearchPlugin.logger.Error(ex, "Could not Update Addon Database");
+            }
+            return null;
+        }
+
+        private static IEnumerable<AddonItem> DeserializeManifests(IEnumerable<string> manifestFiles)
+        {
+            var addonManifests = manifestFiles.AsParallel().Select(file =>
+            {
+                using (var yaml = File.OpenText(file))
+                {
+                    IDeserializer deserializer = new DeserializerBuilder()
+                        .IgnoreUnmatchedProperties()
+                        .Build();
+                    var manifest = deserializer.Deserialize<AddonManifestBase>(yaml);
+                    if (manifest != null) manifest.LocalPath = file;
+                    return manifest;
+                }
+            }).OfType<AddonManifestBase>();
+            var items = addonManifests
+                .OrderBy(addon => addon.Type)
+                .ThenBy(addon => addon.Name)
+                .ThenBy(addon => addon.Author)
+                .Select(addon => new AddonItem(addon));
+            return items;
+        }
+
+        private class RepoUpdate
+        {
+            public HashSet<string> OldPaths { get; } = new HashSet<string>();
+            public HashSet<string> NewPaths { get; } = new HashSet<string>();
+        }
+
+        private RepoUpdate UpdateRepository()
+        {
+            using (var repo = new LibGit2Sharp.Repository(RepoPath))
+            {
+                if (repo is LibGit2Sharp.Repository)
+                {
+                    repo.Reset(ResetMode.Hard);
+                    var currentCommit = repo.Head.Tip;
+                    var mergeResult = Commands.Pull(
+                        repo,
+                        new LibGit2Sharp.Signature(new Identity("felixkmh", "24227002+felixkmh@users.noreply.github.com"), DateTimeOffset.Now),
+                        new PullOptions() { MergeOptions = new MergeOptions { MergeFileFavor = MergeFileFavor.Theirs } }
+                    );
+                    if (mergeResult.Status != MergeStatus.UpToDate)
+                    {
+                        var diff = repo.Diff.Compare<TreeChanges>(currentCommit.Tree, mergeResult.Commit.Tree);
+                        var repoUpdate = new RepoUpdate();
+                        foreach (var change in diff)
+                        {
+                            if (change.OldExists && change.OldPath.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase))
+                            {
+                                repoUpdate.OldPaths.Add(Path.Combine(RepoPath, change.OldPath.Replace("/","\\")));
+                            }
+                            if (change.Exists && change.Path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase))
+                            {
+                                repoUpdate.NewPaths.Add(Path.Combine(RepoPath, change.Path.Replace("/", "\\")));
+                            }
+                        }
+                        return repoUpdate;
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    public class AddonInstallerManifest
+    {
+        public string AddonId { get; set; }
+        public AddonType AddonType { get; set; }
+        public List<AddonInstallerPackage> Packages { get; set; }
+        //public AddonInstallerPackage GetLatestCompatiblePackage()
+        //{
+        //    if (!Packages.HasItems())
+        //    {
+        //        return null;
+        //    }
+
+        //    var apiVersion = GetApiVersion(AddonType);
+        //    return GetLatestCompatiblePackage(apiVersion);
+        //}
+
+        public AddonInstallerPackage GetLatestCompatiblePackage(System.Version apiVersion)
+        {
+            if (!Packages.HasItems())
+            {
+                return null;
+            }
+
+            return Packages.
+                Where(a => a.RequiredApiVersion.Major == apiVersion.Major && a.RequiredApiVersion <= apiVersion).
+                OrderByDescending(a => a.Version).FirstOrDefault();
+        }
+
+        //private static Version GetApiVersion(AddonType type)
+        //{
+        //    switch (type)
+        //    {
+        //        case AddonType.GameLibrary:
+        //        case AddonType.MetadataProvider:
+        //        case AddonType.Generic:
+        //            return SdkVersions.SDKVersion;
+        //        case AddonType.ThemeDesktop:
+        //            return ThemeManager.DesktopApiVersion;
+        //        case AddonType.ThemeFullscreen:
+        //            return ThemeManager.FullscreenApiVersion;
+        //    }
+
+        //    return new Version(999, 0);
+        //}
+    }
+
+    public class AddonInstallerPackage
+    {
+        public List<string> Changelog { get; set; }
+        public string PackageUrl { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public System.Version RequiredApiVersion { get; set; }
+        public System.Version Version { get; set; }
     }
 
     public class AddonItem : ISearchItem<string>
     {
         internal AddonManifestBase addon;
-        static AddonDetailsView detailsView = null;
-
-        private string AddonTypeToString(AddonType type)
-        {
-            switch (type)
-            {
-                case AddonType.GameLibrary:
-                    return ResourceProvider.GetString("LOC_QS_LibraryIntegration");
-                case AddonType.MetadataProvider:
-                    return ResourceProvider.GetString("LOC_QS_MetadataProvider");
-                case AddonType.Generic:
-                    return ResourceProvider.GetString("LOC_QS_GenericExtension");
-                case AddonType.ThemeDesktop:
-                    return ResourceProvider.GetString("LOC_QS_DesktopTheme");
-                case AddonType.ThemeFullscreen:
-                    return ResourceProvider.GetString("LOC_QS_FullscreenTheme");
-                default:
-                    return null;
-            }
-        }
+        internal static AddonDetailsView detailsView = null;
 
         public AddonItem(AddonManifestBase addon)
         {
@@ -175,32 +295,21 @@ namespace QuickSearch.SearchItems
                 if (Uri.TryCreate(addon.IconUrl, UriKind.RelativeOrAbsolute, out var uri))
                 {
                     Icon = uri;
-                } else
+                }
+                else
                 {
                     Icon = (System.Windows.Application.Current.FindResource("TrayIcon") as BitmapImage).UriSource;
                 }
             }
         }
 
-        public IList<ISearchKey<string>> Keys { get; } = null;
-
         public IList<ISearchAction<string>> Actions => GetActions(addon);
-
-        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
-
-        public Uri Icon { get; } = null;
-
-        public string TopLeft => addon.Name;
-
-        public string TopRight => string.Format(ResourceProvider.GetString("LOC_QS_AddonByDev"), AddonTypeToString(addon.Type), addon.Author);
-
-        public string BottomLeft => addon.ShortDescription;
 
         public string BottomCenter => null;
 
-        public string BottomRight => null;
+        public string BottomLeft => addon.ShortDescription;
 
-        public char? IconChar => addon.IsEnabled ? (addon.IsInstalled ? '' : default) : '';
+        public string BottomRight => null;
 
         public FrameworkElement DetailsView
         {
@@ -215,7 +324,19 @@ namespace QuickSearch.SearchItems
             }
         }
 
-        static private IList<ISearchAction<string>> GetActions(AddonManifestBase addon)
+        public Uri Icon { get; } = null;
+
+        public char? IconChar => addon.IsEnabled ? (addon.IsInstalled ? '' : default) : '';
+
+        public IList<ISearchKey<string>> Keys { get; } = null;
+
+        public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
+
+        public string TopLeft => addon.Name;
+
+        public string TopRight => string.Format(ResourceProvider.GetString("LOC_QS_AddonByDev"), AddonTypeToString(addon.Type), addon.Author);
+
+        private static IList<ISearchAction<string>> GetActions(AddonManifestBase addon)
         {
             var actions = new List<ISearchAction<string>> { new CommandAction() { Action = () => { var p = Process.Start($"playnite://playnite/installaddon/{addon.AddonId}"); p?.Close(); p?.Dispose(); }, Name = addon.IsInstalled ? ResourceProvider.GetString("LOC_QS_UpdateAction") : ResourceProvider.GetString("LOC_QS_InstallAction") } };
 
@@ -263,26 +384,122 @@ namespace QuickSearch.SearchItems
 
             return actions;
         }
-    }
 
-    // see https://github.com/JosefNemec/Playnite/blob/master/source/Playnite/Manifests/AddonManifests.cs for following types
-    public enum AddonType
-    {
-        GameLibrary,
-        MetadataProvider,
-        Generic,
-        ThemeDesktop,
-        ThemeFullscreen
+        private string AddonTypeToString(AddonType type)
+        {
+            switch (type)
+            {
+                case AddonType.GameLibrary:
+                    return ResourceProvider.GetString("LOC_QS_LibraryIntegration");
+
+                case AddonType.MetadataProvider:
+                    return ResourceProvider.GetString("LOC_QS_MetadataProvider");
+
+                case AddonType.Generic:
+                    return ResourceProvider.GetString("LOC_QS_GenericExtension");
+
+                case AddonType.ThemeDesktop:
+                    return ResourceProvider.GetString("LOC_QS_DesktopTheme");
+
+                case AddonType.ThemeFullscreen:
+                    return ResourceProvider.GetString("LOC_QS_FullscreenTheme");
+
+                default:
+                    return null;
+            }
+        }
     }
 
     public class AddonManifestBase : ObservableObject
     {
-        static Octokit.GitHubClient GetGithubClient()
-        {
-            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("QuickSearch-for-Playnite"));
-            return client;
-        }
         internal static Octokit.GitHubClient gitHub = GetGithubClient();
+
+        private DownloadStats downloadStats = null;
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        private AddonInstallerManifest installerManifest = null;
+
+        public string AddonId { get; set; }
+
+        public string Author { get; set; }
+
+        public string Description { get; set; }
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string DownloadString => GetDownloadString();
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string LocalPath { get; set; }
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string ExtensionManifest { get; } = null;
+
+        public string IconUrl { get; set; }
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        public string InstallationPath { get; } = null;
+
+        [YamlDotNet.Serialization.YamlIgnore]
+        public AddonInstallerManifest InstallerManifest
+        {
+            get
+            {
+                if (installerManifest == null)
+                {
+                    try
+                    {
+                        var deserializer = new DeserializerBuilder()
+                            .IgnoreUnmatchedProperties()
+                            .Build();
+                        using (var client = new System.Net.Http.HttpClient())
+                        {
+                            using (var response = client.GetStringAsync(InstallerManifestUrl))
+                            {
+                                response.Wait();
+                                if (!response.IsFaulted)
+                                {
+                                    var yaml = response.Result;
+                                    var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
+                                    installerManifest = manifest;
+                                    installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SearchPlugin.logger.Error(ex, $"Failed to download InstallerManifest for \"{Name}\"");
+                    }
+                }
+                return installerManifest;
+            }
+        }
+
+        public string InstallerManifestUrl { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        [YamlDotNet.Serialization.YamlIgnore]
+        public bool IsEnabled { get; set; } = false;
+
+        [Newtonsoft.Json.JsonIgnore]
+        [YamlDotNet.Serialization.YamlIgnore]
+        public bool IsInstalled { get; set; } = false;
+
+        public Dictionary<string, string> Links { get; set; }
+
+        public string Name { get; set; }
+
+        public List<AddonScreenshot> Screenshots { get; set; }
+
+        public string ShortDescription { get; set; }
+
+        public string SourceUrl { get; set; }
+
+        public List<string> Tags { get; set; }
+
+        public AddonType Type { get; set; }
+
+        public AddonUserAgreement UserAgreement { get; set; }
 
         public void Reset()
         {
@@ -290,44 +507,10 @@ namespace QuickSearch.SearchItems
             installerManifest = null;
         }
 
-        private DownloadStats downloadStats = null;
-
-        private string GetDownloadString()
+        private static Octokit.GitHubClient GetGithubClient()
         {
-            var stats = downloadStats ?? GetDownloadCount();
-            downloadStats = stats;
-            if ((downloadStats?.total ?? -1) < 0)
-            {
-                return null;
-            } else
-            {
-                string total;
-                if (stats.total >= 1_000_000_000)
-                    total = ((stats.total / 1_000_000_000.0).ToString("#,##0.###") + "G");
-                else if (stats.total >= 1_000_000)
-                    total = ((stats.total / 1_000_000.0).ToString("#,##0.##") + "M");
-                else if (stats.total >= 10_000)
-                    total = ((stats.total / 1_000.0).ToString("#,##0.#") + "K");
-                else
-                    total = (stats.total.ToString("#,##0.#"));
-                string latest;
-
-                if (stats.latest >= 1_000_000_000)
-                    latest = ((stats.latest / 1_000_000_000.0).ToString("#,##0.###") + "G");
-                else if (stats.latest >= 1_000_000)
-                    latest = ((stats.latest / 1_000_000.0).ToString("#,##0.##") + "M");
-                else if (stats.latest >= 10_000)
-                    latest = ((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
-                else
-                    latest = (stats.latest.ToString("#,##0.#"));
-                return string.Format(ResourceProvider.GetString("LOC_QS_DownloadStats"), total, latest);
-            }
-        }
-
-        class DownloadStats
-        {
-            public Int64 total = 0;
-            public Int64 latest = 0;
+            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("QuickSearch-for-Playnite"));
+            return client;
         }
 
         private DownloadStats GetDownloadCount()
@@ -400,168 +583,76 @@ namespace QuickSearch.SearchItems
             return null;
         }
 
-
-        public class AddonUserAgreement
+        private string GetDownloadString()
         {
-            public DateTime Updated { get; set; }
-            public string AgreementUrl { get; set; }
+            var stats = downloadStats ?? GetDownloadCount();
+            downloadStats = stats;
+            if ((downloadStats?.total ?? -1) < 0)
+            {
+                return null;
+            }
+            else
+            {
+                string total;
+                if (stats.total >= 1_000_000_000)
+                    total = ((stats.total / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                else if (stats.total >= 1_000_000)
+                    total = ((stats.total / 1_000_000.0).ToString("#,##0.##") + "M");
+                else if (stats.total >= 10_000)
+                    total = ((stats.total / 1_000.0).ToString("#,##0.#") + "K");
+                else
+                    total = (stats.total.ToString("#,##0.#"));
+                string latest;
+
+                if (stats.latest >= 1_000_000_000)
+                    latest = ((stats.latest / 1_000_000_000.0).ToString("#,##0.###") + "G");
+                else if (stats.latest >= 1_000_000)
+                    latest = ((stats.latest / 1_000_000.0).ToString("#,##0.##") + "M");
+                else if (stats.latest >= 10_000)
+                    latest = ((stats.latest / 1_000.0).ToString("#,##0.#") + "K");
+                else
+                    latest = (stats.latest.ToString("#,##0.#"));
+                return string.Format(ResourceProvider.GetString("LOC_QS_DownloadStats"), total, latest);
+            }
         }
 
         public class AddonScreenshot
         {
-            public string Thumbnail { get; set; }
             public string Image { get; set; }
+            public string Thumbnail { get; set; }
         }
 
-        [DontSerialize]
-        public string DownloadString => GetDownloadString();
-
-        public string IconUrl { get; set; }
-        public List<AddonScreenshot> Screenshots { get; set; }
-        public AddonType Type { get; set; }
-        public string InstallerManifestUrl { get; set; }
-        public string ShortDescription { get; set; }
-        public string Description { get; set; }
-        public string Name { get; set; }
-        public string AddonId { get; set; }
-        public string Author { get; set; }
-        public Dictionary<string, string> Links { get; set; }
-        public List<string> Tags { get; set; }
-        public AddonUserAgreement UserAgreement { get; set; }
-        public string SourceUrl { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        [YamlDotNet.Serialization.YamlIgnore]
-        public bool IsInstalled { get; set; } = false;
-        [Newtonsoft.Json.JsonIgnore]
-        [YamlDotNet.Serialization.YamlIgnore]
-        public bool IsEnabled { get; set; } = false;
-        [YamlDotNet.Serialization.YamlIgnore]
-        public string InstallationPath { get; } = null;
-        [YamlDotNet.Serialization.YamlIgnore]
-        public string ExtensionManifest { get; } = null;
-        [YamlDotNet.Serialization.YamlIgnore]
-        private AddonInstallerManifest installerManifest = null;
-        [YamlDotNet.Serialization.YamlIgnore]
-        public AddonInstallerManifest InstallerManifest
+        public class AddonUserAgreement
         {
-            get
-            {
-                if (installerManifest == null)
-                {
-                    try
-                    {
-                        var deserializer = new DeserializerBuilder()
-                            .IgnoreUnmatchedProperties()
-                            .Build();
-                        using (var client = new System.Net.Http.HttpClient())
-                        {
-                            using (var response = client.GetStringAsync(InstallerManifestUrl))
-                            {
-                                response.Wait();
-                                if (!response.IsFaulted)
-                                {
-                                    var yaml = response.Result;
-                                    var manifest = deserializer.Deserialize<AddonInstallerManifest>(yaml);
-                                    installerManifest = manifest;
-                                    installerManifest.Packages = installerManifest.Packages.OrderByDescending(p => p.Version).ToList();
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SearchPlugin.logger.Error(ex, $"Failed to download InstallerManifest for \"{Name}\"");
-                    }
-                }
-                return installerManifest;
-            }
+            public string AgreementUrl { get; set; }
+            public DateTime Updated { get; set; }
         }
-    }
 
-    public class AddonInstallerManifest
-    {
-        public string AddonId { get; set; }
-        public List<AddonInstallerPackage> Packages { get; set; }
-        public AddonType AddonType { get; set; }
-
-        //public AddonInstallerPackage GetLatestCompatiblePackage()
-        //{
-        //    if (!Packages.HasItems())
-        //    {
-        //        return null;
-        //    }
-
-        //    var apiVersion = GetApiVersion(AddonType);
-        //    return GetLatestCompatiblePackage(apiVersion);
-        //}
-
-        public AddonInstallerPackage GetLatestCompatiblePackage(System.Version apiVersion)
+        private class DownloadStats
         {
-            if (!Packages.HasItems())
-            {
-                return null;
-            }
-
-            return Packages.
-                Where(a => a.RequiredApiVersion.Major == apiVersion.Major && a.RequiredApiVersion <= apiVersion).
-                OrderByDescending(a => a.Version).FirstOrDefault();
+            public Int64 latest = 0;
+            public Int64 total = 0;
         }
-
-        //private static Version GetApiVersion(AddonType type)
-        //{
-        //    switch (type)
-        //    {
-        //        case AddonType.GameLibrary:
-        //        case AddonType.MetadataProvider:
-        //        case AddonType.Generic:
-        //            return SdkVersions.SDKVersion;
-        //        case AddonType.ThemeDesktop:
-        //            return ThemeManager.DesktopApiVersion;
-        //        case AddonType.ThemeFullscreen:
-        //            return ThemeManager.FullscreenApiVersion;
-        //    }
-
-        //    return new Version(999, 0);
-        //}
-    }
-
-    public class AddonInstallerPackage
-    {
-        public System.Version Version { get; set; }
-        public string PackageUrl { get; set; }
-        public System.Version RequiredApiVersion { get; set; }
-        public DateTime ReleaseDate { get; set; }
-        public List<string> Changelog { get; set; }
-    }
-
-    public enum ExtensionType
-    {
-        GenericPlugin,
-        GameLibrary,
-        Script,
-        MetadataProvider
     }
 
     public class BaseExtensionManifest
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
         public string Author { get; set; }
 
-        public string Version { get; set; }
-
-        public List<Link> Links { get; set; }
-
         [YamlIgnore]
-        public string DirectoryPath { get; set; }
+        public string DescriptionPath { get; set; }
 
         [YamlIgnore]
         public string DirectoryName { get; set; }
 
         [YamlIgnore]
-        public string DescriptionPath { get; set; }
+        public string DirectoryPath { get; set; }
+
+        public string Id { get; set; }
+
+        public List<Link> Links { get; set; }
+        public string Name { get; set; }
+        public string Version { get; set; }
 
         public void VerifyManifest()
         {
@@ -574,6 +665,12 @@ namespace QuickSearch.SearchItems
 
     public class ExtensionManifest : BaseExtensionManifest
     {
+        public ExtensionManifest()
+        {
+        }
+
+        public string Icon { get; set; }
+
         [YamlIgnore]
         public bool IsExternalDev { get; set; }
 
@@ -581,14 +678,7 @@ namespace QuickSearch.SearchItems
         //public bool IsCompatible { get; } = false;
 
         public string Module { get; set; }
-
-        public string Icon { get; set; }
-
         public ExtensionType Type { get; set; }
-
-        public ExtensionManifest()
-        {
-        }
 
         public static ExtensionManifest FromFile(string descriptorPath)
         {
