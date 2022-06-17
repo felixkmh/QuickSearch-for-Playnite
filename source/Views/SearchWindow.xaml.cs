@@ -33,6 +33,7 @@ namespace QuickSearch
 
         internal double heightSelected = double.NaN;
         internal double heightNotSelected = double.NaN;
+        internal int? maxItems = null;
 
         public void Reset()
         {
@@ -155,6 +156,39 @@ namespace QuickSearch
             {
                 heightSelected = double.NaN;
                 heightNotSelected = double.NaN;
+                scrollViewer = null;
+                maxItems = null;
+            }
+            if (scrollViewer != null && 
+                !double.IsNaN(heightSelected) && 
+                !double.IsNaN(heightNotSelected) && 
+                maxItems != null)
+            {
+                var margin = SearchResults.Margin;
+                if (maxItems + 1 >= items && scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled)
+                {
+                    scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                }
+                else if (scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
+                {
+                    scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                }
+                switch (scrollViewer.VerticalScrollBarVisibility)
+                {
+                    case ScrollBarVisibility.Visible:
+                        margin.Right = -SystemParameters.VerticalScrollBarWidth;
+                        break;
+                    case ScrollBarVisibility.Hidden:
+                    case ScrollBarVisibility.Disabled:
+                        margin.Right = 0;
+                        break;
+                }
+                if (SearchResults.Margin.Right != margin.Right)
+                {
+                    SearchResults.Margin = margin;
+                }
+                
+                return;
             }
             if (scrollViewer == null)
             {
@@ -188,8 +222,8 @@ namespace QuickSearch
                 {
                     var availableHeight = 400.0;
                     availableHeight -= heightSelected;
-                    var maxItems = Math.Floor(availableHeight / heightNotSelected);
-                    var maxHeight = heightSelected + maxItems * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
+                    maxItems = (int)Math.Floor(availableHeight / heightNotSelected);
+                    var maxHeight = heightSelected + (maxItems ?? 0) * heightNotSelected + SearchResults.Padding.Top + SearchResults.Padding.Bottom + 2;
                     if (maxItems + 1 >= items)
                     {
                         var margin = SearchResults.Margin;
@@ -217,7 +251,7 @@ namespace QuickSearch
                     var margin = SearchResults.Margin;
                     margin.Right = items > 5 ? -SystemParameters.VerticalScrollBarWidth : 0;
                     SearchResults.Margin = margin;
-                    scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    //scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 }
             }
         }

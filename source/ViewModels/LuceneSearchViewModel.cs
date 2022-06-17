@@ -40,9 +40,10 @@ namespace QuickSearch.ViewModels
             {
                 TokenStream t = null;
                 t = new WhitespaceTokenizer(reader);
+                //t = new KeywordTokenizer(reader);
                 t = new ASCIIFoldingFilter(t);
                 t = new LowerCaseFilter(t);
-                t = new NGramTokenFilter(t, 1, 10);
+                t = new NGramTokenFilter(t, 1, 12);
 
                 return t;
             }
@@ -437,7 +438,7 @@ namespace QuickSearch.ViewModels
                         if (!string.IsNullOrWhiteSpace(escapedInput))
                         {
                             var fieldQuery = new List<Query>();
-                            for (int i = 0; i < maxFields; i++)
+                            for (int i = 0; i < maxNumFields; i++)
                             {
                                 var boolQuery = new BooleanQuery();
                                 var pos = 0;

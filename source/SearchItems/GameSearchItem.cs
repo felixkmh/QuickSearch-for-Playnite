@@ -1053,7 +1053,7 @@ namespace QuickSearch.SearchItems
 
         public ScoreMode ScoreMode => ScoreMode.WeightedMaxScore;
 
-        public char? IconChar => null;
+        public char? IconChar => !game.Hidden ? default : '\uef22';
 
         private GameDetailsView details = null;
 

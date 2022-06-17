@@ -297,7 +297,7 @@
                      Focusable="False" KeyboardNavigation.ControlTabNavigation="None" 
                      KeyboardNavigation.IsTabStop="False" 
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                      VirtualizingPanel.IsVirtualizing="True"
                      VirtualizingPanel.VirtualizationMode="Recycling"
                      ItemsSource="{Binding SearchResults, Mode=OneWay}"
