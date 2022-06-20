@@ -101,6 +101,8 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog">Öffne Playnite-Log</sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog">Erweiterungs-Log</sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog">Öffne Erweiterungs-Log</sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">Wenn aktiviert, wird der Spielesuchindex auf der Festplatte gespeichert und beim nächsten Start von Playnite wiederverwendet. Andernfalls wird er bei jedem Start von Playnite von Grund auf neu erstellt.</sys:String>
