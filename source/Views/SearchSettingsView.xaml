@@ -165,6 +165,14 @@
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="10" Grid.IsSharedSizeScope="True">
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding AddMainMenuItemsAsCommands}" Margin="5"/>
+                        <TextBlock Text="{DynamicResource LOC_QS_IncludeMainMenuItems}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding AddExtensionSettingsItems}" Margin="5"/>
+                        <TextBlock Text="{DynamicResource LOC_QS_IncludePluginSettings}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
                         <CheckBox  IsChecked="{Binding EnableExternalItems}" Margin="5" x:Name="GlobalItemsEnabled"/>
                         <TextBlock Text="{DynamicResource LOC_QS_AllowExternalItems}" VerticalAlignment="Center" />
                     </StackPanel>

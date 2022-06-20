@@ -207,6 +207,12 @@ namespace QuickSearch
 
         public bool EnableInFullscreenMode { get; set; } = false;
 
+        [GenericOption("LOC_QS_IncludeMainMenuItems")]
+        public bool AddMainMenuItemsAsCommands { get; set; } = true;
+
+        [GenericOption("LOC_QS_IncludePluginSettings")]
+        public bool AddExtensionSettingsItems { get; set; } = true;
+
         public string GitHubAccessToken { get; set; } = null;
 
         public delegate void SettingsChangedHandler(SearchSettings newSettings, SearchSettings oldSettings);

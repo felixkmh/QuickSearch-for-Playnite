@@ -306,6 +306,7 @@ namespace QuickSearch
             InitializeUsedFields(PlayniteApi);
             instance = this;
             searchItemSources.Add("Games", new GameSearchSource());
+            searchItemSources.Add("ExtensionItems", new ExtensionItemSource(this));
 
             if (!string.IsNullOrWhiteSpace(Settings.GitHubAccessToken))
             {
@@ -321,7 +322,7 @@ namespace QuickSearch
                 }
             }
 
-            AddPluginSettings();
+            // AddPluginCommands();
 
             // searchItemSources.Add("Commands", simpleCommands);
             // QuickSearchSDK.AddItemSource("External_Commands", QuickSearchSDK.simpleCommands);
@@ -606,7 +607,7 @@ namespace QuickSearch
                 addGameCommand.Keys.Add(new CommandItemKey() { Key = "> " + key.Key, Weight = 1 });
             }
             addGameCommand.Keys.Add(new CommandItemKey { Key = ">", Weight = 1 });
-            QuickSearchSDK.AddPluginSettings("QuickSearch", Settings, OpenSettingsView);
+            
             QuickSearchSDK.AddItemSource("ITAD", new ITADItemSource());
 
             //foreach(var metadataPlugin in PlayniteApi.Addons.Plugins.OfType<MetadataPlugin>().Where(p => p.Name == "IGDB"))
@@ -671,7 +672,7 @@ namespace QuickSearch
             return name.Substring(0, sep);
         }
 
-        private void AddPluginSettings()
+        private void AddPluginCommands()
         {
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var plugins = PlayniteApi.Addons.Plugins
@@ -697,6 +698,7 @@ namespace QuickSearch
             {
                 var installDir = System.IO.Path.GetDirectoryName(plugin.GetType().Assembly.Location);
                 var extensionYaml = System.IO.Path.Combine(installDir, "extension.yaml");
+                Uri iconUri = null;
                 if (System.IO.File.Exists(extensionYaml))
                 {
                     var text = System.IO.File.ReadAllText(extensionYaml);
@@ -712,6 +714,7 @@ namespace QuickSearch
                             item.TopRight = config["Version"] as string;
                             if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
                             {
+                                iconUri = uri;
                                 item.Icon = uri;
                             }
                             item.Actions.Add(new CommandAction()
@@ -725,6 +728,33 @@ namespace QuickSearch
                                 Action = () => Process.Start(installDir)
                             });
                         }
+                    }
+                }
+                var mainMenuItems = plugin.GetMainMenuItems(new GetMainMenuItemsArgs()) ?? new List<MainMenuItem>();
+                foreach (var mainMenuItem in mainMenuItems)
+                {
+                    var path = mainMenuItem.MenuSection
+                        .Replace("@", "")
+                        .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                    var title = string.Join(" > ", path);
+                    var command = QuickSearchSDK.AddCommand(
+                        name: mainMenuItem.Description,
+                        descripton: title,
+                        action: () => mainMenuItem.Action?.Invoke(new MainMenuItemActionArgs { SourceItem = mainMenuItem }));
+                    if (mainMenuItem.Icon?.Length > 0)
+                    {
+                        if (mainMenuItem.Icon.Length == 1)
+                        {
+                            command.IconChar = mainMenuItem.Icon[0];
+                        }
+                        else
+                        {
+                            command.Icon = new Uri(mainMenuItem.Icon);
+                        }
+                    }
+                    else
+                    {
+                        command.Icon = iconUri;
                     }
                 }
             }

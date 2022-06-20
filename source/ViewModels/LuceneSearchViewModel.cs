@@ -196,6 +196,7 @@ namespace QuickSearch.ViewModels
             {
                 openedSearchTokenSource.Cancel();
             }
+            var oldSource = openedSearchTokenSource;
             openedSearchTokenSource = new CancellationTokenSource();
             var cancellationToken = openedSearchTokenSource.Token;
             Task updateTask = Task.Run(() =>
@@ -265,6 +266,7 @@ namespace QuickSearch.ViewModels
             {
                 t.Dispose();
                 task.Wait();
+                oldSource?.Dispose();
             });
         }
 
@@ -442,6 +444,7 @@ namespace QuickSearch.ViewModels
                             {
                                 var boolQuery = new BooleanQuery();
                                 var pos = 0;
+                                //var boolQuery2 = new BooleanQuery();
                                 foreach (var term in terms)
                                 {
                                     var queryTerm = new Term($"key{i}", term);
@@ -449,7 +452,12 @@ namespace QuickSearch.ViewModels
                                     fuzzy.Boost = 5;
                                     boolQuery.Add(fuzzy, Occur.SHOULD);
                                     boolQuery.Add(new SpanFirstQuery(new SpanTermQuery(queryTerm), ++pos), Occur.SHOULD);
+                                    //foreach(var c in term)
+                                    //{
+                                    //    boolQuery2.Add(new TermQuery(new Term($"key{i}", c.ToString())), Occur.SHOULD);
+                                    //}
                                 }
+                                //fieldQuery.Add(boolQuery2);
                                 fieldQuery.Add(boolQuery);
                             }
 
