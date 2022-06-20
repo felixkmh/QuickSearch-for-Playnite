@@ -42,7 +42,7 @@
     <sys:String x:Key="LOC_QS_ExpandAllItems">Développer tous les éléments</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">Afficher le séparateur</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding">Diminuer la priorité d'ajout des résultats (Activer en cas de ralentissements)</sys:String>
-    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">Ajouter des éléments à la liste de basse priorité</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">Ajouter des éléments à la liste de basse priorit</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">Trier par état d'installation plutôt que par noms lorsque la priorité est égale</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">Donner priorité à l'état d'installation pour le tri</sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems">Activer la recherche par filtres</sys:String>
@@ -63,7 +63,7 @@
     <sys:String x:Key="LOC_QS_OverrideSuffix">Suffixe de la commande manuelle :</sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops">Sélectionner les magasins à ajouter dans la liste de recherche :</sys:String>
     <sys:String x:Key="LOC_QS_Shop">Magasin</sys:String>
-    <sys:String x:Key="LOC_QS_Enabled">Activé</sys:String>
+    <sys:String x:Key="LOC_QS_Enabled">Activ</sys:String>
     <sys:String x:Key="LOC_QS_Settings">Paramètres</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">Ouvrir les paramètres pour {0}</sys:String>
     <sys:String x:Key="LOC_QS_Library">Bibliothèque</sys:String>
@@ -72,10 +72,10 @@
     <sys:String x:Key="LOC_QS_Category">Catégorie</sys:String>
     <sys:String x:Key="LOC_QS_Company">Développeur/Éditeur </sys:String>
     <sys:String x:Key="LOC_QS_InstallationStatus">Statut de l'installation</sys:String>
-    <sys:String x:Key="LOC_QS_Installed">Installé</sys:String>
-    <sys:String x:Key="LOC_QS_Uninstalled">Non installé</sys:String>
+    <sys:String x:Key="LOC_QS_Installed">Install</sys:String>
+    <sys:String x:Key="LOC_QS_Uninstalled">Non install</sys:String>
     <sys:String x:Key="LOC_QS_XFilter">{0} filtre</sys:String>
-    <sys:String x:Key="LOC_QS_EnableDetailsView">Affichage détaillé</sys:String>
+    <sys:String x:Key="LOC_QS_EnableDetailsView">Affichage détaill</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">Largeur de la fenêtre de recherche</sys:String>
     <sys:String x:Key="LOC_QS_DetailsMaxWidth">Largeur maximale (affichage détaillé)</sys:String>
     <sys:String x:Key="LOC_QS_AddonBrowserPrefix">Parcourir les extensions</sys:String>
@@ -85,7 +85,7 @@
     <sys:String x:Key="LOC_QS_DesktopTheme">Thème (Bureau)</sys:String>
     <sys:String x:Key="LOC_QS_FullscreenTheme">Thème (Plein Écran)</sys:String>
     <sys:String x:Key="LOC_QS_MetadataProvider">Sources de métadonnées</sys:String>
-    <sys:String x:Key="LOC_QS_Disabled">Désactivé</sys:String>
+    <sys:String x:Key="LOC_QS_Disabled">Désactiv</sys:String>
     <sys:String x:Key="LOC_QS_UserData">Données de l'utilisateur</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installation</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">Journal des modifications</sys:String>
@@ -101,6 +101,8 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
