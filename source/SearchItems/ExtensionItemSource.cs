@@ -97,7 +97,7 @@ namespace QuickSearch.SearchItems
                     var command = new CommandItem(
                         name: mainMenuItem.Description,
                         action: () => mainMenuItem.Action?.Invoke(new MainMenuItemActionArgs { SourceItem = mainMenuItem }),
-                        actionName: "Open",
+                        actionName: ResourceProvider.GetString("LOC_QS_RunAction"),
                         description: title,
                         iconPath: null
                     );
