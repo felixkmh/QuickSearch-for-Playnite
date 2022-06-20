@@ -101,8 +101,8 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog">Open Playnite log</sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog">Extension log</sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog">Open extension log</sys:String>
-    <sys:String x:Key="LOC_QS_IncludeMainMenuItems">Include Extension Main Menu Items in search results</sys:String>
-    <sys:String x:Key="LOC_QS_IncludePluginSettings">Include Extension Settings Items in search results</sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems">Include extension Main Menu items in search results</sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings">Include extension settings items in search results</sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">If enabled, the game search index is stored on disk, and re-used the next time Playnite starts. Otherwise, it will be created from scratch each time Playnite starts.</sys:String>
