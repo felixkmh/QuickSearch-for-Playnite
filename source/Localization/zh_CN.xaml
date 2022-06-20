@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 	<!--Actions-->
-    <sys:String x:Key="LOC_QS_PlayAction">游玩</sys:String>
-    <sys:String x:Key="LOC_QS_InstallAction">安装</sys:String>
+    <sys:String x:Key="LOC_QS_PlayAction">游</sys:String>
+    <sys:String x:Key="LOC_QS_InstallAction">安</sys:String>
     <sys:String x:Key="LOC_QS_RunAction">运行</sys:String>
-    <sys:String x:Key="LOC_QS_ApplyAction">应用</sys:String>
+    <sys:String x:Key="LOC_QS_ApplyAction">应</sys:String>
     <sys:String x:Key="LOC_QS_SearchAction">搜索</sys:String>
-    <sys:String x:Key="LOC_QS_OpenAction">打开</sys:String>
+    <sys:String x:Key="LOC_QS_OpenAction">打</sys:String>
     <sys:String x:Key="LOC_QS_ShowAction">显示</sys:String>
     <sys:String x:Key="LOC_QS_ToggleAction">切换</sys:String>
     <sys:String x:Key="LOC_QS_SetAction">设置</sys:String>
@@ -23,47 +23,47 @@
 
     <!--Settings-->
 	<!--Tabs-->
-	<sys:String x:Key="LOC_QS_CommonTab">常用</sys:String>
-	<sys:String x:Key="LOC_QS_AppearanceTab">外观</sys:String>
-    <sys:String x:Key="LOC_QS_ExternalTab">外部</sys:String>
-    <sys:String x:Key="LOC_QS_ITADTab">有折扣吗（IsThereAnyDeal）</sys:String>
+	<sys:String x:Key="LOC_QS_CommonTab">常</sys:String>
+	<sys:String x:Key="LOC_QS_AppearanceTab">外</sys:String>
+    <sys:String x:Key="LOC_QS_ExternalTab">外</sys:String>
+    <sys:String x:Key="LOC_QS_ITADTab">有折扣吗（IsThereAnyDeal</sys:String>
 
 	<!--Labels-->
-    <sys:String x:Key="LOC_QS_LocalHotkey">打开搜索弹窗的热键：</sys:String>
+    <sys:String x:Key="LOC_QS_LocalHotkey">打开搜索弹窗的热键</sys:String>
     <sys:String x:Key="LOC_QS_LocalHotkeyShort">搜索热键</sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkey">打开搜索弹窗的全局热键：</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkey">打开搜索弹窗的全局热键</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyShort">全局搜索热键</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">启用全局热键</sys:String>
-    <sys:String x:Key="LOC_QS_SearchThreshold">模糊搜索阈值（数值越高=越严格=搜索越快）：</sys:String>
+    <sys:String x:Key="LOC_QS_SearchThreshold">模糊搜索阈值（数值越高=越严格=搜索越快）</sys:String>
     <sys:String x:Key="LOC_QS_SearchThresholdShort">模糊搜索阈值</sys:String>
-    <sys:String x:Key="LOC_QS_AsyncDelay">请求异步项目之前等待的时间，以毫秒为单位：</sys:String>
-    <sys:String x:Key="LOC_QS_AsyncDelayShort">异步项目延迟（毫秒）</sys:String>
-    <sys:String x:Key="LOC_QS_MaxResults">结果数目上限（0=无限制）：</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelay">请求异步项目之前等待的时间，以毫秒为单位</sys:String>
+    <sys:String x:Key="LOC_QS_AsyncDelayShort">异步项目延迟（毫秒</sys:String>
+    <sys:String x:Key="LOC_QS_MaxResults">结果数目上限（0=无限制）</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">展开所有项目</sys:String>
     <sys:String x:Key="LOC_QS_ShowSeparator">显示分隔符</sys:String>
-    <sys:String x:Key="LOC_QS_LowerPriorityAdding">降低添加结果的优先级（适用于打字延迟较高的问题）</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAdding">降低添加结果的优先级（适用于打字延迟较高的问题</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">以较低优先级添加项目</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">若分数相同，则先后按安装状态以及名称排序</sys:String>
     <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">优先按安装状态排序</sys:String>
     <sys:String x:Key="LOC_QS_FilterSubItems">启用过滤器-子项目来源</sys:String>
-    <sys:String x:Key="LOC_QS_PreferCoverArt">封面艺术比游戏图标优先</sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArt">封面艺术比游戏图标优</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffect">启用搜索窗口的透明玻璃效果</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffectShort">玻璃效果</sys:String>
-    <sys:String x:Key="LOC_QS_BorderWidth">搜索窗口外边框的宽度：</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidth">搜索窗口外边框的宽度</sys:String>
     <sys:String x:Key="LOC_QS_BorderWidthShort">外边框宽度</sys:String>
-    <sys:String x:Key="LOC_QS_AllowExternalItems">启用由其他扩展添加的项目。</sys:String>
-    <sys:String x:Key="LOC_QS_AllowExternalGameActions">启用由其他扩展添加的游戏指令。</sys:String>
-    <sys:String x:Key="LOC_QS_PerExtensionSettings">为每个扩展启用项目和游戏指令：</sys:String>
+    <sys:String x:Key="LOC_QS_AllowExternalItems">启用由其他扩展添加的项目</sys:String>
+    <sys:String x:Key="LOC_QS_AllowExternalGameActions">启用由其他扩展添加的游戏指令</sys:String>
+    <sys:String x:Key="LOC_QS_PerExtensionSettings">为每个扩展启用项目和游戏指令</sys:String>
     <sys:String x:Key="LOC_QS_Extension">扩展</sys:String>
     <sys:String x:Key="LOC_QS_Items">项目</sys:String>
     <sys:String x:Key="LOC_QS_Actions">指令</sys:String>
     <sys:String x:Key="LOC_QS_EnableITAD">允许以有折扣吗 API 进行搜索</sys:String>
-    <sys:String x:Key="LOC_QS_ITADThreshold">有折扣吗的阈值。若最佳结果的分数小于该值，则在有折扣吗上搜素。</sys:String>
+    <sys:String x:Key="LOC_QS_ITADThreshold">有折扣吗的阈值。若最佳结果的分数小于该值，则在有折扣吗上搜</sys:String>
     <sys:String x:Key="LOC_QS_ITADThresholdShort">有折扣吗阈值</sys:String>
-    <sys:String x:Key="LOC_QS_OverrideSuffix">手动覆盖后缀：</sys:String>
-    <sys:String x:Key="LOC_QS_EnabledITADShops">启用可用商店以搜索：</sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffix">手动覆盖后缀</sys:String>
+    <sys:String x:Key="LOC_QS_EnabledITADShops">启用可用商店以搜索</sys:String>
     <sys:String x:Key="LOC_QS_Shop">商店</sys:String>
-    <sys:String x:Key="LOC_QS_Enabled">已启用</sys:String>
+    <sys:String x:Key="LOC_QS_Enabled">已启</sys:String>
     <sys:String x:Key="LOC_QS_Settings">设置</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">打开 {0} 的设置</sys:String>
     <sys:String x:Key="LOC_QS_Library">库</sys:String>
@@ -71,10 +71,10 @@
     <sys:String x:Key="LOC_QS_Genre">流派​​</sys:String>
     <sys:String x:Key="LOC_QS_Category">分类</sys:String>
     <sys:String x:Key="LOC_QS_Company">公司</sys:String>
-    <sys:String x:Key="LOC_QS_InstallationStatus">安装状态</sys:String>
-    <sys:String x:Key="LOC_QS_Installed">已安装</sys:String>
-    <sys:String x:Key="LOC_QS_Uninstalled">未安装</sys:String>
-    <sys:String x:Key="LOC_QS_XFilter">{0} 过滤器</sys:String>
+    <sys:String x:Key="LOC_QS_InstallationStatus">安装状</sys:String>
+    <sys:String x:Key="LOC_QS_Installed">已安</sys:String>
+    <sys:String x:Key="LOC_QS_Uninstalled">未安</sys:String>
+    <sys:String x:Key="LOC_QS_XFilter">{0} 过滤</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsView">启用详情视图</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">搜索窗口宽度</sys:String>
     <sys:String x:Key="LOC_QS_DetailsMaxWidth">详情视图最大宽度</sys:String>
@@ -85,12 +85,12 @@
     <sys:String x:Key="LOC_QS_DesktopTheme">桌面主题</sys:String>
     <sys:String x:Key="LOC_QS_FullscreenTheme">全屏主题</sys:String>
     <sys:String x:Key="LOC_QS_MetadataProvider">元数据供应源</sys:String>
-    <sys:String x:Key="LOC_QS_Disabled">禁用</sys:String>
+    <sys:String x:Key="LOC_QS_Disabled">禁</sys:String>
     <sys:String x:Key="LOC_QS_UserData">用户数据</sys:String>
-    <sys:String x:Key="LOC_QS_InstallationData">安装</sys:String>
+    <sys:String x:Key="LOC_QS_InstallationData">安</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">更改日志</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">忽略隐藏游戏</sys:String>
-    <sys:String x:Key="LOC_QS_MinAcronmLength">可搜索的最短缩写长度（例如：Final Fantasy VII-&gt;FFVII，Resident Evil 7-&gt;RE7）</sys:String>
+    <sys:String x:Key="LOC_QS_MinAcronmLength">可搜索的最短缩写长度（例如：Final Fantasy VII-&gt;FFVII，Resident Evil 7-&gt;RE7</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
@@ -101,15 +101,17 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
-    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">若可用，使用游戏封面艺术而非游戏图标作为游戏结果的图标。</sys:String>
-    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">将此字符串添加到搜索查询的最后，以强制使用有折扣吗搜索。留空则禁用手动覆盖。</sys:String>
-    <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">若启用且可用，则在短暂延迟后为所选结果显示更多细节。</sys:String>
-    <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">游戏名称缩写所需的最小字数。设为 0 可禁用缩写。缩写由每个词的首字母组合而成。数字，无论是罗马数字还是小数位，都应完全保留。</sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">若可用，使用游戏封面艺术而非游戏图标作为游戏结果的图</sys:String>
+    <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">将此字符串添加到搜索查询的最后，以强制使用有折扣吗搜索。留空则禁用手动覆盖</sys:String>
+    <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">若启用且可用，则在短暂延迟后为所选结果显示更多细</sys:String>
+    <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">游戏名称缩写所需的最小字数。设为 0 可禁用缩写。缩写由每个词的首字母组合而成。数字，无论是罗马数字还是小数位，都应完全保留</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve"></sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">设置热键</sys:String>
-    <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">现在按热键（+修饰键）</sys:String>
+    <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">现在按热键（+修饰键</sys:String>
 </ResourceDictionary>
