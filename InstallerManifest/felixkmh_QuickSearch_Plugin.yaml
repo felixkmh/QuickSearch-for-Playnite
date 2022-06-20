@@ -1,5 +1,14 @@
 AddonId: felixkmh_QuickSearch_Plugin
 Packages:    
+  - Version: 2.23.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-06-17
+    PackageUrl: https://github.com/felixkmh/QuickSearch-for-Playnite/releases/download/v2.23.0/felixkmh_QuickSearch_Plugin_2_23_0.pext
+    Changelog:
+      - Add-on Browser items are now cached after loading the first time
+      - Show icon indicating whether a game is hidden
+      - Show star icon on favorites
+      - Slight performance improvements
   - Version: 2.22.2
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2022-06-07
