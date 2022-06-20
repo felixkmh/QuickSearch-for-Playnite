@@ -1,31 +1,31 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 	<!--Actions-->
-    <sys:String x:Key="LOC_QS_PlayAction">لعب</sys:String>
+    <sys:String x:Key="LOC_QS_PlayAction">لع</sys:String>
     <sys:String x:Key="LOC_QS_InstallAction">تثبيت</sys:String>
-    <sys:String x:Key="LOC_QS_RunAction">تشغيل</sys:String>
-    <sys:String x:Key="LOC_QS_ApplyAction">تطبيق</sys:String>
+    <sys:String x:Key="LOC_QS_RunAction">تشغي</sys:String>
+    <sys:String x:Key="LOC_QS_ApplyAction">تطبي</sys:String>
     <sys:String x:Key="LOC_QS_SearchAction">بحث</sys:String>
     <sys:String x:Key="LOC_QS_OpenAction">فتح</sys:String>
     <sys:String x:Key="LOC_QS_ShowAction">إظهار</sys:String>
-    <sys:String x:Key="LOC_QS_ToggleAction">تبديل</sys:String>
-    <sys:String x:Key="LOC_QS_SetAction">تعيين</sys:String>
+    <sys:String x:Key="LOC_QS_ToggleAction">تبدي</sys:String>
+    <sys:String x:Key="LOC_QS_SetAction">تعيي</sys:String>
     <sys:String x:Key="LOC_QS_SetToAction">تعيين إلى {0}</sys:String>
     <sys:String x:Key="LOC_QS_UpdateAction">تحديث</sys:String>
     <sys:String x:Key="LOC_QS_UpdateAllLibraries">تحديث جميع المكتبات</sys:String>
-    <sys:String x:Key="LOC_QS_DownloadMetaData">تحميل بيانات التعريف</sys:String>
-    <sys:String x:Key="LOC_QS_Addons">الإضافة</sys:String>
+    <sys:String x:Key="LOC_QS_DownloadMetaData">تحميل بيانات التعري</sys:String>
+    <sys:String x:Key="LOC_QS_Addons">الإضاف</sys:String>
     <sys:String x:Key="LOC_QS_OpenAddons">فتح نافذة الإضافات</sys:String>
-    <sys:String x:Key="LOC_QS_SwitchAction">تبديل</sys:String>
+    <sys:String x:Key="LOC_QS_SwitchAction">تبدي</sys:String>
     <sys:String x:Key="LOC_QS_ConfigureAction">ضبط</sys:String>
     <sys:String x:Key="LOC_QS_SearchOnAction">البحث في {0}</sys:String>
     <sys:String x:Key="LOC_QS_OpenClient"></sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
-	<sys:String x:Key="LOC_QS_CommonTab">شائعة</sys:String>
+	<sys:String x:Key="LOC_QS_CommonTab">شائع</sys:String>
 	<sys:String x:Key="LOC_QS_AppearanceTab">المظهر</sys:String>
-    <sys:String x:Key="LOC_QS_ExternalTab">خارجي</sys:String>
+    <sys:String x:Key="LOC_QS_ExternalTab">خارج</sys:String>
     <sys:String x:Key="LOC_QS_ITADTab">IsThereAnyDeal</sys:String>
 
 	<!--Labels-->
@@ -33,24 +33,24 @@
     <sys:String x:Key="LOC_QS_LocalHotkeyShort">مفتاح البحث</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkey">المفتاح العام لفتح نافذة البحث:</sys:String>
     <sys:String x:Key="LOC_QS_GlobalHotkeyShort">المفتاح العام للبحث</sys:String>
-    <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">تفعيل مفتاح الاختصار العام</sys:String>
+    <sys:String x:Key="LOC_QS_GlobalHotkeyToggle">تفعيل مفتاح الاختصار العا</sys:String>
     <sys:String x:Key="LOC_QS_SearchThreshold"></sys:String>
     <sys:String x:Key="LOC_QS_SearchThresholdShort"></sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelay">مقدار الوقت بالمللي ثانية للانتظار قبل طلب عناصر الـ async:</sys:String>
     <sys:String x:Key="LOC_QS_AsyncDelayShort">تأخير عنصر Async (ms)</sys:String>
     <sys:String x:Key="LOC_QS_MaxResults">الحد الأقصى لعدد النتائج (0 = بلا حدود):</sys:String>
     <sys:String x:Key="LOC_QS_ExpandAllItems">توسيع جميع العناصر</sys:String>
-    <sys:String x:Key="LOC_QS_ShowSeparator">إظهار الفاصل</sys:String>
+    <sys:String x:Key="LOC_QS_ShowSeparator">إظهار الفاص</sys:String>
     <sys:String x:Key="LOC_QS_LowerPriorityAdding"></sys:String>
-    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">إضافة عناصر ذات أولوية أقل</sys:String>
-    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">الفرز حسب حالة التثبيت قبل الاسم إذا كانت النتيجة متساوية</sys:String>
-    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">أولوية حالة التثبيت للترتيب</sys:String>
-    <sys:String x:Key="LOC_QS_FilterSubItems">تمكين تصفية مصادر العناصر الفرعية</sys:String>
-    <sys:String x:Key="LOC_QS_PreferCoverArt">تفضيل غلاف الفن على أيقونة الألعاب</sys:String>
+    <sys:String x:Key="LOC_QS_LowerPriorityAddingShort">إضافة عناصر ذات أولوية أق</sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatus">الفرز حسب حالة التثبيت قبل الاسم إذا كانت النتيجة متساوي</sys:String>
+    <sys:String x:Key="LOC_QS_PrioritizeInstallationStatusShort">أولوية حالة التثبيت للترتي</sys:String>
+    <sys:String x:Key="LOC_QS_FilterSubItems">تمكين تصفية مصادر العناصر الفرعي</sys:String>
+    <sys:String x:Key="LOC_QS_PreferCoverArt">تفضيل غلاف الفن على أيقونة الألعا</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffect">تمكين تأثير الزجاج الشفاف على نافذة البحث</sys:String>
     <sys:String x:Key="LOC_QS_GlassEffectShort">تأثير الزجاج</sys:String>
     <sys:String x:Key="LOC_QS_BorderWidth">عرض الحدود الخارجية لنافذة البحث:</sys:String>
-    <sys:String x:Key="LOC_QS_BorderWidthShort">عرض الحدود الخارجية</sys:String>
+    <sys:String x:Key="LOC_QS_BorderWidthShort">عرض الحدود الخارجي</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalItems">تمكين العناصر المضافة بواسطة إضافات أخرى.</sys:String>
     <sys:String x:Key="LOC_QS_AllowExternalGameActions">تمكين إجراءات اللعبة المضافة بواسطة إضافات أخرى.</sys:String>
     <sys:String x:Key="LOC_QS_PerExtensionSettings">تمكين العناصر وإجراءات اللعبة لكل إضافة:</sys:String>
@@ -63,44 +63,46 @@
     <sys:String x:Key="LOC_QS_OverrideSuffix"></sys:String>
     <sys:String x:Key="LOC_QS_EnabledITADShops">تمكين المتاجر المتاحة للبحث في:</sys:String>
     <sys:String x:Key="LOC_QS_Shop">متجر</sys:String>
-    <sys:String x:Key="LOC_QS_Enabled">مفعّل</sys:String>
+    <sys:String x:Key="LOC_QS_Enabled">مفعّ</sys:String>
     <sys:String x:Key="LOC_QS_Settings">الاعدادات</sys:String>
     <sys:String x:Key="LOC_QS_OpenSettings">فتح الإعدادات لـ {0}</sys:String>
-    <sys:String x:Key="LOC_QS_Library">المكتبة</sys:String>
-    <sys:String x:Key="LOC_QS_Platform">المنصة</sys:String>
+    <sys:String x:Key="LOC_QS_Library">المكتب</sys:String>
+    <sys:String x:Key="LOC_QS_Platform">المنص</sys:String>
     <sys:String x:Key="LOC_QS_Genre">النوع</sys:String>
-    <sys:String x:Key="LOC_QS_Category">الفئة</sys:String>
-    <sys:String x:Key="LOC_QS_Company">الشركة</sys:String>
+    <sys:String x:Key="LOC_QS_Category">الفئ</sys:String>
+    <sys:String x:Key="LOC_QS_Company">الشرك</sys:String>
     <sys:String x:Key="LOC_QS_InstallationStatus">حالة التثبيت</sys:String>
     <sys:String x:Key="LOC_QS_Installed">مثبت</sys:String>
     <sys:String x:Key="LOC_QS_Uninstalled">غير مثبت</sys:String>
     <sys:String x:Key="LOC_QS_XFilter">{0} فلتر</sys:String>
-    <sys:String x:Key="LOC_QS_EnableDetailsView">تفعيل عرض التفاصيل</sys:String>
+    <sys:String x:Key="LOC_QS_EnableDetailsView">تفعيل عرض التفاصي</sys:String>
     <sys:String x:Key="LOC_QS_SearchWindowWidth">عرض نافذة البحث</sys:String>
-    <sys:String x:Key="LOC_QS_DetailsMaxWidth">أقصى عرض للوحة التفاصيل</sys:String>
+    <sys:String x:Key="LOC_QS_DetailsMaxWidth">أقصى عرض للوحة التفاصي</sys:String>
     <sys:String x:Key="LOC_QS_AddonBrowserPrefix">تصفح الإضافات</sys:String>
     <sys:String x:Key="LOC_QS_AddonByDev">{0} من {1}</sys:String>
-    <sys:String x:Key="LOC_QS_GenericExtension">الإضافة</sys:String>
-    <sys:String x:Key="LOC_QS_LibraryIntegration">المكتبة</sys:String>
-    <sys:String x:Key="LOC_QS_DesktopTheme">سمة سطح المكتب</sys:String>
-    <sys:String x:Key="LOC_QS_FullscreenTheme">سِمة ملء الشاشة</sys:String>
-    <sys:String x:Key="LOC_QS_MetadataProvider">موفر بيانات التعريف</sys:String>
-    <sys:String x:Key="LOC_QS_Disabled">معطل</sys:String>
-    <sys:String x:Key="LOC_QS_UserData">بيانات المستخدم</sys:String>
+    <sys:String x:Key="LOC_QS_GenericExtension">الإضاف</sys:String>
+    <sys:String x:Key="LOC_QS_LibraryIntegration">المكتب</sys:String>
+    <sys:String x:Key="LOC_QS_DesktopTheme">سمة سطح المكت</sys:String>
+    <sys:String x:Key="LOC_QS_FullscreenTheme">سِمة ملء الشاش</sys:String>
+    <sys:String x:Key="LOC_QS_MetadataProvider">موفر بيانات التعري</sys:String>
+    <sys:String x:Key="LOC_QS_Disabled">معط</sys:String>
+    <sys:String x:Key="LOC_QS_UserData">بيانات المستخد</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">التثبيت</sys:String>
     <sys:String x:Key="LOC_QS_Changelog">سِجل التغييرات</sys:String>
-    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">تجاهل الألعاب المخفية</sys:String>
+    <sys:String x:Key="LOC_QS_IgnoreHiddenGames">تجاهل الألعاب المخفي</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength"></sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
     <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
     <sys:String x:Key="LOC_QS_DownloadStats">مجموع التنزيلات: {0}، الأحدث: {1}</sys:String>
-    <sys:String x:Key="LOC_QS_EnableTagCreation">إنشاء وسوم [QS] عند التشغيل</sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation">إنشاء وسوم [QS] عند التشغي</sys:String>
     <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
     <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
     <sys:String x:Key="LOC_QS_PlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>

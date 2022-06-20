@@ -101,6 +101,8 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>

@@ -88,7 +88,7 @@
     <sys:String x:Key="LOC_QS_Disabled">Disattivata</sys:String>
     <sys:String x:Key="LOC_QS_UserData">Dati utente</sys:String>
     <sys:String x:Key="LOC_QS_InstallationData">Installazione</sys:String>
-    <sys:String x:Key="LOC_QS_Changelog">Novità</sys:String>
+    <sys:String x:Key="LOC_QS_Changelog">Novit</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">Ignora i giochi nascosti</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength">Lunghezza minima degli acronimi ricercabili (ad es. Final Fantasy VII -&gt; FFVII, Resident Evil 7 -&gt; RE7)</sys:String>
     <sys:String x:Key="LOC_QS_SwapGameActions">Scambiare l'azione di riproduzione e l'azione di visualizzazione</sys:String>
@@ -101,6 +101,8 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
     <!--Tool Tips-->
     <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
