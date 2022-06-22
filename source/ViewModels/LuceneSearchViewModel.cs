@@ -207,7 +207,7 @@ namespace QuickSearch.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     IsLoadingResults = true;
-                });
+                }, DispatcherPriority.Send);
 
                 var items = StartIndexUpdate(itemSources, isSubSource);
 
@@ -259,7 +259,7 @@ namespace QuickSearch.ViewModels
                     Application.Current?.Dispatcher?.Invoke(() =>
                     {
                         IsLoadingResults = false;
-                    });
+                    }, DispatcherPriority.Send);
                 })
             );
             backgroundTask = backgroundTask.ContinueWith(t =>
@@ -332,7 +332,7 @@ namespace QuickSearch.ViewModels
             {
                 var searchSw = Stopwatch.StartNew();
                 t.Dispose();
-                Application.Current.Dispatcher.Invoke(() => { IsLoadingResults = true; });
+                Application.Current.Dispatcher.Invoke(() => { IsLoadingResults = true; }, DispatcherPriority.Send);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -694,7 +694,7 @@ namespace QuickSearch.ViewModels
                 {
                     IsLoadingResults = false;
                     oldSource.Dispose();
-                });
+                }, DispatcherPriority.Send);
             });
         }
 
