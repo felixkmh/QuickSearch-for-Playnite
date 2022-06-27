@@ -145,8 +145,9 @@ namespace QuickSearch
                 var window = mainWindow;
                 var handle = mainWindowHandle;
                 source.AddHook(GlobalHotkeyCallback);
-                globalHotkeyRegistered = true;
-                return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
+                var success = HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
+                globalHotkeyRegistered = success;
+                return success;
             }
             return false;
         }
@@ -159,7 +160,7 @@ namespace QuickSearch
                 var handle = mainWindowHandle;
                 var success = HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
                 source.RemoveHook(GlobalHotkeyCallback);
-                globalHotkeyRegistered = false;
+                globalHotkeyRegistered = success ? success : globalHotkeyRegistered;
                 return success;
             }
             return false;
