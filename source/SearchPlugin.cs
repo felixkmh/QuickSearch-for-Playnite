@@ -140,7 +140,7 @@ namespace QuickSearch
 
         internal bool RegisterGlobalHotkey()
         {
-            if (!globalHotkeyRegistered)
+            if (!globalHotkeyRegistered && source != null)
             {
                 var window = mainWindow;
                 var handle = mainWindowHandle;
@@ -148,12 +148,12 @@ namespace QuickSearch
                 globalHotkeyRegistered = true;
                 return HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
             }
-            return true;
+            return false;
         }
 
         internal bool UnregisterGlobalHotkey()
         {
-            if (globalHotkeyRegistered)
+            if (globalHotkeyRegistered && source != null)
             {
                 var window = mainWindow;
                 var handle = mainWindowHandle;
@@ -162,7 +162,7 @@ namespace QuickSearch
                 globalHotkeyRegistered = false;
                 return success;
             }
-            return true;
+            return false;
         }
 
         private void OnSettingsChanged(SearchSettings newSettings, SearchSettings oldSettings)

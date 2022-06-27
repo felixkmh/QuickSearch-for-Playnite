@@ -91,13 +91,13 @@ namespace QuickSearch
                 if (timer == null)
                 {
                     timer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher);
-                    timer.Interval = TimeSpan.FromSeconds(0.3333);
+                    timer.Interval = TimeSpan.FromSeconds(0.5);
                     timer.Tick += Timer_Tick;
                 }
                 timer.Stop();
-                DetailsPopup.PopupAnimation = PopupAnimation.None;
                 if (DetailsPopup.IsOpen)
                 {
+                    DetailsPopup.PopupAnimation = PopupAnimation.None;
                     DetailsPopup.IsOpen = false;
                 }
                 if (DetailsScrollViewer.Content != null)
@@ -109,10 +109,11 @@ namespace QuickSearch
             if (addedItems.Count > 0 && addedItems[0] is Models.Candidate candidate1)
             {
                 timer.Start();
-                if (ActionsListBox.Items.Count > 0)
+                //if (ActionsListBox.Items.Count > 0)
                 {
                     ActionsListBox.Dispatcher.BeginInvoke((Action<int>)SelectActionButton, DispatcherPriority.Normal, 0);
                 }
+                //scrollViewer?.ScrollToVerticalOffset(0);
                 SearchResults.ScrollIntoView(addedItems[0]);
                 previouslySelected = candidate1.Item;
             }
@@ -125,9 +126,9 @@ namespace QuickSearch
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            timer.Stop();
             if (SearchPlugin.Instance.Settings.EnableDetailsView)
             {
-                timer.Stop();
                 if (SearchResults.SelectedItem is Models.Candidate item)
                 {
                     if (IsVisible && item.Item.DetailsView is FrameworkElement view)
@@ -399,9 +400,11 @@ namespace QuickSearch
 
         private void SelectActionButton(int idx)
         {
-            ActionsListBox.SelectedIndex = idx;
-            //var containter = ActionsListBox.ItemContainerGenerator.ContainerFromIndex(idx);
-            ActionsListBox.ScrollIntoView(ActionsListBox.SelectedItem);
+            if (ActionsListBox.Items.Count > idx)
+            {
+                ActionsListBox.SelectedIndex = idx;
+                ActionsListBox.ScrollIntoView(ActionsListBox.SelectedItem);
+            }
         }
 
         private void ActionButton_MouseEnter(object sender, MouseEventArgs e)
