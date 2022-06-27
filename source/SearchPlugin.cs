@@ -142,12 +142,19 @@ namespace QuickSearch
         {
             if (!globalHotkeyRegistered && source != null)
             {
-                var window = mainWindow;
-                var handle = mainWindowHandle;
-                source.AddHook(GlobalHotkeyCallback);
-                var success = HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
-                globalHotkeyRegistered = success;
-                return success;
+                try
+                {
+                    var window = mainWindow;
+                    var handle = mainWindowHandle;
+                    source.AddHook(GlobalHotkeyCallback);
+                    var success = HotkeyHelper.RegisterHotKey(handle, HOTKEY_ID, Settings.SearchShortcutGlobal.Modifiers.ToVK(), (uint)KeyInterop.VirtualKeyFromKey(Settings.SearchShortcutGlobal.Key));
+                    globalHotkeyRegistered = success;
+                    return success;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex, "Failed to register global hotkey.");
+                }
             }
             return false;
         }
@@ -156,12 +163,19 @@ namespace QuickSearch
         {
             if (globalHotkeyRegistered && source != null)
             {
-                var window = mainWindow;
-                var handle = mainWindowHandle;
-                var success = HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
-                source.RemoveHook(GlobalHotkeyCallback);
-                globalHotkeyRegistered = success ? success : globalHotkeyRegistered;
-                return success;
+                try
+                {
+                    var window = mainWindow;
+                    var handle = mainWindowHandle;
+                    var success = HotkeyHelper.UnregisterHotKey(handle, HOTKEY_ID);
+                    source.RemoveHook(GlobalHotkeyCallback);
+                    globalHotkeyRegistered = success ? success : globalHotkeyRegistered;
+                    return success;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex, "Failed to unregister global hotkey.");
+                }
             }
             return false;
         }
