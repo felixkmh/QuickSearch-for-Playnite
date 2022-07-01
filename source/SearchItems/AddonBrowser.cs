@@ -72,7 +72,7 @@ namespace QuickSearch.SearchItems
                         var toAdd = DeserializeManifests(repoUpdate.NewPaths).ToList();
                         cachedItems.Value.InsertRangeSorted(toAdd, comparison);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //SearchPlugin.Instance.PlayniteApi.Dialogs
                         //    .ShowMessage($"{ex.Message}\n{ex.StackTrace}", "AddonDatabase-Update Errors");

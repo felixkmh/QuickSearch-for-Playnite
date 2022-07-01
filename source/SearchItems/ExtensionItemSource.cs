@@ -61,9 +61,11 @@ namespace QuickSearch.SearchItems
                     var config = deserializer.Deserialize<Dictionary<string, object>>(text);
                     if (config != null)
                     {
-                        string name = config["Name"] as string ?? plugin.GetType().Name;
-                        string icon = config["Icon"] as string;
-                        string addonId = config["Id"] as string;
+                        string name = config.TryGetValue("Name", out var nameObject) ? nameObject as string : plugin.GetType().Name;
+                        string icon = null;
+                        if (config.TryGetValue("Icon", out var iconObject)) icon = iconObject as string;
+                        if (config.TryGetValue("icon", out var iconObject2)) icon = iconObject2 as string;
+                        // string addonId = config["Id"] as string;
                         if (name is string && pluginsWithSettingsSet.Contains(plugin))
                         {
                             var item = CreatePluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
