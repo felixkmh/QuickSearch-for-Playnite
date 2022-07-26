@@ -101,16 +101,18 @@
     <sys:String x:Key="LOC_QS_OpenPlayniteLog">打开 Playnite 日志</sys:String>
     <sys:String x:Key="LOC_QS_ExtensionLog">扩展日志</sys:String>
     <sys:String x:Key="LOC_QS_OpenExtensionLog">打开扩展日志</sys:String>
-    <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
-    <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
+    <sys:String x:Key="LOC_QS_IncludeMainMenuItems">在搜索结果中包含扩展主菜单项目</sys:String>
+    <sys:String x:Key="LOC_QS_IncludePluginSettings">在搜索结果中包含扩展设置项目</sys:String>
     
     <!--Tool Tips-->
-    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip"></sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndexTooltip">若启用，游戏搜索索引将存储在磁盘上，并在下次 Playnite 启动时再次使用。否则，每次 Playnite 启动时都将重新创建该索引。</sys:String>
     <sys:String x:Key="LOC_QS_PreferCoverArtTooltip">若可用，使用游戏封面艺术而非游戏图标作为游戏结果的图</sys:String>
     <sys:String x:Key="LOC_QS_OverrideSuffixTooltip">将此字符串添加到搜索查询的最后，以强制使用有折扣吗搜索。留空则禁用手动覆盖</sys:String>
     <sys:String x:Key="LOC_QS_EnableDetailsViewTooltip">若启用且可用，则在短暂延迟后为所选结果显示更多细</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLengthTooltip">游戏名称缩写所需的最小字数。设为 0 可禁用缩写。缩写由每个词的首字母组合而成。数字，无论是罗马数字还是小数位，都应完全保留</sys:String>
-    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve"></sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemoryTooltip" xml:space="preserve">若启用，游戏的搜索索引将完全保存在内存中（搜索速度更快，内存占用更高）。 
+否则，该索引将存储在磁盘上，仅部分缓存于内存中（搜索速度更慢，内存占用更低）。
+更改此项需要重开 Playnite 才能生效。</sys:String>
     <!--Buttons-->
     <sys:String x:Key="LOC_QS_SetHotkeyButton">设置热键</sys:String>
     <sys:String x:Key="LOC_QS_SetHotkeyPromtpButton">现在按热键（+修饰键</sys:String>
