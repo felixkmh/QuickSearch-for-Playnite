@@ -19,7 +19,7 @@
     <sys:String x:Key="LOC_QS_SwitchAction">切换</sys:String>
     <sys:String x:Key="LOC_QS_ConfigureAction">配置</sys:String>
     <sys:String x:Key="LOC_QS_SearchOnAction">在 {0} 上搜索</sys:String>
-    <sys:String x:Key="LOC_QS_OpenClient"></sys:String>
+    <sys:String x:Key="LOC_QS_OpenClient">打开客户端 {0}</sys:String>
 
     <!--Settings-->
 	<!--Tabs-->
@@ -91,16 +91,16 @@
     <sys:String x:Key="LOC_QS_Changelog">更改日志</sys:String>
     <sys:String x:Key="LOC_QS_IgnoreHiddenGames">忽略隐藏游戏</sys:String>
     <sys:String x:Key="LOC_QS_MinAcronmLength">可搜索的最短缩写长度（例如：Final Fantasy VII-&gt;FFVII，Resident Evil 7-&gt;RE7</sys:String>
-    <sys:String x:Key="LOC_QS_SwapGameActions"></sys:String>
-    <sys:String x:Key="LOC_QS_UpdateLibraryX"></sys:String>
-    <sys:String x:Key="LOC_QS_DownloadStats"></sys:String>
-    <sys:String x:Key="LOC_QS_EnableTagCreation"></sys:String>
-    <sys:String x:Key="LOC_QS_KeepIndexInMemory"></sys:String>
-    <sys:String x:Key="LOC_QS_PersistantGameIndex"></sys:String>
-    <sys:String x:Key="LOC_QS_PlayniteLog"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenPlayniteLog"></sys:String>
-    <sys:String x:Key="LOC_QS_ExtensionLog"></sys:String>
-    <sys:String x:Key="LOC_QS_OpenExtensionLog"></sys:String>
+    <sys:String x:Key="LOC_QS_SwapGameActions">交换游玩指令和展示指令</sys:String>
+    <sys:String x:Key="LOC_QS_UpdateLibraryX">更新库 {0}</sys:String>
+    <sys:String x:Key="LOC_QS_DownloadStats">总下载：{0}，最近：{1}</sys:String>
+    <sys:String x:Key="LOC_QS_EnableTagCreation">在启动时创建 [QS] 标签</sys:String>
+    <sys:String x:Key="LOC_QS_KeepIndexInMemory">在内存中保存游戏索引</sys:String>
+    <sys:String x:Key="LOC_QS_PersistantGameIndex">使用持久性游戏索引</sys:String>
+    <sys:String x:Key="LOC_QS_PlayniteLog">Playnite 日志</sys:String>
+    <sys:String x:Key="LOC_QS_OpenPlayniteLog">打开 Playnite 日志</sys:String>
+    <sys:String x:Key="LOC_QS_ExtensionLog">扩展日志</sys:String>
+    <sys:String x:Key="LOC_QS_OpenExtensionLog">打开扩展日志</sys:String>
     <sys:String x:Key="LOC_QS_IncludeMainMenuItems"></sys:String>
     <sys:String x:Key="LOC_QS_IncludePluginSettings"></sys:String>
     
