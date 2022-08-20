@@ -151,6 +151,8 @@ namespace QuickSearch
 
         private ScrollViewer scrollViewer = null;
 
+        private Lazy<double> scrollbarWidth = new Lazy<double>(() => SystemParameters.VerticalScrollBarWidth);
+
         internal void UpdateListBox(int items, bool refresh = false)
         {
             if (refresh)
@@ -177,7 +179,7 @@ namespace QuickSearch
                 switch (scrollViewer.VerticalScrollBarVisibility)
                 {
                     case ScrollBarVisibility.Visible:
-                        margin.Right = -SystemParameters.VerticalScrollBarWidth;
+                        margin.Right = -scrollbarWidth.Value;
                         break;
                     case ScrollBarVisibility.Hidden:
                     case ScrollBarVisibility.Disabled:

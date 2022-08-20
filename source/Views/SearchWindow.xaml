@@ -96,7 +96,7 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-        <DropShadowEffect x:Key="DropShadow" BlurRadius="25" ShadowDepth="0" Color="Black" Opacity="0.95" RenderingBias="Quality"/>
+        <DropShadowEffect x:Key="DropShadow" BlurRadius="25" ShadowDepth="0" Color="Black" Opacity="0.95" RenderingBias="Performance"/>
     </UserControl.Resources>
     <Grid x:Name="BackgroundGrid">
         <Popup StaysOpen="True" 

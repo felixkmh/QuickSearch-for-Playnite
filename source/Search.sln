@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearch", "QuickSearch.csproj", "{4FDF1E89-5BC3-4C72-8FDA-0D580E7A5D5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK", "QuickSearchSDK\QuickSearchSDK.csproj", "{0425A0C6-C410-48FC-8218-6F7B124EECA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickSearchSDK.Attributes", "QuickSearchSDK.Attributes\QuickSearchSDK.Attributes.csproj", "{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{896BB5D7-35CD-4634-878D-11BEC89DB6A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +27,6 @@ Global
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}.Release|Any CPU.Build.0 = Release|Any CPU
-		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{896BB5D7-35CD-4634-878D-11BEC89DB6A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
