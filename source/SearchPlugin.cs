@@ -4,6 +4,7 @@ using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using PlayniteCommon.UI;
 using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
 using QuickSearch.ViewModels;
@@ -379,7 +380,7 @@ namespace QuickSearch
             // Library Commands
             try 
             {
-                var mainMenuBorder = Helper.UiHelper.FindVisualChildren<Border>(mainWindow, "PART_ElemMainMenu").FirstOrDefault();
+                var mainMenuBorder = UiHelper.FindVisualChildren<Border>(mainWindow, "PART_ElemMainMenu").FirstOrDefault();
                 if (mainMenuBorder != null)
                 {
                     if (mainMenuBorder.ContextMenu is ContextMenu mainMenu)
@@ -820,7 +821,7 @@ namespace QuickSearch
                 };
 
                 FrameworkElement mainWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Name == "WindowMain");
-                placementTarget = Helper.UiHelper.FindVisualChildren(mainWindow, "PART_ContentView").FirstOrDefault();
+                placementTarget = UiHelper.FindVisualChildren(mainWindow, "PART_ContentView").FirstOrDefault();
                 placementTarget = mainWindow;
                 var p = VisualTreeHelper.GetParent(Application.Current.MainWindow);
                 popup.Placement = PlacementMode.Center;
@@ -955,7 +956,7 @@ namespace QuickSearch
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
 
                 int radius = 80;
-                var sidebar = Helper.UiHelper.FindVisualChildren(placementTarget, "PART_Sidebar").FirstOrDefault();
+                var sidebar = UiHelper.FindVisualChildren(placementTarget, "PART_Sidebar").FirstOrDefault();
                 var backgroundMargin = new Thickness() { Left = radius + sidebar?.ActualWidth ?? 0 };
                 searchWindow.BackgroundBorder.Margin = backgroundMargin;
                 searchWindow.BackgroundBorder.Effect = new BlurEffect() { Radius = radius, RenderingBias = RenderingBias.Performance, KernelType = KernelType.Gaussian };

@@ -162,7 +162,6 @@
     <Compile Include="SearchPlugin.cs" />
     <Compile Include="Settings\AssemblyOptions.cs" />
     <Compile Include="Settings\SearchSettings.cs" />
-    <Compile Include="UiHelper.cs" />
     <Compile Include="ViewModels\LuceneSearchViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\TextFileViewModel.cs" />
@@ -238,6 +237,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\extern\PlayniteCommon\PlayniteCommon.csproj">
+      <Project>{426461dc-3089-4ec5-99a2-a55733ed33fe}</Project>
+      <Name>PlayniteCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="QuickSearchSDK.Attributes\QuickSearchSDK.Attributes.csproj">
       <Project>{D4892F70-05C7-4DE2-8E4A-36F3BD82D168}</Project>
       <Name>QuickSearchSDK.Attributes</Name>
