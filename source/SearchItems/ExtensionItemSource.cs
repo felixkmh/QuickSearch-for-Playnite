@@ -92,7 +92,7 @@ namespace QuickSearch.SearchItems
                 var mainMenuItems = plugin.GetMainMenuItems(new GetMainMenuItemsArgs()) ?? new List<MainMenuItem>();
                 foreach (var mainMenuItem in mainMenuItems)
                 {
-                    var path = mainMenuItem.MenuSection
+                    var path = (mainMenuItem.MenuSection ?? "")
                         .Replace("@", "")
                         .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                     var title = string.Join(" > ", path);
