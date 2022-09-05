@@ -55,70 +55,85 @@ namespace QuickSearch.SearchItems
                 var installDir = System.IO.Path.GetDirectoryName(plugin.GetType().Assembly.Location);
                 var extensionYaml = System.IO.Path.Combine(installDir, "extension.yaml");
                 Uri iconUri = null;
+                string name = null;
                 if (System.IO.File.Exists(extensionYaml))
                 {
-                    var text = System.IO.File.ReadAllText(extensionYaml);
-                    var config = deserializer.Deserialize<Dictionary<string, object>>(text);
-                    if (config != null)
+                    try
                     {
-                        string name = config.TryGetValue("Name", out var nameObject) ? nameObject as string : plugin.GetType().Name;
-                        string icon = null;
-                        if (config.TryGetValue("Icon", out var iconObject)) icon = iconObject as string;
-                        if (config.TryGetValue("icon", out var iconObject2)) icon = iconObject2 as string;
-                        // string addonId = config["Id"] as string;
-                        if (name is string && pluginsWithSettingsSet.Contains(plugin))
+                        var text = System.IO.File.ReadAllText(extensionYaml);
+                        var config = deserializer.Deserialize<Dictionary<string, object>>(text);
+                        if (config != null)
                         {
-                            var item = CreatePluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
-                            item.TopRight = config["Version"] as string;
-                            if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
+                            name = config.TryGetValue("Name", out var nameObject) ? nameObject as string : plugin.GetType().Name;
+                            string icon = null;
+                            if (config.TryGetValue("Icon", out var iconObject)) icon = iconObject as string;
+                            if (config.TryGetValue("icon", out var iconObject2)) icon = iconObject2 as string;
+                            // string addonId = config["Id"] as string;
+                            if (name is string && pluginsWithSettingsSet.Contains(plugin))
                             {
-                                iconUri = uri;
-                                item.Icon = uri;
+                                var item = CreatePluginSettings(name, plugin.GetSettings(false), plugin.OpenSettingsView);
+                                item.TopRight = config["Version"] as string;
+                                if (icon is string && Uri.TryCreate(System.IO.Path.Combine(installDir, icon), UriKind.RelativeOrAbsolute, out var uri))
+                                {
+                                    iconUri = uri;
+                                    item.Icon = uri;
+                                }
+                                item.Actions.Add(new CommandAction()
+                                {
+                                    Name = ResourceProvider.GetString("LOC_QS_UserData"),
+                                    Action = () => Process.Start(plugin.GetPluginUserDataPath())
+                                });
+                                item.Actions.Add(new CommandAction()
+                                {
+                                    Name = ResourceProvider.GetString("LOC_QS_InstallationData"),
+                                    Action = () => Process.Start(installDir)
+                                });
+                                pluginSettingsItems.Add(item);
                             }
-                            item.Actions.Add(new CommandAction()
-                            {
-                                Name = ResourceProvider.GetString("LOC_QS_UserData"),
-                                Action = () => Process.Start(plugin.GetPluginUserDataPath())
-                            });
-                            item.Actions.Add(new CommandAction()
-                            {
-                                Name = ResourceProvider.GetString("LOC_QS_InstallationData"),
-                                Action = () => Process.Start(installDir)
-                            });
-                            pluginSettingsItems.Add(item);
                         }
                     }
-                }
-                var mainMenuItems = plugin.GetMainMenuItems(new GetMainMenuItemsArgs()) ?? new List<MainMenuItem>();
-                foreach (var mainMenuItem in mainMenuItems)
-                {
-                    var path = (mainMenuItem.MenuSection ?? "")
-                        .Replace("@", "")
-                        .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                    var title = string.Join(" > ", path);
-                    var command = new CommandItem(
-                        name: mainMenuItem.Description,
-                        action: () => mainMenuItem.Action?.Invoke(new MainMenuItemActionArgs { SourceItem = mainMenuItem }),
-                        actionName: ResourceProvider.GetString("LOC_QS_RunAction"),
-                        description: title,
-                        iconPath: null
-                    );
-                    if (mainMenuItem.Icon?.Length > 0)
+                    catch (Exception ex)
                     {
-                        if (mainMenuItem.Icon.Length == 1)
+                        SearchPlugin.logger.Error(ex, $"Failed to add plugin search items for extension {name}");
+                    }   
+                }
+                try
+                {
+                    var mainMenuItems = plugin.GetMainMenuItems(new GetMainMenuItemsArgs()) ?? new List<MainMenuItem>();
+                    foreach (var mainMenuItem in mainMenuItems)
+                    {
+                        var path = (mainMenuItem.MenuSection ?? "")
+                            .Replace("@", "")
+                            .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                        var title = string.Join(" > ", path);
+                        var command = new CommandItem(
+                            name: mainMenuItem.Description,
+                            action: () => mainMenuItem.Action?.Invoke(new MainMenuItemActionArgs { SourceItem = mainMenuItem }),
+                            actionName: ResourceProvider.GetString("LOC_QS_RunAction"),
+                            description: title,
+                            iconPath: null
+                        );
+                        if (mainMenuItem.Icon?.Length > 0)
                         {
-                            command.IconChar = mainMenuItem.Icon[0];
+                            if (mainMenuItem.Icon.Length == 1)
+                            {
+                                command.IconChar = mainMenuItem.Icon[0];
+                            }
+                            else
+                            {
+                                command.Icon = new Uri(mainMenuItem.Icon);
+                            }
                         }
                         else
                         {
-                            command.Icon = new Uri(mainMenuItem.Icon);
+                            command.Icon = iconUri;
                         }
+                        mainMenuSearchItems.Add(command);
                     }
-                    else
-                    {
-                        command.Icon = iconUri;
-                    }
-                    mainMenuSearchItems.Add(command);
+                }
+                catch (Exception ex)
+                {
+                    SearchPlugin.logger.Error(ex, $"Failed to create menu search items for extension {name}.");
                 }
             }
         }
