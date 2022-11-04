@@ -308,15 +308,16 @@ namespace QuickSearch.SearchItems
             if (cachedItems.TryGetValue(guid, out ISearchItem<string> item))
             {
                 return item;
-            } else
+            } else if (SearchPlugin.Instance.PlayniteApi.Database.Games.Get(guid) is Game game)
             {
-                var gameItem = new GameSearchItem(SearchPlugin.Instance.PlayniteApi.Database.Games.Get(guid));
+                var gameItem = new GameSearchItem(game);
                 if (gameItem != null)
                 {
                     cachedItems[guid] = gameItem;
                 }
                 return gameItem;
             }
+            return null;
         }
 
         private static Mutex getItemsMutex = new Mutex();
@@ -954,8 +955,8 @@ namespace QuickSearch.SearchItems
                     Name = ResourceProvider.GetString("LOC_QS_ShowAction"),
                     Action = () => 
                     {
-                        SearchPlugin.Instance.PlayniteApi.MainView.SwitchToLibraryView();
                         SearchPlugin.Instance.PlayniteApi.MainView.SelectGame(game.Id);
+                        SearchPlugin.Instance.PlayniteApi.MainView.SwitchToLibraryView();
                     }
                 };
 

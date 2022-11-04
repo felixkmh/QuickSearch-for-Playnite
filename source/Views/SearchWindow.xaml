@@ -195,6 +195,8 @@
             <TextBox Text="{DynamicResource LOCSearchLabel}" 
                        Grid.Row="0" Background="Transparent"
                        TextAlignment="Left" 
+                        MaxHeight="50"
+                     BorderBrush="Transparent"
                        VerticalAlignment="Center" Padding="{Binding ElementName=SearchBox, Path=Padding}" Opacity="0.4" IsHitTestVisible="False">
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
@@ -248,7 +250,7 @@
                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
                      PreviewMouseWheel="ActionsListBox_PreviewMouseWheel"
                      SelectionChanged="ActionsListBox_SelectionChanged"
-                     Padding="2" Background="{x:Null}" MaxWidth="300"
+                     Padding="0" Background="{x:Null}" MaxWidth="300"
                      Visibility="Hidden"
                      BorderBrush="Transparent"
                      BorderThickness="0"
@@ -273,8 +275,9 @@
                                 Content="{Binding Name}"
                                 local:ButtonHelper.CommandParameter="{Binding ElementName=SearchResults, Path=SelectedItem.Item}"
                                 MouseEnter="ActionButton_MouseEnter"
-                                IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="1"
-                                Padding="6,0"
+                                IsSelected="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}, Path=IsSelected}" Margin="6,2,0,2"
+                                Padding="8,4"
+                                MaxHeight="40"
                                 Opacity="{Binding Converter={StaticResource OpacityBoolConverter}, RelativeSource={RelativeSource Mode=Self}, Path=IsSelected, Mode=OneWay}">
                         </controls:ActionButton>
                     </DataTemplate>
@@ -307,11 +310,10 @@
                      Visibility="Collapsed"
                      Background="Transparent"
                      BorderBrush="Transparent"
-                     BorderThickness="0"
-                     >
+                     BorderThickness="0">
                 <ListBox.Resources>
-                    <SolidColorBrush x:Key="GlyphBrush" Color="{DynamicResource GlyphColor}" Opacity="0.5"/>
-                    <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource HighlightGlyphColor}" Opacity="0.5"/>
+                    <!--<SolidColorBrush x:Key="GlyphBrush" Color="{DynamicResource GlyphColor}" Opacity="0.5"/>
+                    <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource HighlightGlyphColor}" Opacity="0.5"/>-->
                     <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
                     <CornerRadius x:Key="ControlCornerRadiusSmall">6</CornerRadius>
                 </ListBox.Resources>

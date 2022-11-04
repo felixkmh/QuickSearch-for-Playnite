@@ -4,6 +4,7 @@ using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using PlayniteCommon.Extensions;
 using PlayniteCommon.UI;
 using QuickSearch.SearchItems;
 using QuickSearch.SearchItems.Settings;
@@ -829,6 +830,10 @@ namespace QuickSearch
                 popup.PlacementTarget = placementTarget;
                 luceneSearchViewModel = new LuceneSearchViewModel(this);
                 searchWindow = new SearchWindow(this, luceneSearchViewModel) { DataContext = luceneSearchViewModel };
+                var glyphBrush = ResourceProvider.GetResource<Brush>("GlyphBrush");
+                searchWindow.SearchResults.Resources.Add("GlyphBrush", glyphBrush.Clone());
+                var hoverBrush = ResourceProvider.GetResource<Brush>("HoverBrush");
+                searchWindow.SearchResults.Resources.Add("HoverBrush", hoverBrush.Clone());
 
                 searchWindow.DetailsBorder.Width = Settings.DetailsViewMaxWidth;
                 searchWindow.WindowGrid.Width = Settings.SearchWindowWidth;

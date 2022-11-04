@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Windows.Documents;
 using QuickSearch.ViewModels;
 using System.Collections.Specialized;
+using PlayniteCommon;
 
 [assembly: InternalsVisibleTo("QuickSearch")]
 namespace QuickSearch
@@ -150,6 +151,7 @@ namespace QuickSearch
         }
 
         private ScrollViewer scrollViewer = null;
+        private ScrollBar scrollBar = null;
 
         private Lazy<double> scrollbarWidth = new Lazy<double>(() => SystemParameters.VerticalScrollBarWidth);
 
@@ -168,9 +170,12 @@ namespace QuickSearch
                 maxItems != null)
             {
                 var margin = SearchResults.Margin;
-                if (maxItems + 1 >= items && scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled)
+                if (maxItems + 1 >= items)
                 {
-                    scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    if (scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled)
+                    {
+                        scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    }
                 }
                 else if (scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
                 {
@@ -179,7 +184,7 @@ namespace QuickSearch
                 switch (scrollViewer.VerticalScrollBarVisibility)
                 {
                     case ScrollBarVisibility.Visible:
-                        margin.Right = -scrollbarWidth.Value;
+                        margin.Right = -(scrollBar?.Width ?? 0);
                         break;
                     case ScrollBarVisibility.Hidden:
                     case ScrollBarVisibility.Disabled:
@@ -206,6 +211,7 @@ namespace QuickSearch
             {
                 return;
             }
+            scrollBar = scrollBar ?? PlayniteCommon.UI.UiHelper.FindVisualChildren<ScrollBar>(scrollViewer, "PART_VerticalScrollBar").FirstOrDefault();
             if (SearchResults.Items.Count > 1)
             {
                 if (double.IsNaN(heightSelected) || double.IsNaN(heightNotSelected))
@@ -237,7 +243,7 @@ namespace QuickSearch
                     else
                     {
                         var margin = SearchResults.Margin;
-                        margin.Right = -SystemParameters.VerticalScrollBarWidth;
+                        margin.Right = -(scrollBar?.Width ?? 0);
                         SearchResults.Margin = margin;
                         scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
                     }
@@ -252,7 +258,7 @@ namespace QuickSearch
                 if (SearchResults.Items.Count > 0)
                 {
                     var margin = SearchResults.Margin;
-                    margin.Right = items > 5 ? -SystemParameters.VerticalScrollBarWidth : 0;
+                    margin.Right = -(scrollBar?.Width ?? 0);
                     SearchResults.Margin = margin;
                     //scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 }
