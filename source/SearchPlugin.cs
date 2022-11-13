@@ -956,7 +956,7 @@ namespace QuickSearch
                 searchWindow.DetailsBackgroundVisual.Background = brush;
                 searchWindow.DetailsBackgroundBorderFallback.Visibility = Visibility.Hidden;
                 RenderOptions.SetCachingHint(brush, CachingHint.Cache);
-                RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
+                //RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
                 ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
                 ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
 
