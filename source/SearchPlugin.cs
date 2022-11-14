@@ -955,10 +955,24 @@ namespace QuickSearch
                 searchWindow.BackgroundBorder.Background = brush;
                 searchWindow.DetailsBackgroundVisual.Background = brush;
                 searchWindow.DetailsBackgroundBorderFallback.Visibility = Visibility.Hidden;
-                RenderOptions.SetCachingHint(brush, CachingHint.Cache);
-                //RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
-                ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
-                ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
+                try
+                {
+                    RenderOptions.SetCachingHint(brush, CachingHint.Cache);
+                    RenderOptions.SetCachingHint(searchWindow.SearchResultsBackground, CachingHint.Cache);
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, "Failed to set caching hint for the QuickSearch background.");
+                }
+                try
+                {
+                    ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 0.5f;
+                    ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 0.5f;
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, "Failed to set opacity for the QuickSearch background.");
+                }
 
                 int radius = 80;
                 var sidebar = UiHelper.FindVisualChildren(placementTarget, "PART_Sidebar").FirstOrDefault();
