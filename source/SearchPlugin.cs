@@ -998,8 +998,15 @@ namespace QuickSearch
                 searchWindow.BackgroundBorder.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
                 searchWindow.DetailsBackgroundVisual.Background = Application.Current.TryFindResource("PopupBackgroundBrush") as Brush;
                 searchWindow.HeaderBorder.Background = new SolidColorBrush { Color = Colors.Black, Opacity = 0.25 };
-                ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
-                ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
+                try
+                {
+                    ((Brush)searchWindow.SearchResults.Resources["GlyphBrush"]).Opacity = 1f;
+                    ((Brush)searchWindow.SearchResults.Resources["HoverBrush"]).Opacity = 1f;
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, "Failed to set opacity for the QuickSearch background.");
+                }
                 searchWindow.BackgroundBorder.Effect = null;
                 var backgroundMargin = new Thickness();
                 searchWindow.BackgroundBorder.Margin = backgroundMargin;
