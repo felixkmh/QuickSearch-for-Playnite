@@ -31,7 +31,7 @@ namespace QuickSearch.SearchItems
 {
     using GameFilter = MultiFilter<Game>;
 
-    struct NameKey : ISearchKey<string>
+    sealed class NameKey : ISearchKey<string>
     {
         public NameKey(Game game)
         {
@@ -43,7 +43,7 @@ namespace QuickSearch.SearchItems
         public float Weight => 1f;
     }
 
-    struct AcronymKey : ISearchKey<string>
+    sealed class AcronymKey : ISearchKey<string>
     {
         public static readonly Regex romanNumerals = new Regex(@"^[MDCLXVI]+$");
         // https://mnaoumov.wordpress.com/2014/06/14/stripping-invalid-characters-from-utf-16-strings/
@@ -82,7 +82,7 @@ namespace QuickSearch.SearchItems
         public float Weight => 0.9998f;
     }
 
-    struct CleanNameKey : ISearchKey<string>
+    sealed class CleanNameKey : ISearchKey<string>
     {
         static public readonly Regex regex = new Regex(@"[\[\]\{}&.,:;^°_`´~!""§$%&/()=?<>#|'’]");
         static public readonly Regex spaceLike = new Regex(@"[-+]");
@@ -101,7 +101,7 @@ namespace QuickSearch.SearchItems
         public float Weight => 1f;
     }
 
-    struct RomKey : ISearchKey<string>
+    sealed class RomKey : ISearchKey<string>
     {
         public Game game;
         public string Key => game.Roms?.FirstOrDefault()?.Name;
@@ -109,7 +109,7 @@ namespace QuickSearch.SearchItems
         public float Weight => string.IsNullOrEmpty(game.Roms?.FirstOrDefault()?.Name) ? 0f : 1f;
     }
 
-    struct SourceKey : ISearchKey<string>
+    sealed class SourceKey : ISearchKey<string>
     {
         public Game game;
         public string Key => game.Source?.Name;
@@ -200,7 +200,7 @@ namespace QuickSearch.SearchItems
         }
     }
 
-    public class GameSearchSource : ISearchItemSource<string>
+    public sealed class GameSearchSource : ISearchItemSource<string>
     {
         public GameSearchSource()
         {
@@ -650,7 +650,7 @@ namespace QuickSearch.SearchItems
         }
     }
 
-    public class FavoritesSource : ISearchSubItemSource<string>
+    public sealed class FavoritesSource : ISearchSubItemSource<string>
     {
         private static Tuple<string, string> GetAssemblyName(string name)
         {
@@ -705,7 +705,7 @@ namespace QuickSearch.SearchItems
         }
     }
 
-    public class RecentlyPlayedSource : ISearchSubItemSource<string>
+    public sealed class RecentlyPlayedSource : ISearchSubItemSource<string>
     {
         private static Tuple<string, string> GetAssemblyName(string name)
         {
@@ -763,7 +763,7 @@ namespace QuickSearch.SearchItems
         }
     }
 
-    public class FilteredGameSource : ISearchSubItemSource<string>
+    public sealed class FilteredGameSource : ISearchSubItemSource<string>
     {
         private static Tuple<string, string> GetAssemblyName(string name)
         {
@@ -829,7 +829,7 @@ namespace QuickSearch.SearchItems
                 }
             }
             return SearchPlugin.Instance.PlayniteApi.Database.Games
-                .Where(g => filter.Eval(g))
+                .Where(filter.Eval)
                 .OrderBy(g => g.Name)
                 .Select(g =>
                 {
@@ -846,7 +846,7 @@ namespace QuickSearch.SearchItems
         }
     }
 
-    public class FilterItem : ISearchItem<string>
+    public sealed class FilterItem : ISearchItem<string>
     {
         public FilterItem(string name, string prefix, string kind, GameFilter filter, string seperator)
         {
@@ -901,7 +901,7 @@ namespace QuickSearch.SearchItems
         public FrameworkElement DetailsView => null;
     }
 
-    public class GameSearchItem : ISearchItem<string>
+    public sealed class GameSearchItem : ISearchItem<string>
     {
         public GameSearchItem()
         {

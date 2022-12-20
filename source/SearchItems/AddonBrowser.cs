@@ -239,7 +239,7 @@ namespace QuickSearch.SearchItems
         public System.Version Version { get; set; }
     }
 
-    public class AddonItem : ISearchItem<string>
+    public sealed class AddonItem : ISearchItem<string>
     {
         internal AddonManifestBase addon;
         internal static AddonDetailsView detailsView = null;

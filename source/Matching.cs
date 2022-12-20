@@ -22,8 +22,8 @@ namespace QuickSearch
 
         public static float GetCombinedScore(in string str1, in string str2)
         {
-            var pattern = str2.ToLower();
-            var input = str1.ToLower();
+            var pattern =  RemoveDiacritics(str2.ToLower());
+            var input = RemoveDiacritics(str1.ToLower());
             float matchingPairs = MatchingLetterPairs2(input, pattern, ScoreNormalization.Str1);
             var lcs = LongestCommonSubstringDP(input, pattern, ScoreNormalization.Str1);
             float matchingWords = MatchingWords(input, pattern, 0.666f, ScoreNormalization.Str1);
@@ -173,8 +173,8 @@ namespace QuickSearch
                 return 0f;
             }
 
-            var normalized1 = RemoveDiacritics(str1).ToLower();
-            var normalized2 = RemoveDiacritics(str2).ToLower();
+            var normalized1 = str1;
+            var normalized2 = str2;
 
             var pairs1 = GetWordLetterPairs2(normalized1);
             var pairs2 = GetWordLetterPairs2(normalized2);
@@ -281,8 +281,8 @@ namespace QuickSearch
                 return 0f;
             }
 
-            var words1 = WhiteSpaceLike.Split(RemoveDiacritics(str1).ToLower()).ToArray();
-            var words2 = WhiteSpaceLike.Split(RemoveDiacritics(str2).ToLower()).ToList();
+            var words1 = WhiteSpaceLike.Split(str1).ToArray();
+            var words2 = WhiteSpaceLike.Split(str2).ToList();
 
             var words1Count = words1.Count();
             var words2Count = words2.Count();
@@ -412,8 +412,8 @@ namespace QuickSearch
         // see https://www.programmingalgorithms.com/algorithm/longest-common-substring/
         public static LcsResult LongestCommonSubstringDP(in string str1, in string str2, ScoreNormalization normalization = ScoreNormalization.None)
         {
-            var a = RemoveDiacritics(str1.ToLower());
-            var b = RemoveDiacritics(str2.ToLower());
+            var a = str1;
+            var b = str2;
 
             bool swapped = a.Length < b.Length;
 
