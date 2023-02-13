@@ -263,14 +263,14 @@ namespace QuickSearch
             foreach (var c in normalizedString)
             {
                 var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark && unicodeCategory != UnicodeCategory.ModifierSymbol && unicodeCategory != UnicodeCategory.EnclosingMark)
                 {
                     stringBuilder.Append(c);
                 }
             }
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
-        }
+        }   
 
         public static readonly Regex WhiteSpaceLike = new Regex(@"[\s+-]+");
 
